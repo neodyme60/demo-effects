@@ -23,5 +23,6 @@
 extern void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
 extern void jumpingscroller_LTX_draw_effect(void);
 extern void jumpingscroller_LTX_free_effect(void);
+extern Uint8 jumpingscroller_LTX_is_filter(void);
 
 #endif

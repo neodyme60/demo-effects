@@ -22,6 +22,7 @@
 #include "SDL/SDL.h"
 
 #include "utils.h"
+#include "layers.h"
 #include "plasma.h"
 
 static SDL_Surface *_plasma_surface;
@@ -117,4 +118,9 @@ void plasma_LTX_draw_effect()
   
 void plasma_LTX_free_effect(void)
 {
+}
+
+Uint8 plasma_LTX_is_filter(void)
+{
+  return TDEC_NO_FILTER;
 }

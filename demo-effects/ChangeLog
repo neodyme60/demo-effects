@@ -1,3 +1,8 @@
+0.5 TDEC has been extended with a run-time pluggable multi-layered demo effects plugin system, which is able to show 
+a lot of effects, filters and transition plugins concurrently and can be used to create demo's. This is now part of 
+libTDEC. Plugins can be found in the PLUGINS directory. 
+Check out the new MULTILAYER demo to see the system in action.
+
 0.4 The WPCG libray was improved. An animation manager was added. Objects can now share models and animate independently from each other. Object instancing in libWPCG is now complete, every object can share the same model for both collision detection and animation. For every frame of an animated model a separate collision detection model is generated which is used accordingly in frustum culling and collision detection. 3D object picking is functioning again. The WP_Camera class was improved, so was WP_Math.
 The DEMON effect was extended and the DEMONS effect is new, it demonstrates libWPCG's latest features. The XHACKS directory was added which includes demo effect ports to X so they can be used by xscreensaver, only source for now. OPCODE now works when compiled with gcc >= 3.0
 The weapon.MD2 model was changed so its frame names now matches those of the demon MD2 model.

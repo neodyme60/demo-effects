@@ -18,6 +18,7 @@
 
 #include <math.h>
 #include "scroller.h"
+#include "layers.h"
 #include "sinescroller.h"
 
 #define _sine_ _sinescroller_
@@ -131,4 +132,9 @@ void sinescroller_LTX_free_effect(void)
 {
   SDL_FreeSurface(_sine_scroll_surface);
   TDEC_free_scroller(_sine_scroll_id);
+}
+
+Uint8 sinescroller_LTX_is_filter(void)
+{
+  return TDEC_NO_FILTER;
 }

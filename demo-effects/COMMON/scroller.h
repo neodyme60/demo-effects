@@ -23,6 +23,7 @@ extern char TDEC_add_scroller(char *_text, char *font, char *_characters,
 			       Uint8 character_width, Uint8 character_height);
 extern SDL_Rect* TDEC_get_font_char(Uint8 scroll_id);
 extern void TDEC_free_scroller(Uint8 scroll_id);
+extern void TDEC_free_all_scrollers(void);
 extern Uint8 TDEC_scroller_ready(Uint8 scroll_id);
 extern Uint8 TDEC_get_character_width(Uint8 scroll_id);
 extern Uint8 TDEC_get_character_height(Uint8 scroll_id);

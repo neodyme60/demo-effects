@@ -1,6 +1,10 @@
 This project will try to cover the basics of demo programming, by including all different kind of demo effects. Starting with the 
 retro ones and ending with the latest techniques. 
 
+TDEC does not only include effects but also harbours a run-time pluggable multi-layered demo effects plugin system, 
+which is able to show a lot of effects, filters and transition plugins concurrently and can thus be used to create 
+demo's.
+
 The Demo Effects Collection uses the great mikmod library for playing musical mods. 
 run configure --enable-mikmod=no if you don't want to use it. The Equalizer effect won't build in that case. 
 The use of mikmod is enabled by default

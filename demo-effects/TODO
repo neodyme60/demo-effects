@@ -1,5 +1,7 @@
-Adding the following effects:
+Adding more effect, filter and transition plugins for the new TDEC demo system. Extending the demo system with 3D and 
+music. In the future, effects should be scripted. Creating plugins for the 'older' effects of TDEC.
 
+Adding the following effect plugins:
 3D Metaballs
 Dots
 spectrum analyzer

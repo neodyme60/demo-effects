@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "utils.h"
+#include "layers.h"
 #include "fire.h"
 
 static SDL_Surface *_fire_surface;
@@ -181,4 +182,9 @@ void fire_LTX_draw_effect()
 void fire_LTX_free_effect()
 {
   free(_fire_fire);
+}
+
+Uint8 fire_LTX_is_filter(void)
+{
+  return TDEC_NO_FILTER;
 }

@@ -23,5 +23,6 @@
 extern void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
 extern void plasma_LTX_draw_effect(void);
 extern void plasma_LTX_free_effect(void);
+extern Uint8 plasma_LTX_is_filter(void);
 
 #endif

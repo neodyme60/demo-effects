@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "scroller.h"
+#include "layers.h"
 #include "jumpingscroller.h"
 
 #define _jump_ _jumpingscroller_
@@ -199,4 +200,9 @@ void jumpingscroller_LTX_free_effect(void)
 {
   free(_jump_letters);
   TDEC_free_scroller(_jump_scroll_id);
+}
+
+Uint8 jumpingscroller_LTX_is_filter(void)
+{
+  return TDEC_NO_FILTER;
 }

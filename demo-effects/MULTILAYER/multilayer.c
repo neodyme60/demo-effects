@@ -24,6 +24,13 @@
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
 
+static char plasma;
+static char fire;
+static char copper;
+static char stars;
+static char lens;
+static Uint8 change = 1;
+
 void quit( int code )
 {
   /*
@@ -75,50 +82,70 @@ void process_events( void )
 
 void restart_sine(void)
 {
-  printf("Restarting Sine Scroller\n");
-}
-
-void restart_jump(void)
-{
-  printf("Restarting Jumping Scroller\n");
+  if (change)
+    {
+      TDEC_disable_layer(plasma);
+      TDEC_disable_layer(fire);
+      TDEC_enable_layer(stars);
+      TDEC_enable_layer(copper);
+      change = 0;
+    }
+  else
+    {
+      TDEC_disable_layer(stars);
+      TDEC_disable_layer(copper);
+      TDEC_enable_layer(plasma);
+      TDEC_enable_layer(fire);
+      change = 1;
+    }
 }
 
 void init()
 {
   Uint32 i;
-  char *text = " tDeC TdEc ";
-  char *text2 = "The Demo Effects Collection ";
+  char *text = " TDEC Demo ";
+  char *text2 = "Run-Time Pluggable Multi Effects and Filter system ";
 
-  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 
-		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 4))
+  if ((plasma = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 
+		      TDEC_NO_RESTART_CALLBACK, 4)) == -1)
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",
-		      &restart_jump, TDEC_NO_FILTER, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
+  if (TDEC_add_effect(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",
+		      TDEC_NO_RESTART_CALLBACK, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100) == -1)
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", 
-		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, SCREEN_WIDTH, 60, 0, 0))
+  if ((fire = TDEC_add_effect(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", 
+		      TDEC_NO_RESTART_CALLBACK, SCREEN_WIDTH, 60, 0, 0)) == -1)
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",
-		      &restart_sine, TDEC_NO_FILTER, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
+  if (TDEC_add_effect(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",
+		      &restart_sine, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2) == -1)
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/STARFIELD/starfield",
-		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 500))
+  if ((stars = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/STARFIELD/starfield",
+		      TDEC_NO_RESTART_CALLBACK, 750)) == -1)
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0x80, "../PLUGINS/COPPERBARS/copperbars",
-		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 100))
+
+  if ((lens = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/LENS/lens",
+    TDEC_NO_RESTART_CALLBACK)) == -1)
     {
       exit(1);
     }
+
+  if ((copper = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0x80, "../PLUGINS/COPPERBARS/copperbars",
+		      TDEC_NO_RESTART_CALLBACK, 100)) == -1)
+    {
+      exit(1);
+    }
+
+  TDEC_disable_layer(stars);
+  TDEC_disable_layer(copper);
   
  /*disable events */
   
@@ -137,7 +164,7 @@ int main( int argc, char* argv[] )
 {
  if (argc > 1)
     {
-      printf("Multi layered run-time pluggable effects - W.P. van Paassen - 2003\n");
+      printf("Run-Time Pluggable Multi Effects and Filter system - W.P. van Paassen - 2003\n");
       return -1;
     }
 
@@ -147,7 +174,7 @@ int main( int argc, char* argv[] )
  TDEC_init_timer();
  TDEC_set_fps(60);
 
- SDL_WM_SetCaption("Multi layered run-time pluggable effects", "");
+ SDL_WM_SetCaption("Run-Time Pluggable Multi Effects and Filter system", "");
   
  init();
 
@@ -158,7 +185,7 @@ int main( int argc, char* argv[] )
      process_events();
      
      TDEC_draw_layers();
-     
+     TDEC_set_layer_alpha(copper, TDEC_get_layer_alpha(copper) + 1);
      TDEC_fps_ok();
    }
 }

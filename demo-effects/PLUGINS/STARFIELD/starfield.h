@@ -14,15 +14,15 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef SINE_SCROLLER_H
-#define SINE_SCROLLER_H
+#ifndef THREED_STARFIELD_H
+#define THREED_STARFIELD_H
 
 #include <stdarg.h>
 #include "SDL/SDL.h"
 
-extern void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
-extern void sinescroller_LTX_draw_effect(void);
-extern void sinescroller_LTX_free_effect(void);
-extern Uint8 sinescroller_LTX_is_filter(void);
+extern void starfield_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void starfield_LTX_draw_effect(void);
+extern void starfield_LTX_free_effect(void);
+extern Uint8 starfield_LTX_is_filter(void);
 
 #endif

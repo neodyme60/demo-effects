@@ -27,6 +27,7 @@ typedef struct
   void (*init)(SDL_Surface *s, void (*restart)(void), va_list parameters);
   void (*draw)(void);
   void (*free)(void);
+  Uint8 (*is_filter)(void);
   lt_dlhandle effect_module;
 } EFFECT;
 
@@ -36,6 +37,7 @@ typedef struct
   SDL_Rect r;
   Uint8 alpha;
   EFFECT *effect;
+  Uint8 visible;
 } LAYER;
 
 static LAYER* layers[NLAYERS];
@@ -43,7 +45,7 @@ static Uint8 nlayers = 0;
 
 void TDEC_free_layers(void)
 {
-  Uint32 i;
+  Uint8 i;
 
   for (i = 0; i < nlayers; ++i)
     {
@@ -65,15 +67,60 @@ SDL_Surface* TDEC_get_background_layer(void)
   return layers[TDEC_BACKGROUND_LAYER]->surface;
 }
 
-SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
-			    const char *module, void (*restart_callback)(void), Uint8 is_filter, ...)
+char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
+			    const char *module, void (*restart_callback)(void), ...)
 {
-  SDL_Surface *res = (SDL_Surface*)0;
+  char res = -1;
   va_list parameters;
   EFFECT *effect;
+  Uint8 is_filter;
 
   lt_dlinit();
 
+  /* dynamically load effects-plugin, attach it to a layer and init it */
+
+  effect = (EFFECT*)malloc(sizeof(EFFECT));
+
+  effect->effect_module = lt_dlopenext(module);
+  if (!effect->effect_module)
+    {
+      printf("error, unable to load effects plugin %s\n", module);
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
+  if (!effect->init)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->draw = (void(*)(void))lt_dlsym(effect->effect_module, "draw_effect");
+  if (!effect->draw)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->free = (void(*)(void))lt_dlsym(effect->effect_module, "free_effect");
+  if (!effect->free)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->is_filter = (Uint8(*)(void))lt_dlsym(effect->effect_module,"is_filter");
+  if (!effect->is_filter)
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  /* check if effects module is a filter by invoking its is_filter function and checking the result */
+
+  is_filter = (*effect->is_filter)();
+  
   if (nlayers + 1 <= NLAYERS && nlayers != 0)
     {
       LAYER *l = (LAYER*)malloc(sizeof(LAYER));
@@ -103,12 +150,14 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 	      SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
 	    }
 
+#ifdef DEBUG
 	  printf("Added layer %i\n", nlayers);
+#endif
 	  SDL_FreeSurface(s);
 	}
       else
 	{
-	  /* effect is a filter, for instance a blur or a lens, so use background as surface */
+	  /* effect is a filter, for instance a blur or a lens or a transition effect, so use background as surface */
 	  l->surface = TDEC_get_background_layer();
 	}
       
@@ -117,53 +166,19 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       l->r.y = ystart;
       l->r.w = width;
       l->r.h = height;
+      l->visible = 1;
       layers[nlayers] = l;
 
-      res = l->surface;
+      res = nlayers;
 
-      /* dynamically load effects-plugin, attach it to a layer and init it */
-
-      effect = (EFFECT*)malloc(sizeof(EFFECT));
       layers[nlayers++]->effect = effect;
 
-      effect->effect_module = lt_dlopenext(module);
-      if (!effect->effect_module)
-	{
-	  printf("error, unable to load effects plugin %s\n", module);
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
+      va_start(parameters, restart_callback);
 
-      effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
-      if (!effect->init)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
+      /*init effects plugin */
+      (*effect->init)(l->surface, restart_callback, parameters);
 
-      effect->draw = (void(*)(void))lt_dlsym(effect->effect_module, "draw_effect");
-      if (!effect->draw)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-
-      effect->free = (void(*)(void))lt_dlsym(effect->effect_module, "free_effect");
-      if (!effect->free)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-      
-      if (res)
-	{
-	  va_start(parameters, is_filter);
-
-	  /*init effects plugin */
-	  (*effect->init)(res, restart_callback, parameters);
-
-	  va_end(parameters);
-	}
+      va_end(parameters);
     }
   else if (nlayers == 0)
     {
@@ -175,7 +190,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       if (!screen)
 	{
 	  printf("error, video not set, call TDEC_set_video first please\n");
-	  res = (SDL_Surface*)0;
+	  return -1;
 	}
 
       /* screen is the display buffer and therefore the background */
@@ -187,56 +202,20 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       background->r.w = screen->w;
       background->r.h = screen->h;
       background->alpha = 0xFF;
-      res = background->surface;
+      background->visible = 1;
+      res = 0;
 
-      /* dynamically load effects-plugin, attach it to the background layer and init it */
-
-      effect = (EFFECT*)malloc(sizeof(EFFECT));
       background->effect = effect;
       layers[TDEC_BACKGROUND_LAYER] = background;
 
-      effect->effect_module = lt_dlopenext(module);
-      if (!effect->effect_module)
-	{
-	  printf("error, unable to load effects plugin %s\n", module);
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-
-      printf("Opened effects plugin %s\n",module);
-
-      effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
-      if (!effect->init)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-
-      effect->draw = (void(*)(void))lt_dlsym(effect->effect_module, "draw_effect");
-      if (!effect->draw)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-
-      effect->free = (void(*)(void))lt_dlsym(effect->effect_module, "free_effect");
-      if (!effect->free)  
-	{
-	  fprintf (stderr, "%s\n", lt_dlerror());
-	  res = (SDL_Surface*)0;
-	}
-
-      if (res)
-	{
-	  va_start(parameters, is_filter);
+      va_start(parameters, restart_callback);
 	  
-	  /*init effects plugin */
-	  (*effect->init)(res, restart_callback, parameters);
+      /*init effects plugin */
+      (*effect->init)(background->surface, restart_callback, parameters);
 
-	  va_end(parameters);
-
-	  nlayers = 1;
-	}
+      va_end(parameters);
+      
+      nlayers = 1;
     }
 
   return res;
@@ -246,11 +225,24 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 void TDEC_draw_layers(void)
 {
   Uint8 i;
-  for (i = 0; i < nlayers; ++i)
+
+  if (layers[0]->visible)
+    {
+      (layers[0]->effect->draw)();
+    }
+  else
+    {
+      TDEC_clear_layer(0);
+    }
+
+  for (i = 1; i < nlayers; ++i)
     {
       LAYER *l = layers[i];
-      (*l->effect->draw)();
-      SDL_BlitSurface(l->surface, 0, screen, &l->r);
+      if (l->visible)
+	{
+	  (*l->effect->draw)();
+	  SDL_BlitSurface(l->surface, 0, screen, &l->r);
+	}
     }
   SDL_Flip(screen);
 }
@@ -277,9 +269,10 @@ void TDEC_flatten_layers()
     }
 }
 
-void TDEC_clear_layer(SDL_Surface* surface)
+void TDEC_clear_layer(Uint8 id)
 {
-      SDL_FillRect(surface, 0, SDL_MapRGB(surface->format, 0, 0, 0));
+  SDL_Surface *s = layers[id]->surface;
+  SDL_FillRect(s, 0, SDL_MapRGB(s->format, 0, 0, 0));
 }
 
 void TDEC_remove_layer(void)
@@ -292,6 +285,31 @@ void TDEC_remove_layer(void)
       SDL_FreeSurface(layers[nlayers - 1]->surface);
       free(layers[nlayers - 1]);
       nlayers--;
+#ifdef DEBUG
       printf("Removed layer %i\n", nlayers);
+#endif
     }
 }
+
+void TDEC_enable_layer(Uint8 id)
+{
+  layers[id]->visible = 1;
+}
+
+void TDEC_disable_layer(Uint8 id)
+{
+  layers[id]->visible = 0;
+}
+
+void TDEC_set_layer_alpha(Uint8 id, Uint8 alpha)
+{
+  LAYER *l = layers[id];
+  l->alpha = alpha;
+  SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
+}
+
+Uint8 TDEC_get_layer_alpha(Uint8 id)
+{
+  return layers[id]->alpha;
+}
+
