@@ -14,16 +14,10 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-
+#include <cmath>
 #include "tdec.h"
 #include "WPCG.h"
-#include "GL/glut.h"
 
-//redefine width and height
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -199,7 +193,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   if (argc > 1) {
-    printf("3D collision and frustum culling demo - W.P. van Paassen - 2002\n");
+    cout << "3D collision and frustum culling demo - W.P. van Paassen - 2002" << endl;
     return -1;
   }
   

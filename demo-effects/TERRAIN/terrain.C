@@ -16,16 +16,10 @@
 
 /*note that the code has not been optimized*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "GL/glut.h"
-
+#include <cmath>
 #include "tdec.h"
 #include "WPCG.h"
 
-//redefine width and height
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -171,6 +165,7 @@ void draw_screen( void )
 
   state->disableDepthTest();
   state->disableCulling();
+  state->disableLighting();
         
   state->projection();
   glPushMatrix();
@@ -191,6 +186,7 @@ void draw_screen( void )
   state->enableDepthTest();
   state->enableCulling();
   state->disableBlending();
+  state->enableLighting();
 
   manager->updateAll();
 
@@ -265,7 +261,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   if (argc > 1) {
-    printf("Retro Terrain - W.P. van Paassen - 2002\n");
+    cout << "Retro Terrain - W.P. van Paassen - 2002" << endl;
     return -1;
   }
   

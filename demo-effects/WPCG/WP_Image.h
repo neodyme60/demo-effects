@@ -68,7 +68,11 @@ class WP_Image
    * @param y the row index of the to be placed pixel
    * @param p a WP_RGBA object representing the pixel and holding the pixels' RGBA values
    */
-  void setPixel(int x, int y, const WP_RGBA& p);
+  inline void setPixel(int x, int y, const WP_RGBA& p)
+    {
+      if (x >= 0 && x < columns && y >= 0 && y < rows)
+	pixels[y * columns + x] = p;
+    }
 
   /**
    * this function writes a pixel in the current image without checking the x and y ranges
@@ -76,7 +80,10 @@ class WP_Image
    * @param y the row index of the to be placed pixel
    * @param p a WP_RGBA object representing the pixel and holding the pixels' RGBA values
    */
-  void setFastPixel(int x, int y, const WP_RGBA& p);
+  inline void setFastPixel(int x, int y, const WP_RGBA& p)
+    {
+      pixels[y * columns + x] = p;
+    }
 
   /**
    * this functions gets a pixel from the image
@@ -84,7 +91,13 @@ class WP_Image
    * @param y the row index of the wanted pixel
    * @return a pointer to WP_RGBA object holding the pixels' RGBA values
    */
-  WP_RGBA* getPixel(int x, int y);
+  inline WP_RGBA* getPixel(int x, int y)
+    {
+      if (x >= 0 && x < columns && y >= 0 && y < rows)
+	return pixels + (y * columns + x);
+  
+      return (WP_RGBA*)0; //failure
+    }
 
   /**
    * this functions gets a pixel from the image without checking the ranges
@@ -92,8 +105,10 @@ class WP_Image
    * @param y the row index of the wanted pixel
    * @return a pointer to WP_RGBA object holding the pixels' RGBA values
    */
-  WP_RGBA* getFastPixel(int x, int y);
-
+  inline WP_RGBA* getFastPixel(int x, int y)
+    {
+      return pixels + (y * columns + x);
+    }
 
   /**
    * this function draws the image directly to the framebuffer using OpenGL, placing the lower left corner of the pixmap at the current raster position (rasterpos_x and rasterpos_y)
@@ -118,7 +133,10 @@ class WP_Image
    * @param height the height of the image's rectangle
    * @ return a boolean indicating the success or failure of this function
    */
-  void copy(int x, int y, int width, int height);
+  inline void copy(int x, int y, int width, int height)
+    {
+      glCopyPixels(x, y, width, height, GL_COLOR);
+    }
   
   /**
    * this function creates a texture from this image and sets it for the use in OpenGL
@@ -178,7 +196,11 @@ class WP_Image
    * @param extension the extension which is checked
    * @return a boolean indicating if the file has the extension
    */
-  bool hasValidExtension(const string &file, const string &extension);
+  inline bool hasValidExtension(const string &file, const string &extension)
+    {
+      int pos = file.find('.' + extension);
+      return pos != string::npos;
+    }
 
   /**
    * this function loads a bitmap (.bmp). Currently compressed/uncompressed 8 bit (indexed) and uncompressed 24 bit RGB bmp\n

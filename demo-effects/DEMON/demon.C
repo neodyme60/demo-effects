@@ -14,16 +14,10 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "GL/glut.h"
-
+#include <cmath>
 #include "tdec.h"
 #include "WPCG.h"
 
-//redefine width and height
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -100,6 +94,7 @@ void draw_screen( void )
 
   state->disableDepthTest();
   state->disableCulling();
+  state->disableLighting();
         
   state->projection();
   glPushMatrix();
@@ -119,6 +114,7 @@ void draw_screen( void )
       
   state->enableDepthTest();
   state->enableCulling();
+  state->enableLighting();
 
   manager->updateAll();
 
@@ -182,7 +178,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   if (argc > 1) {
-    printf("Retro Quake2 Model - W.P. van Paassen - 2002\n");
+    cout << "Retro Quake2 Model - W.P. van Paassen - 2002" << endl;
     return -1;
   }
   

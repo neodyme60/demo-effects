@@ -180,6 +180,7 @@ class WP_Light
       else
 	{
 	  glLightfv(GL_LIGHT0 + number, GL_POSITION, p->data);
+	  
 	  /*glBegin(GL_POLYGON);
 	    glVertex3f(p->data[0], p->data[1], p->data[2]);
 	    glVertex3f(p->data[0] + 1.0, p->data[1] + 1.0, p->data[2]);

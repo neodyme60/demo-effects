@@ -198,7 +198,7 @@ int main( int argc, char* argv[] )
   SDL_Rect srect2 = {0, 0, 1, CHARACTER_HEIGHT};
   SDL_Rect drect = {0, 0, 1, CHARACTER_HEIGHT}; 
   SDL_Rect srect = {2, 0, SCREEN_WIDTH + (CHARACTER_WIDTH * 2), CHARACTER_HEIGHT};
-  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, 112};
+  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, 120};
   
   if (argc > 1)
     {

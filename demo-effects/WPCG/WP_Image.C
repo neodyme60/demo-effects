@@ -84,30 +84,6 @@ WP_Image::~WP_Image()
   delete[] pixels;
 }
 
-void WP_Image::setPixel(int x, int y, const WP_RGBA& p)
-{
-  if (x >= 0 && x < columns && y >= 0 && y < rows)
-    pixels[y * columns + x] = p;
-}
-
-void WP_Image::setFastPixel(int x, int y, const WP_RGBA& p)
-{
-  pixels[y * columns + x] = p;
-}
-
-WP_RGBA* WP_Image::getPixel(int x, int y)
-{
-  if (x >= 0 && x < columns && y >= 0 && y < rows)
-    return pixels + (y * columns + x);
-  
-  return (WP_RGBA*)0; //failure
-}
-
-WP_RGBA* WP_Image::getFastPixel(int x, int y)
-{
-  return pixels + (y * columns + x);
-}
-
 void WP_Image::drawToFrameBuffer() const
 {
   if (rows == 0 || columns == 0)
@@ -137,11 +113,6 @@ bool WP_Image::readFromFrameBuffer(int x, int y, int width, int height)
   return true;
 }
 
-void WP_Image::copy(int x, int y, int width, int height)
-{
-  glCopyPixels(x, y, width, height, GL_COLOR);
-}
-
 bool WP_Image::loadImage(const string &file)
 {
   //check file extensions
@@ -159,12 +130,6 @@ bool WP_Image::loadImage(const string &file)
   
   //file format not supported 
   return false;
-}
-
-bool WP_Image::hasValidExtension(const string &file, const string &extension)
-{
-  int pos = file.find('.' + extension);
-  return pos != string::npos;
 }
 
 bool WP_Image::loadBMP(const string &file)
