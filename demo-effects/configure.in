@@ -62,6 +62,12 @@ echo "3D effects depending on OpenGL will not be build "
 echo "run configure --enable-opengl=yes to include OpenGL support"
 fi
 
+#file OPC_TreeCollider.cpp of OPCODE-1.2 is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
+#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+AC_MSG_CHECKING(checking gcc version)
+AM_CONDITIONAL(GCCVERSION3, gcc -dumpversion | grep 3. > /dev/null)
+AC_MSG_RESULT()
+
 AC_CHECK_LIB(m, abs, , [AC_MSG_ERROR([libm not found])],)
 
 dnl Checks for header files.

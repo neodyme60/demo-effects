@@ -4166,6 +4166,23 @@ echo "3D effects depending on OpenGL will not be build "
 echo "run configure --enable-opengl=yes to include OpenGL support"
 fi
 
+#file OPC_TreeCollider.cpp of OPCODE-1.2 is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
+#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+echo "$as_me:$LINENO: checking checking gcc version" >&5
+echo $ECHO_N "checking checking gcc version... $ECHO_C" >&6
+
+
+if gcc -dumpversion | grep 3. > /dev/null; then
+  GCCVERSION3_TRUE=
+  GCCVERSION3_FALSE='#'
+else
+  GCCVERSION3_TRUE='#'
+  GCCVERSION3_FALSE=
+fi
+
+echo "$as_me:$LINENO: result: " >&5
+echo "${ECHO_T}" >&6
+
 
 echo "$as_me:$LINENO: checking for abs in -lm" >&5
 echo $ECHO_N "checking for abs in -lm... $ECHO_C" >&6
@@ -4821,6 +4838,13 @@ echo "$as_me: error: conditional \"OPENGL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${GCCVERSION3_TRUE}" && test -z "${GCCVERSION3_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"GCCVERSION3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"GCCVERSION3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
@@ -5381,6 +5405,8 @@ s,@MIKMOD_FALSE@,$MIKMOD_FALSE,;t t
 s,@CPP@,$CPP,;t t
 s,@OPENGL_TRUE@,$OPENGL_TRUE,;t t
 s,@OPENGL_FALSE@,$OPENGL_FALSE,;t t
+s,@GCCVERSION3_TRUE@,$GCCVERSION3_TRUE,;t t
+s,@GCCVERSION3_FALSE@,$GCCVERSION3_FALSE,;t t
 CEOF
 
 _ACEOF

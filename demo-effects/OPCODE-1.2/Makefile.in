@@ -13,6 +13,9 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+#file OPC_TreeCollider.cpp is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
+#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -365,11 +368,12 @@ uninstall-am: uninstall-info-am
 	mostlyclean-generic tags uninstall uninstall-am \
 	uninstall-info-am
 
-OPC_TreeCollider.o:
-	source='OPC_TreeCollider.cpp' object='OPC_TreeCollider.o' libtool=no \
-	depfile='$(DEPDIR)/OPC_TreeCollider.Po' tmpdepfile='$(DEPDIR)/OPC_TreeCollider.TPo' \
-	$(CXXDEPMODE) $(depcomp) \
-	$(CXXCOMPILE) -O1 -c -o OPC_TreeCollider.o `test -f 'OPC_TreeCollider.cpp' || echo '$(srcdir)/'`OPC_TreeCollider.cpp
+
+@GCCVERSION3_TRUE@OPC_TreeCollider.o:
+@GCCVERSION3_TRUE@	source='OPC_TreeCollider.cpp' object='OPC_TreeCollider.o' libtool=no \
+@GCCVERSION3_TRUE@	depfile='$(DEPDIR)/OPC_TreeCollider.Po' tmpdepfile='$(DEPDIR)/OPC_TreeCollider.TPo' \
+@GCCVERSION3_TRUE@	$(CXXDEPMODE) $(depcomp) \
+@GCCVERSION3_TRUE@	$(CXXCOMPILE) -O1 -c -o OPC_TreeCollider.o `test -f 'OPC_TreeCollider.cpp' || echo '$(srcdir)/'`OPC_TreeCollider.cpp
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

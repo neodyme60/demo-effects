@@ -6,13 +6,12 @@ dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_RANLIB
-
-AC_EGREP(version 3,
-      [
-	`gcc -v`
-      ],[sane_cv_use_libjpeg="yes";
-      AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
-    ],)
+	
+#file OPC_TreeCollider.cpp is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
+#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+AC_MSG_CHECKING(checking gcc version)
+AM_CONDITIONAL(GCCVERSION3, gcc -dumpversion | grep 3. > /dev/null)
+AC_MSG_RESULT()
 
 dnl Checks for header files.
 AC_HEADER_STDC
