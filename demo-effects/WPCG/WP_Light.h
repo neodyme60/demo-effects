@@ -67,7 +67,10 @@ class WP_Light
       else
 	v = light.v;
 
-      color = light.color;
+      ambient_color = light.ambient_color;
+      diffuse_color = light.diffuse_color;
+      specular_color = light.specular_color;
+      emissive_color = light.emissive_color;
     }
   
   ~WP_Light()
@@ -101,7 +104,10 @@ class WP_Light
 	  delete v;
 	  v = light.v;
 	}
-      color = light.color;
+      ambient_color = light.ambient_color;
+      diffuse_color = light.diffuse_color;
+      specular_color = light.specular_color;
+      emissive_color = light.emissive_color;
       return *this;
     }
   
@@ -139,6 +145,33 @@ class WP_Light
 	}
       return 0;
     }
+
+  /**
+   * this function is used for drawing the light in OpenGL
+   */
+  void drawOpenGL()
+    {
+      glPushMatrix();
+      if (k == vector)
+	{
+	  glLightfv(GL_LIGHT0, GL_POSITION, v->data);
+	  /*glBegin(GL_POLYGON);
+	    glVertex3f(v->data[0], v->data[1], v->data[2]);
+	    glVertex3f(v->data[0] + 1.0, v->data[1] + 1.0, v->data[2]);
+	    glVertex3f(v->data[0] + 1.0, v->data[1], v->data[2]);
+	    glEnd();*/
+	}
+      else
+	{
+	  glLightfv(GL_LIGHT0, GL_POSITION, p->data);
+	  /*glBegin(GL_POLYGON);
+	    glVertex3f(p->data[0], p->data[1], p->data[2]);
+	    glVertex3f(p->data[0] + 1.0, p->data[1] + 1.0, p->data[2]);
+	    glVertex3f(p->data[0] + 1.0, p->data[1], p->data[2]);
+	    glEnd();*/
+	}
+      glPopMatrix();
+    } 
 
   /**
    * this function sets the position of the light as a point or a vector
@@ -182,8 +215,11 @@ class WP_Light
   /**
    * the color that this light emmits
    */
-  WP_Color color;
- 
+  WP_Color ambient_color;
+  WP_Color diffuse_color;
+  WP_Color specular_color;
+  WP_Color emissive_color;
+
  private:
 
   //an enumeration holding the representation of the position, being a point or a vector

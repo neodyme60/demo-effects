@@ -595,8 +595,11 @@ bool WP_Model_MD2::initModel()
 	      point *= internal_orientation;
 	      point *= internal_scale;
 	      endian->getTypedData(&x, p, sizeof(byte));
+
+	      WP_Vector3D normal(quake2_normals[x]);    
+	      normal *= internal_orientation;
 	  
-	      (frames + k)->vertices[j] = WP_Vertex(point, quake2_normals[x]);
+	      (frames + k)->vertices[j] = WP_Vertex(point, normal);
 	    }
 	}  
 
@@ -683,7 +686,7 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object)
   glPushMatrix();
   glMultMatrixf(matrix.data); 
   
-  glCullFace(GL_FRONT); 
+  glFrontFace(GL_CW); //FIXME 
 
   if (object->animate)
     {
@@ -711,7 +714,7 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object)
 
   WP_GLState::getInstance()->disableTexture2D();
   glPopMatrix();
-  glCullFace(GL_BACK);
+  glFrontFace(GL_CCW);
 }
 
 ////////////////////////// WP_MetaBall ////////////////////

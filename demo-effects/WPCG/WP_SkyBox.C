@@ -65,16 +65,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glBegin(GL_QUADS);
 
   glTexCoord2f(1.0, 1.0);
-  glVertex3f(-20.0, -20.0, -20.0);
+  glVertex3f(-1.0, -1.0, -1.0);
 
   glTexCoord2f(0.0, 1.0);
-  glVertex3f(20.0, -20.0, -20.0);
+  glVertex3f(1.0, -1.0, -1.0);
 
   glTexCoord2f(0.0, 0.0);
-  glVertex3f(20.0, 20.0, -20.0);
+  glVertex3f(1.0, 1.0, -1.0);
 
   glTexCoord2f(1.0, 0.0);
-  glVertex3f(-20.0, 20.0, -20.0);
+  glVertex3f(-1.0, 1.0, -1.0);
   
   glEnd();
 
@@ -85,16 +85,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glBegin(GL_QUADS);
 
   glTexCoord2f(1.0, 1.0);
-  glVertex3f(20.0, -20.0, -20.0);
+  glVertex3f(1.0, -1.0, -1.0);
 
   glTexCoord2f(0.0, 1.0);
-  glVertex3f(20.0, -20.0, 20.0);
+  glVertex3f(1.0, -1.0, 1.0);
 
   glTexCoord2f(0.0, 0.0);
-  glVertex3f(20.0, 20.0, 20.0);
+  glVertex3f(1.0, 1.0, 1.0);
 
   glTexCoord2f(1.0, 0.0);
-  glVertex3f(20.0, 20.0, -20.0);
+  glVertex3f(1.0, 1.0, -1.0);
 
   glEnd();
 
@@ -105,16 +105,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glBegin(GL_QUADS);
 
   glTexCoord2f(1.0, 1.0);
-  glVertex3f(20.0, -20.0, 20.0);
+  glVertex3f(1.0, -1.0, 1.0);
 
   glTexCoord2f(0.0, 1.0);
-  glVertex3f(-20.0, -20.0, 20.0);
+  glVertex3f(-1.0, -1.0, 1.0);
 
   glTexCoord2f(0.0, 0.0);
-  glVertex3f(-20.0, 20.0, 20.0);
+  glVertex3f(-1.0, 1.0, 1.0);
 
   glTexCoord2f(1.0, 0.0);
-  glVertex3f(20, 20.0, 20.0);
+  glVertex3f(1, 1.0, 1.0);
 
   glEnd();
 
@@ -125,16 +125,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glBegin(GL_QUADS);
 
   glTexCoord2f(1.0, 1.0);
-  glVertex3f(-20.0, -20.0, 20.0);
+  glVertex3f(-1.0, -1.0, 1.0);
 
   glTexCoord2f(0.0, 1.0);
-  glVertex3f(-20.0, -20.0, -20.0);
+  glVertex3f(-1.0, -1.0, -1.0);
 
   glTexCoord2f(0.0, 0.0);
-  glVertex3f(-20.0, 20.0, -20.0);
+  glVertex3f(-1.0, 1.0, -1.0);
 
   glTexCoord2f(1.0, 0.0);
-  glVertex3f(-20, 20.0, 20.0);
+  glVertex3f(-1, 1.0, 1.0);
 
   glEnd();
 
@@ -147,16 +147,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
       glBegin(GL_QUADS);
 
       glTexCoord2f(1.0, 1.0);
-      glVertex3f(20.0, 20.0, -20.0);
+      glVertex3f(1.0, 1.0, -1.0);
 
       glTexCoord2f(0.0, 1.0);
-      glVertex3f(20.0, 20.0, 20.0);
+      glVertex3f(1.0, 1.0, 1.0);
 
       glTexCoord2f(0.0, 0.0);
-      glVertex3f(-20.0, 20.0, 20.0);
+      glVertex3f(-1.0, 1.0, 1.0);
 
       glTexCoord2f(1.0, 0.0);
-      glVertex3f(-20, 20.0, -20.0);
+      glVertex3f(-1, 1.0, -1.0);
 
       glEnd();
     }
@@ -170,16 +170,16 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
       glBegin(GL_QUADS);
 
       glTexCoord2f(1.0, 1.0);
-      glVertex3f(-20.0, -20.0, -20.0);
+      glVertex3f(-1.0, -1.0, -1.0);
 
       glTexCoord2f(0.0, 1.0);
-      glVertex3f(-20.0, -20.0, 20.0);
+      glVertex3f(-1.0, -1.0, 1.0);
 
       glTexCoord2f(0.0, 0.0);
-      glVertex3f(20.0, -20.0, 20.0);
+      glVertex3f(1.0, -1.0, 1.0);
 
       glTexCoord2f(1.0, 0.0);
-      glVertex3f(20, -20.0, -20.0);
+      glVertex3f(1, -1.0, -1.0);
 
       glEnd();
     }

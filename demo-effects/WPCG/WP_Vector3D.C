@@ -187,6 +187,9 @@ scalar WP_Vector3D::normalize()
   data[1] /= l;
   data[2] /= l;
 
+  if (data[0] == 0.0 && data[1] == 0.0 && data[2] == 0.0)
+    data[0] = data[1] = data[2] = 1.0;
+
   return l;
 }
 

@@ -20,14 +20,17 @@
 void 
 WP_Triangle::drawOpenGL() const
 {	
+  glColor4f(1.0, 1.0, 1.0, 1.0);
   glNormal3fv(vertices[0]->normal.data);
   glTexCoord2fv(vertices[0]->texCoords);	
   glVertex3fv(vertices[0]->point.data);
   
+  glColor4f(1.0, 1.0, 1.0, 1.0);
   glNormal3fv(vertices[1]->normal.data);
   glTexCoord2fv(vertices[1]->texCoords);	
   glVertex3fv(vertices[1]->point.data);
   
+  glColor4f(1.0, 1.0, 1.0, 1.0);
   glNormal3fv(vertices[2]->normal.data);
   glTexCoord2fv(vertices[2]->texCoords);	
   glVertex3fv(vertices[2]->point.data);
@@ -93,6 +96,7 @@ WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *v
       for(i = 0, j =0; i < numberIndices; i++, j += 2)
 	{
 	  WP_Vertex v = verticesFrameA[indices[i]];
+	  glColor4f(1.0, 1.0, 1.0, 1.0);
 	  glNormal3fv(v.normal.data);
 	  glTexCoord2fv(texCoords + j);
 	  v.lerp3D(verticesFrameB + indices[i], interpolation);
@@ -106,6 +110,7 @@ WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *v
       for(i = 0, j = 0; i < numberIndices; i++, j += 2)
 	{
 	  const WP_Vertex *v = verticesFrameA + indices[i];
+	  glColor4f(1.0, 1.0, 1.0, 1.0);
 	  glNormal3fv(v->normal.data);
 	  glTexCoord2fv(texCoords + j);
 	  glVertex3fv(v->point.data);
@@ -135,6 +140,7 @@ WP_TriangleFan::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *ver
       for(i = 0, j = 0; i < numberIndices; i++, j += 2)
 	{
 	  WP_Vertex v = verticesFrameA[indices[i]];
+	  glColor4f(1.0, 1.0, 1.0, 1.0);
 	  glNormal3fv(v.normal.data);
 	  glTexCoord2fv(texCoords + j);
 	  v.lerp3D(verticesFrameB + indices[i], interpolation);
@@ -148,6 +154,7 @@ WP_TriangleFan::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *ver
       for(i = 0, j = 0; i < numberIndices; i++, j += 2)
 	{
 	  const WP_Vertex *v = verticesFrameA + indices[i];
+	  glColor4f(1.0, 1.0, 1.0, 1.0);
 	  glNormal3fv(v->normal.data);
 	  glTexCoord2fv(texCoords + j);
 	  glVertex3fv(v->point.data);

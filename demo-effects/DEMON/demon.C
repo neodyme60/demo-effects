@@ -128,9 +128,9 @@ void init()
 	
   WP_Light light;
   light.setPosition(0.0, 3.0, 0.0, 1.0);
-  light.color = WP_Color((float).75,(float).75,(float).75);
+  light.diffuse_color = WP_Color((float).75,(float).75,(float).75);
   glLightfv(GL_LIGHT0, GL_POSITION, light.getPointPosition()->data);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, light.color.components);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light.diffuse_color.components);
 
   state->enableLighti(0);
 
