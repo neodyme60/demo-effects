@@ -60,7 +60,7 @@ void handle_key_down( SDL_keysym* keysym )
       case SDLK_ESCAPE:
 	quit(1);
         break;
-      case SDLK_t:
+	/*      case SDLK_t:
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		
 	state->disableCulling();
 	break;
@@ -76,6 +76,7 @@ void handle_key_down( SDL_keysym* keysym )
       case SDLK_s:
 	cam->rotate(0, 350,0);
 	break;
+	*/
      default:
         break;
       }
@@ -116,7 +117,10 @@ void draw_screen( void )
     heading -= 360.0;
   
   box->drawSkyBox(cam->eye);
+
+  //  glShadeModel(GL_FLAT);
   terrain->drawTerrain();
+  //glShadeModel(GL_SMOOTH);
 
   //draw waterplane
 
@@ -177,8 +181,8 @@ void init()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
   WP_Light light;
-  light.setPosition(0.0,55.0,5.0,1.0);
-  light.color = WP_Color((float).2,(float).8,(float).6);
+  light.setPosition(0.0, 0.0, 0.0, 1.0);
+  light.color = WP_Color((float)0.2,(float)0.8,(float)0.3);
   glLightfv(GL_LIGHT0, GL_POSITION, light.getPointPosition()->data);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light.color.components);  
   state->enableLighti(0);
@@ -249,6 +253,7 @@ int main( int argc, char* argv[] )
   box = new WP_SkyBox("SKY3_FT.pcx", "SKY3_RT.pcx", "SKY3_BK.pcx", "SKY3_LF.pcx", "SKY3_UP.pcx", "SKY3_DN.pcx");
   terrain = new WP_Terrain(40, 40, 200, 1.5, 6);
   terrain->setMiddlePoint(WP_Point3D(0.0, 0.0,0.0));
+
   /* time based demo loop */
   while( 1 ) 
     {

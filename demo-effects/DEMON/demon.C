@@ -89,8 +89,8 @@ void draw_screen( void )
 	
   WP_DynamicObject *demon = manager->getDynamicObject();
   WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
-  demon->setNewRoll(heading); //FIXME the model's orientation should be changed in the MD2 file so the heading can be used instead of roll
-  weapon->setNewRoll(heading);
+  demon->setNewHeading(heading);
+  weapon->setNewHeading(heading);
   heading += 0.6;
 
   if (heading >= 360.0)
@@ -192,10 +192,10 @@ int main( int argc, char* argv[] )
   init();
 
   // add quake2 demon model  
-  manager->createDynamicObject(WP_Matrix3D(Y_ROTATION_MATRIX, 90.0) * WP_Matrix3D(X_ROTATION_MATRIX, -90.0), "Demon", "tris1.MD2",
+  manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2",
 WP_Vector3D(0.1,0.1,0.1)); 
   // add quake2 demon weapon model
-  manager->createDynamicObject(WP_Matrix3D(Y_ROTATION_MATRIX, 90.0) * WP_Matrix3D(X_ROTATION_MATRIX, -90.0), "Demon_Weapon", "weapon.MD2",
+  manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2",
 WP_Vector3D(0.1,0.1,0.1)); 
 
   /* time based demo loop */

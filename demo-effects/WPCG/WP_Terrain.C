@@ -21,20 +21,23 @@
 #include "WP_Math.h"
 #include "WP_Vertex.h"
 #include "WP_Quad.h"
+#include "WP_TextureManager.h"
 #include "WP_Terrain.h"
 
-WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar resolution, int scale): 
-  width(_width), height(_height), displayID(0), height_map(0)
+WP_Terrain::WP_Terrain(int width, int height, int number_iterations, scalar resolution, int scale): displayID(0)
 {
   //creates a random 3D terrain
 
-  height_map = new (WP_Vertex*)[height];
+  WP_Vertex **height_map = new (WP_Vertex*)[height];
   if (!height_map)
     {
       cerr << "Unable to allocate memory for height_map" << endl;
       exit(-1);
     }
-  for (int i = 0; i < height; i++)
+
+  int i;
+
+  for (i = 0; i < height; i++)
     {
       height_map[i] = new WP_Vertex[width];
       if (!height_map[i])
@@ -44,8 +47,10 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
 	}
     }
   
+  int k,l;
+
   //create heightmap
-  for (int i = 0; i < number_iterations; i++)
+  for (i = 0; i < number_iterations; i++)
     {
       //create hill
 
@@ -57,10 +62,10 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
       int radius_square = radius << 1;
 
       //FIXME optimize, cycles through all vertices
-
-      for (int k = 0; k < height; k++)
+      
+      for (k = 0; k < height; k++)
 	{
-	  for (int l = 0; l < width; l++)
+	  for (l = 0; l < width; l++)
 	    {
 	      //raise hill
 	      int x = center_x - l;
@@ -89,9 +94,9 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
   int min = INT_MAX;
   int max = 0;
 
-  for (int k = 0; k < height; k++)
+  for (k = 0; k < height; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 0; l < width; l++)
 	{
 	  if (height_map[k][l].point.data[1] > max)
 	    {
@@ -110,9 +115,9 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
       norm = 0.0001;
     }
 
-  for (int k = 0; k < height; k++)
+  for (k = 0; k < height; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 0; l < width; l++)
 	{
 	  height_map[k][l].point.data[1] = (height_map[k][l].point.data[1] - min) / norm;
 	}
@@ -120,9 +125,9 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
 
   //flatten terrain
   
-  for (int k = 0; k < height; k++)
+  for (k = 0; k < height; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 0; l < width; l++)
 	{
 	  height_map[k][l].point.data[1] *= height_map[k][l].point.data[1];
 	}
@@ -130,9 +135,9 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
 
   //finalize height map (by adding x and z values and scaling by spread and resolution
 
- for (int k = 0; k < height; k++)
+ for (k = 0; k < height; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 0; l < width; l++)
 	{
 	  height_map[k][l].point.data[0] = l * resolution;
 	  height_map[k][l].point.data[1] *= scale;
@@ -143,90 +148,124 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
   //create quad list for vertex normal calculation (for per vertex lighting)
   list<WP_Quad*> quads;
 
- for (int k = 0; k < height; k++)
+ for (k = 0; k < height - 1; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 0; l < width - 1; l++)
 	{
-	  if (k + 1 < height)
-	    {
-	      WP_Quad* quad = new WP_Quad();
-	      quad->vertices[0] = &height_map[k][l];
-	      quad->vertices[1] = &height_map[k + 1][l];
-	      quad->vertices[2] = &height_map[k][l + 1];
-	      quad->vertices[3] = &height_map[k + 1][l + 1];
-	      quads.push_back(quad);
-	    }
+	  WP_Quad* quad = new WP_Quad();
+	  quad->vertices[0] = &height_map[k][l];
+	  quad->vertices[1] = &height_map[k + 1][l];
+	  quad->vertices[2] = &height_map[k][l + 1];
+	  quad->vertices[3] = &height_map[k + 1][l + 1];
+	  quads.push_back(quad);
 	}
     }
 
  //compute quad normals
 
-  list<WP_Quad*>::const_iterator i = quads.begin();
-  while (i != quads.end())
+ list<WP_Quad*>::const_iterator q = quads.begin();
+ while (q != quads.end())
     {	
-      WP_Vector3D v1 = (*i)->vertices[1]->point - (*i)->vertices[3]->point;
-      WP_Vector3D v2 = (*i)->vertices[2]->point - (*i)->vertices[0]->point;
-      v1.crossProduct(v2);
-      v1.normalize();
-      (*i)->normal = v1;
-      i++;
+      WP_Vector3D v1 = (*q)->vertices[3]->point - (*q)->vertices[1]->point;
+      WP_Vector3D v2 = (*q)->vertices[2]->point - (*q)->vertices[0]->point;
+      if (!v1.crossProduct(v2))
+	{
+	  v1 = (*q)->vertices[3]->point - (*q)->vertices[2]->point;
+	  v2 = (*q)->vertices[2]->point - (*q)->vertices[1]->point;
+	  v1.crossProduct(v2);
+	  v1.normalize();
+	  (*q)->normal = v1;
+	}
+      else
+	{
+	  v1.normalize();
+	  (*q)->normal = v1;
+	}
+      q++;
     }
 
   //compute vertex normals
 
-  for (int k = 0; k < height; k++)
+ for (k = 1; k < height - 1; k++)
     {
-      for (int l = 0; l < width; l++)
+      for (l = 1; l < width - 1; l++)
 	{
-	  WP_Vector3D normal_sum;
-	  list<WP_Quad*>::const_iterator i = quads.begin();
+	  WP_Vector3D normal_sum(1.0, 1.0, 1.0);
+	  q = quads.begin();
 	  WP_Vertex* v = &height_map[k][l];
-	  while (i != quads.end())
+	  while (q != quads.end())
 	    {	
-	      if ((*i)->vertices[0] == v || (*i)->vertices[1] == v || (*i)->vertices[2] == v || (*i)->vertices[3] == v)
+	      if ((*q)->vertices[0] == v || (*q)->vertices[1] == v || (*q)->vertices[2] == v || (*q)->vertices[3] == v)
 	      {
-	        normal_sum += (*i)->normal;
+	        normal_sum += (*q)->normal;
 	      }
-	      i++;
+	      q++;
 	    }
 	  normal_sum.normalize();
 	  height_map[k][l].normal = normal_sum;
 	}
     }
-  
+
+  WP_TextureManager* tex_manager = WP_TextureManager::getInstance();
+  tex_manager->mipmapping = true;
+  GLuint ft_id = tex_manager->getTexture("terrain.pcx", this);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
+  glBindTexture(GL_TEXTURE_2D, ft_id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
+ 
   //create display list
 
   displayID = glGenLists(1);
   glNewList(displayID, GL_COMPILE);
   glPushMatrix();
+  WP_GLState::getInstance()->enableTexture2D(); 
 
+  int mod = 0;
   //send terrain to OpenGL
-  for (int k = 0; k < height; k++)
+  for (k = 1; k < height - 1; k++)
     {
       glBegin(GL_QUAD_STRIP);
-      for (int l = 0; l < width; l++)
+      for (l = 1; l < width - 1; l++)
 	{
-	  if (k + 1 < height)
+	  if (mod++ % 2)
 	    {
+	      glTexCoord2f(0.0, 0.0);
 	      glNormal3fv(height_map[k][l].normal.data);
 	      glVertex3fv(height_map[k][l].point.data);  
+	      glTexCoord2f(0.0, 1.0);
 	      glNormal3fv(height_map[k + 1][l].normal.data);
 	      glVertex3fv(height_map[k + 1][l].point.data);
-	    }
+	  }
+	  else
+	    {
+	      glTexCoord2f(1.0, 0.0);
+	      glNormal3fv(height_map[k][l].normal.data);
+	      glVertex3fv(height_map[k][l].point.data);  
+	      glTexCoord2f(1.0, 1.0);
+	      glNormal3fv(height_map[k + 1][l].normal.data);
+	      glVertex3fv(height_map[k + 1][l].point.data);
+	    }	      
 	}
       glEnd();
     }
  
+  WP_GLState::getInstance()->disableTexture2D(); 
   glPopMatrix();
   glEndList();
 
   //clear quads
-  i = quads.begin();
-  while (i != quads.end())
+  q = quads.begin();
+  while (q != quads.end())
     {	
-      delete (*i);
-      i++;
+      delete (*q);
+      q++;
     }
+
+  for (i = 0; i < height; i++)
+    {
+      delete[] height_map[i];
+    }
+  delete[] height_map;
 
   displacement_x = (width * resolution) / 2;
   displacement_y = (height * resolution) / 2;
@@ -234,15 +273,6 @@ WP_Terrain::WP_Terrain(int _width, int _height, int number_iterations, scalar re
 
 WP_Terrain::~WP_Terrain()
 {
-  if (height_map)
-    {
-      for (int i = 0; i < height; i++)
-	{
-	  delete[] height_map[i];
-	}
-      delete[] height_map;
-    }
-
   if (displayID != 0)
     {
       glDeleteLists(displayID, 1);

@@ -1,9 +1,11 @@
-0.0.9 Optimized BUMP2D effect. Added weapon to CyberDemon 2000 quake2 model.
+0.0.9 Optimized BUMP2D effect. Added weapon to CyberDemon 2000 quake2 model. Added new Terrain effect demo. Added and improved upon 
+WPCG classes (fixed bugs in WP_Terrain class. Removed WP_SkyDome class and added WP_SkyBox class, improved object handling of 
+WP_ObjectManager etc.)
 
 0.0.8 Added vertical scanline effect to SPIRALTWIST effect. Optimized SINEWAVE effect. Added C++ library libWPCG which adds many 
 classes for handling 2D/3D computer graphics. Added first completely 3D C++ effect called DEMON which displays a key frame animated 
 quake2 model. Added 2D bump map effect. Added some new functions to libTDEC. Changed the graphic for the WATER effect. It's using a 
-great TDEC logo by Jason now.
+great TDEC logo by Jason Liszkiewicz now.
 
 0.0.7 mikmod library is now optional and can be dis/enabled with configure --enable-mikmod=yes/no, default is yes. This means that the 
 Equalizer effect won't compile if mikmod is disabled. 

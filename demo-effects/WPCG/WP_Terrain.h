@@ -45,9 +45,9 @@ class WP_Vertex;
 class WP_Terrain
 {
 public:
-	WP_Terrain(): width(0), height(0), displayID(0), height_map(0){};
+	WP_Terrain(): displayID(0){};
 
-	WP_Terrain(int _width, int _height, int number_iterations, scalar resolution, int scale);
+	WP_Terrain(int width, int height, int number_iterations, scalar resolution, int scale);
 	
 	virtual ~WP_Terrain();
 
@@ -59,9 +59,7 @@ public:
 	  }
 
  protected:
-	int width, height;
 	GLuint displayID;
-	WP_Vertex** height_map;
 	scalar displacement_x, displacement_y;
 	
 	WP_Point3D middle;

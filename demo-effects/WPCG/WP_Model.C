@@ -49,6 +49,8 @@ bool WP_Model::init()
 
 bool WP_Model::finalizeAll()
 {
+  //FIXME computation of bounding sphere is broke! Create a bounding sphere for each animation frame
+
   try
     {
       /*      //set center and compute radius of sphere
