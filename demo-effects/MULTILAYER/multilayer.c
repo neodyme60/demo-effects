@@ -34,8 +34,6 @@ static char circle;
 static char fade;
 static char rectfill;
 
-static short alpha = 0xFF;
-
 static Uint8 change = 1;
 static Uint8 quit_it = 0;
 
@@ -88,6 +86,11 @@ void process_events( void )
 	  break;
 	}
     }
+}
+
+void fade_in_ready()
+{
+  TDEC_disable_layer(fade);
 }
 
 void restart_sine(void)
@@ -165,14 +168,14 @@ void init()
       exit(1);
     }
   
-  if ((fade = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, alpha, "../PLUGINS/FADE/fade",
-			      TDEC_NO_RESTART_CALLBACK)) == -1)
+  if ((fade = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/FADE/fade",
+			      &fade_in_ready, TDEC_FADE_IN, 15, 0, 0, 0)) == -1)
     {
       exit(1);
     }
 
   if ((rectfill = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/RECTFILL/rectfill",
-				    &quit_all, TDEC_INNER_OUTER_FILL, 8)) == -1)
+				    &quit_all, TDEC_INNER_OUTER_FILL, 8, 0, 0, 0)) == -1)
     {
       exit(1);
     }
@@ -221,33 +224,6 @@ int main( int argc, char* argv[] )
      if (quit_it)
        {
 	 TDEC_enable_layer(rectfill);
-#if 0
-	 TDEC_enable_layer(fade);
-	 if (alpha < 0xFF)
-	   {
-	     /* fade out */
-	     TDEC_set_layer_alpha(fade, alpha);
-	     alpha += FADE_FACTOR;
-	   }
-	 else
-	   {
-	     quit(0);
-	   }
-#endif
-       }
-     else
-       {
-	 if (alpha > 0)
-	   {
-	     /* fade in */
-	     TDEC_set_layer_alpha(fade, alpha);
-	     alpha -= FADE_FACTOR;
-	   }
-	 else
-	   {
-	     alpha = 0;
-	     TDEC_disable_layer(fade);
-	   }
        }
      
      TDEC_draw_layers();

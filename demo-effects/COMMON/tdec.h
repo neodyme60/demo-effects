@@ -10,6 +10,8 @@ extern "C" {
 
 #define TDEC_INNER_OUTER_FILL 1
 #define TDEC_OUTER_INNER_FILL 0
+#define TDEC_FADE_IN 1
+#define TDEC_FADE_OUT 0
 
 #include "fps.h"
 #include "video.h"

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2003 W.P. van Paassen - peter@paassen.tmfweb.nl, Christophe Conduche - cconduche@apm-online.fr
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -25,6 +25,9 @@ static Uint8 _rectfill_inner_to_outer;
 static SDL_Rect _rectfill_r;
 static Uint8 _rectfill_rate;
 static float _rectfill_ratio;
+static Uint8 _rectfill_color_r;
+static Uint8 _rectfill_color_g;
+static Uint8 _rectfill_color_b;
 
 void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
@@ -32,6 +35,9 @@ void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list par
   _rectfill_restart = restart;
   _rectfill_inner_to_outer = (Uint8)va_arg(parameters, int);
   _rectfill_rate = (Uint8)va_arg(parameters, int);
+  _rectfill_color_r = (Uint8)va_arg(parameters, int);
+  _rectfill_color_g = (Uint8)va_arg(parameters, int);
+  _rectfill_color_b = (Uint8)va_arg(parameters, int);
 
   if (_rectfill_rate % 2)
     {
@@ -71,7 +77,8 @@ void rectfill_LTX_draw_effect(void)
 	}
       else
 	{
-	  SDL_FillRect(_rectfill_surface, &_rectfill_r, SDL_MapRGBA(_rectfill_surface->format, 0, 0, 0, 0));
+	  SDL_FillRect(_rectfill_surface, &_rectfill_r, SDL_MapRGBA(_rectfill_surface->format,
+    _rectfill_color_r, _rectfill_color_g, _rectfill_color_b, 0));
 	  _rectfill_r.x -= _rectfill_rate;
 	  _rectfill_r.y -= _rectfill_rate * _rectfill_ratio;
 	  _rectfill_r.w += _rectfill_rate << 1;
@@ -91,7 +98,8 @@ void rectfill_LTX_draw_effect(void)
 	}
       else
 	{
-	  SDL_FillRect(_rectfill_surface, &_rectfill_r, SDL_MapRGBA(_rectfill_surface->format, 0, 0, 0,0));
+	  SDL_FillRect(_rectfill_surface, &_rectfill_r, SDL_MapRGBA(_rectfill_surface->format, 
+        _rectfill_color_r, _rectfill_color_g, _rectfill_color_b, 0));
 	  _rectfill_r.x += _rectfill_rate;
 	  _rectfill_r.y += _rectfill_rate * _rectfill_ratio;;
 	  _rectfill_r.w -= _rectfill_rate << 1;
