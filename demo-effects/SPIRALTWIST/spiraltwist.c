@@ -15,6 +15,7 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 /* 080802 Added vertical scanline effect. WP */
+/* 241202 Added moziaek transition effect at end WP */
 /*note that the code has not been optimized*/
 
 #include <stdio.h>
@@ -33,6 +34,8 @@ static Uint16 sin_global_index = 0;
 static SDL_Surface* image = 0;
 static SDL_Surface* flippedx_image = 0;
 static SDL_Surface* flippedy_image = 0;
+static Uint8 quiting = 0;
+static Uint16 blocksize = 2;
 
 typedef struct
 {
@@ -77,7 +80,7 @@ void handle_key_down( SDL_keysym* keysym )
     switch( keysym->sym )
       {
       case SDLK_ESCAPE:
-	quit(1);
+	quiting = 1;
         break;
       default:
         break;
@@ -177,8 +180,7 @@ SDL_FULLSCREEN*/))
   
   init();
   
-  TDEC_set_fps(25);
-
+  TDEC_set_fps(30);
 
   /* time based demo loop */
   while( 1 ) 
@@ -188,50 +190,63 @@ SDL_FULLSCREEN*/))
     
       process_events();
 
-      sin_index = sin_global_index;
-      
-      SDL_FillRect(screen, 0, 0);
-
-      if (e->effect)
+      if (!quiting)
 	{
-	  for (i = 0; i < image->w; ++i)
+	  sin_index = sin_global_index;
+	  
+	  SDL_FillRect(screen, 0, 0);
+	  
+	  if (e->effect)
 	    {
-	      if (aSin[sin_index] < 0)
-		TDEC_scale_copy_vscanline(flippedx_image, screen, i, -aSin[sin_index]);
-	      else
-		TDEC_scale_copy_vscanline(image, screen, i, aSin[sin_index]);
-
-	      sin_index += e->index_add;
-	      sin_index &= 511;
+	      for (i = 0; i < image->w; ++i)
+		{
+		  if (aSin[sin_index] < 0)
+		    TDEC_scale_copy_vscanline(flippedx_image, screen, i, -aSin[sin_index]);
+		  else
+		    TDEC_scale_copy_vscanline(image, screen, i, aSin[sin_index]);
+		  
+		  sin_index += e->index_add;
+		  sin_index &= 511;
+		}
+	    }
+	  else
+	    {
+	      for (i = 0; i < image->h; ++i)
+		{
+		  if (aSin[sin_index] < 0) 
+		    TDEC_scale_copy_hscanline(flippedy_image, screen, i, -aSin[sin_index]);
+		  else
+		    TDEC_scale_copy_hscanline(image, screen, i, aSin[sin_index]);
+		  
+		  sin_index += e->index_add;
+		  sin_index &= 511;
+		}
+	    }
+	  
+	  sin_global_index += 4;
+	  if (sin_global_index > 511)
+	    {
+	      sin_global_index = 0;
+	      EFFECTS.current_effect++;
+	      EFFECTS.current_effect %= MAX_EFFECTS;
+	      e = EFFECTS.sine_effects + EFFECTS.current_effect;
 	    }
 	}
       else
 	{
-	  for (i = 0; i < image->h; ++i)
-	    {
-	      if (aSin[sin_index] < 0) 
-		TDEC_scale_copy_hscanline(flippedy_image, screen, i, -aSin[sin_index]);
-	      else
-		TDEC_scale_copy_hscanline(image, screen, i, aSin[sin_index]);
-
-	      sin_index += e->index_add;
-	      sin_index &= 511;
-	    }
-	}
-
-      sin_global_index += 4;
-      if (sin_global_index > 511)
-	{
-	  sin_global_index = 0;
-	  EFFECTS.current_effect++;
-	  EFFECTS.current_effect %= MAX_EFFECTS;
-	  e = EFFECTS.sine_effects + EFFECTS.current_effect;
+	  TDEC_mozaiek_surface(screen, blocksize);
+	  blocksize <<= 1;
+	  if (blocksize > 256)
+	    quit(1);
 	}
       
       if (TDEC_fps_ok()) 
 	{
 	  SDL_Flip(screen);
 	}
+
+      if (quiting)
+	SDL_Delay(200);
     }
   
   return 0; /* never reached */

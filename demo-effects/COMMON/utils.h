@@ -27,6 +27,9 @@ Uint8 TDEC_fadeout( SDL_Surface* s, Uint8 rate);
 Uint8 TDEC_fadein( SDL_Surface* s, SDL_Palette* d, Uint8 rate );
 void TDEC_blacken_palette(SDL_Surface* s);
 
+/* mozaiek effect */
+void TDEC_mozaiek_surface( SDL_Surface* s, Uint16 blocksize);
+
 /* image scaling */
 void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
 void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
@@ -52,6 +55,7 @@ SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source);
 /* local functions */
 static Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate);
 static Uint8 TDEC_fadein_palette(SDL_Palette* source, SDL_Palette* dest, Uint8 rate);
+static void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width, Uint16 height, Uint16 size);
 
 /* variables */
 

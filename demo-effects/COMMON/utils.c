@@ -780,3 +780,48 @@ SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source)
 
   return s;
 }
+
+void TDEC_mozaiek_surface( SDL_Surface* s, Uint16 blocksize)
+{
+  if (blocksize > 1 && !(blocksize % 2)) 
+    TDEC_rquaddivide(s, 0, 0, s->w, s->h, blocksize);
+}
+
+void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width, Uint16 height, Uint16 size)
+{
+  if (width <= size || height <= size)
+    {
+      Uint16 i, j;
+      Uint32 tempx, tempy;
+      Uint32 tempmax = s->h * s->pitch ;
+      Uint8 color = *((Uint8*)s->pixels + starty * s->pitch + startx + (width >> 1) + (width >> 1) * s->pitch);
+      
+      SDL_LockSurface(s);
+      for (i = 0; i < width; ++i)
+	{
+	  tempx = startx + i;
+	  for (j = 0; j < height; ++j)
+	    {
+	      tempy = starty * s->pitch + j * s->pitch;
+	      if (tempx + tempy < tempmax)
+		*((Uint8*)s->pixels + tempx + tempy) = color;
+	      else
+		break;
+	    }
+	}
+      SDL_UnlockSurface(s);
+    }
+  else
+    {
+      if (width % 2)
+	width++;
+      width >>= 1;
+      if (height % 2)
+	height++;
+      height >>= 1;
+      TDEC_rquaddivide(s, startx, starty, width, height, size);    
+      TDEC_rquaddivide(s, startx + width, starty, width, height, size);
+      TDEC_rquaddivide(s, startx, starty + height, width, height, size);
+      TDEC_rquaddivide(s, startx + width, starty + height, width, height, size);
+    }
+}
