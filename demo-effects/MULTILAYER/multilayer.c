@@ -32,6 +32,7 @@ static char stars;
 static char lens;
 static char circle;
 static char fade;
+static char rectfill;
 
 static short alpha = 0xFF;
 
@@ -109,6 +110,11 @@ void restart_sine(void)
     }
 }
 
+void quit_all(void)
+{
+  quit(0);
+}
+
 void init()
 {
   Uint32 i;
@@ -165,8 +171,15 @@ void init()
       exit(1);
     }
 
+  if ((rectfill = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/RECTFILL/rectfill",
+				    &quit_all, TDEC_INNER_OUTER_FILL, 8)) == -1)
+    {
+      exit(1);
+    }
+
   TDEC_disable_layer(stars);
   TDEC_disable_layer(copper);
+  TDEC_disable_layer(rectfill);
   
  /*disable events */
   
@@ -207,6 +220,8 @@ int main( int argc, char* argv[] )
      
      if (quit_it)
        {
+	 TDEC_enable_layer(rectfill);
+#if 0
 	 TDEC_enable_layer(fade);
 	 if (alpha < 0xFF)
 	   {
@@ -218,6 +233,7 @@ int main( int argc, char* argv[] )
 	   {
 	     quit(0);
 	   }
+#endif
        }
      else
        {

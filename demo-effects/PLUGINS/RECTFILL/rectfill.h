@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -14,31 +14,15 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <math.h>
+#ifndef RECTFILL_H
+#define RECTFILL_H
 
-#include "layers.h"
-#include "utils.h"
-#include "fade.h"
+#include <stdarg.h>
+#include "SDL/SDL.h"
 
-static SDL_Surface *_fade_surface;
+extern void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void rectfill_LTX_draw_effect(void);
+extern void rectfill_LTX_free_effect(void);
+extern Uint8 rectfill_LTX_is_filter(void);
 
-void fade_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
-{
-   _fade_surface = s;
-
-   TDEC_set_layer_colorkey(TDEC_get_layer_id(_fade_surface), 0);
-   SDL_FillRect(_fade_surface, 0, SDL_MapRGBA(_fade_surface->format, 0, 0, 0, 0));
-}
-
-void fade_LTX_draw_effect(void)
-{
-}
-
-void fade_LTX_free_effect(void)
-{
-}
-
-Uint8 fade_LTX_is_filter(void)
-{
-  return TDEC_NO_FILTER;
-}
+#endif

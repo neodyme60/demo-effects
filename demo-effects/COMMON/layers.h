@@ -38,5 +38,7 @@ extern void TDEC_enable_layer(Uint8 id);
 extern void TDEC_disable_layer(Uint8 id);
 extern void TDEC_set_layer_alpha(Uint8 id, Uint8 alpha);
 extern Uint8 TDEC_get_layer_alpha(Uint8 id);
+extern void TDEC_set_layer_colorkey(Uint8 id, Uint8 on);
+extern char TDEC_get_layer_id(SDL_Surface *s);
 
 #endif

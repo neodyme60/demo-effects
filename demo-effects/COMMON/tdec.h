@@ -8,6 +8,9 @@ extern "C" {
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 
+#define TDEC_INNER_OUTER_FILL 1
+#define TDEC_OUTER_INNER_FILL 0
+
 #include "fps.h"
 #include "video.h"
 #include "utils.h"

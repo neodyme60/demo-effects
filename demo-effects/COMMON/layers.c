@@ -226,13 +226,13 @@ void TDEC_draw_layers(void)
 {
   Uint8 i;
 
-  if (layers[0]->visible)
+  if (layers[TDEC_BACKGROUND_LAYER]->visible)
     {
-      (layers[0]->effect->draw)();
+      (layers[TDEC_BACKGROUND_LAYER]->effect->draw)();
     }
   else
     {
-      TDEC_clear_layer(0);
+      TDEC_clear_layer(TDEC_BACKGROUND_LAYER);
     }
 
   for (i = 1; i < nlayers; ++i)
@@ -245,6 +245,31 @@ void TDEC_draw_layers(void)
 	}
     }
   SDL_Flip(screen);
+}
+
+void TDEC_set_layer_colorkey(Uint8 id, Uint8 on)
+{
+  if (on)
+    {
+      SDL_SetColorKey(layers[id]->surface, SDL_SRCCOLORKEY/* | SDL_RLEACCEL*/, SDL_MapRGBA(layers[id]->surface->format, 0, 0, 0, 0xFF)); 
+    }
+  else
+    {
+      SDL_SetColorKey(layers[id]->surface, 0, SDL_MapRGBA(layers[id]->surface->format, 0, 0, 0, 0xFF)); 
+    }
+}
+
+char TDEC_get_layer_id(SDL_Surface *s)
+{
+  Uint8 i;
+  for (i = 0; i < nlayers; ++i)
+    {
+      if (layers[i]->surface == s)
+	{
+	  return i;
+	}
+    }
+  return -1; /* no such surface in a layer */
 }
 
 SDL_Surface* TDEC_get_layer(Uint8 index)
