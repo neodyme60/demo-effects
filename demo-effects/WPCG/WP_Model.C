@@ -31,7 +31,6 @@
 
 WP_Model::~WP_Model()
 {
-  delete frames;
   delete scaling_matrix;
 
   WP_TextureManager::getInstance()->removeTextures(this);
@@ -86,42 +85,17 @@ bool WP_Model::finalizeAll()
     }
 }
 
-void WP_Model::drawOpenGL(const WP_Matrix3D& matrix) 
+////////////////////////////////// WP_AnimatedModel ////////////////////////////////////
+
+WP_AnimatedModel::~WP_AnimatedModel()
 {
-  glPushMatrix();
-  glMultMatrixf(matrix.data); 
-  
-  glCullFace(GL_FRONT); 
-
-  //animation
-  if (interpolate >= 1.0)
-    {
-      currentFrame++;
-      currentFrame %= numberFrames;
-      interpolate = 0.0;
-    }
-  interpolate += 0.1;  
-
-  list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
-  glBindTexture(GL_TEXTURE_2D, tex_id);
-  WP_GLState::getInstance()->enableTexture2D();
-
-  while (i != triangle_groups.end())
-    {
-      if (currentFrame == numberFrames - 1 || interpolate == 0.0)
-	(*i)->drawOpenGL((frames + currentFrame)->vertices, 0, interpolate);
-      else
-	(*i)->drawOpenGL((frames + currentFrame)->vertices, (frames + currentFrame + 1)->vertices, interpolate);
-      i++;
-    }
-
-  WP_GLState::getInstance()->disableTexture2D();
-  glPopMatrix();
-  glCullFace(GL_BACK);
+  delete frames;
 }
 
+
+
 WP_Point3D 
-WP_Model::WP_Frame::getMaxPoint() const
+WP_AnimatedModel::WP_Frame::getMaxPoint() const
 {
   WP_Point3D _max(MINFLOAT, MINFLOAT, MINFLOAT);
   /*  WP_Point3D p;
@@ -174,7 +148,7 @@ WP_Model::WP_Frame::getMaxPoint() const
 }
 
 WP_Point3D 
-WP_Model::WP_Frame::getMinPoint() const
+WP_AnimatedModel::WP_Frame::getMinPoint() const
 {
   WP_Point3D _min(MAXFLOAT, MAXFLOAT, MAXFLOAT);
   WP_Point3D p;
@@ -226,7 +200,7 @@ WP_Model::WP_Frame::getMinPoint() const
   return _min;
 }
 
-void WP_Model::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
+void WP_AnimatedModel::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
 {
   /* //set center and determine sphere radius
   
@@ -425,7 +399,7 @@ void WP_Model::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
       WP_Vector3D(-0.688191, -0.587785, -0.425325), 
     };
 
-WP_Model_MD2::WP_Model_MD2(const string& name, const WP_Vector3D& scaling): WP_Model(name, scaling){}
+WP_Model_MD2::WP_Model_MD2(const string& name, const WP_Vector3D& scaling): WP_AnimatedModel(name, scaling){}
 
 bool WP_Model_MD2::initModel()
 {
@@ -652,5 +626,55 @@ bool WP_Model_MD2::initModel()
     }
 }
 
+void 
+WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix) 
+{
+  glPushMatrix();
+  glMultMatrixf(matrix.data); 
+  
+  glCullFace(GL_FRONT); 
+
+  //animation
+  if (interpolate >= 1.0)
+    {
+      currentFrame++;
+      currentFrame %= numberFrames;
+      interpolate = 0.0;
+    }
+  interpolate += 0.1;  
+
+  list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
+  glBindTexture(GL_TEXTURE_2D, tex_id);
+  WP_GLState::getInstance()->enableTexture2D();
+
+  while (i != triangle_groups.end())
+    {
+      if (currentFrame == numberFrames - 1 || interpolate == 0.0)
+	(*i)->drawOpenGL((frames + currentFrame)->vertices, 0, interpolate);
+      else
+	(*i)->drawOpenGL((frames + currentFrame)->vertices, (frames + currentFrame + 1)->vertices, interpolate);
+      i++;
+    }
+
+  WP_GLState::getInstance()->disableTexture2D();
+  glPopMatrix();
+  glCullFace(GL_BACK);
+}
 
 
+////////////////////////// WP_MetaBall ////////////////////
+
+void 
+WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix)
+{
+  
+}
+
+/**
+ * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
+ */
+bool 
+WP_MetaBall::initModel()
+{
+  return true;
+}

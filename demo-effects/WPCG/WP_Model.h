@@ -1,4 +1,4 @@
-/* Copyright (C) 2001 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001/2002 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -25,24 +25,10 @@ using namespace std;
 
 /**
  * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding sphere for frustum culling and in the future its bounding hull for collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
- *
- *  This program is free software; you can redistribute it and/or modify it under
- *  the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your
- *  option) any later version.
- *
- *  This program is distributed in the hope that it will be useful, but WITHOUT
- *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *  for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; see the file COPYING.  If not, write to the Free
- *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
  */
+
 class WP_Model
-{
+ {
  public:
   WP_Model(){};
   
@@ -50,7 +36,7 @@ class WP_Model
    * @param the name of the to be loaded model
    * @param scaling a WP_Vector3D object holding values by which the model is scaled
    */
-  WP_Model(const string& name, const WP_Vector3D& scaling): model_name(name), numberFrames(0), currentFrame(0), interpolate(0.0)
+  WP_Model(const string& name, const WP_Vector3D& scaling): model_name(name)
     {
       scaling_matrix = new WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]);
     };
@@ -61,7 +47,7 @@ class WP_Model
    * this function draws the model according to its world matrix into the 3D scene but only if its bounding sphere is in the viewing frustum
    * @param matrix a WP_Matrix3D object representing the world matrix of the model indicating where and how the model is rendered into the scene
    */
-  void drawOpenGL(const WP_Matrix3D& matrix);
+  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
   
   /**
    * this virtual function should be overriden by child objects. In this function the model must be read and the model's internals must be filled (like for example the meshes, the material etc). Every 3d file format stores this information in a different way there this function can be used to substract the necessary data from it.
@@ -106,22 +92,32 @@ class WP_Model
  protected:
 
   /**
+   * this function finalizes all after the model was read and everything was initialized. The textures are sorted and the model bounding sphere is created
+   */
+  bool finalizeAll();  
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * this abstract class represents an animated model
+ */
+ 
+class WP_AnimatedModel: public WP_Model
+ {
+ public:
+  WP_AnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling),
+    numberFrames(0), currentFrame(0), interpolate(0.0){}; 
+
+  virtual ~WP_AnimatedModel();
+
+  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  virtual bool initModel() = 0;
+
+protected:
+
+ /**
    * this nested class represents a frame. 
-   * @author Copyright (C) 2002 W.P. van Paassen   peter@paassen.tmfweb.nl
-   *
-   *  This program is free software; you can redistribute it and/or modify it under
-   *  the terms of the GNU General Public License as published by the Free
-   *  Software Foundation; either version 2 of the License, or (at your
-   *  option) any later version.
-   *
-   *  This program is distributed in the hope that it will be useful, but WITHOUT
-   *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-   *  for more details.
-   *
-   *  You should have received a copy of the GNU General Public License
-   *  along with this program; see the file COPYING.  If not, write to the Free
-   *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
    */
   class WP_Frame
     {
@@ -182,13 +178,7 @@ class WP_Model
 
     };
 
-  /**
-   * this function finalizes all after the model was read and everything was initialized. The textures are sorted and the model bounding sphere is created
-   */
-  bool finalizeAll();
-
   scalar interpolate;
-  list<WP_TriangleGroup*> triangle_groups;
   WP_Frame *frames;
   unsigned int numberFrames;
   unsigned int currentFrame;
@@ -198,27 +188,10 @@ class WP_Model
 
 /**
  * this class is used for the creation of models in ID's MD2 file format, as used in the computer game Quake2\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
- *
- *  This program is free software; you can redistribute it and/or modify it under
- *  the terms of the GNU General Public License as published by the Free
- *  Software Foundation; either version 2 of the License, or (at your
- *  option) any later version.
- *
- *  This program is distributed in the hope that it will be useful, but WITHOUT
- *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- *  for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; see the file COPYING.  If not, write to the Free
- *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
  */
-class WP_Model_MD2: public WP_Model
+class WP_Model_MD2: public WP_AnimatedModel
 {
  public:
-  WP_Model_MD2(){}; 
-
   /**
    * @param name the name of the file containing the .md2 model
    * @param scaling a WP_Vector3D object holding values by which the model is scaled
@@ -226,11 +199,14 @@ class WP_Model_MD2: public WP_Model
   WP_Model_MD2(const string& name, const WP_Vector3D& scaling);
 
   virtual ~WP_Model_MD2(){};
+
+  void drawOpenGL(const WP_Matrix3D& matrix);
   
   /**
    * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
    */
   bool initModel();
+
 
  protected:
 
@@ -256,6 +232,24 @@ class WP_Model_MD2: public WP_Model
     int offsetGlCommands; 
     int offsetEnd; 
   }; 
+
+  list<WP_TriangleGroup*> triangle_groups;
+};
+
+//////////////////////////////// WP_MetaBall /////////////////////////////////////////////////////
+
+class WP_MetaBall: public WP_Model
+{
+ public:
+  WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling) {};
+  virtual WP_MetaBall::~WP_MetaBall(){};
+
+  void drawOpenGL(const WP_Matrix3D& matrix);
+  
+  /**
+   * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
+   */
+  bool initModel();
 };
 
 #endif

@@ -50,7 +50,11 @@ void WP_Object::print() const
 
 //********************************************* WP_ObjectManager *******************************************************
 
+const unsigned char WP_ObjectManager::num_internal_objects = 1;
+
 WP_ObjectManager* WP_ObjectManager::om_instance = 0;
+
+const string WP_ObjectManager::internal_objects[] = {"WP_METABALL"};
 
 WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0){}
 
@@ -69,7 +73,7 @@ WP_ObjectManager* WP_ObjectManager::getInstance()
   return om_instance;
 }
 
-//FIXME this function is also used in LIBWPCG/WP_Image.C, therefore better to create a WP_File class and park this function there
+//FIXME this function is also used in WP_Image.C, therefore better to create a WP_File class and park this function there
 bool WP_ObjectManager::hasValidExtension(const char* file, const char* extension)
 {
   //find the '.' separating the extension
@@ -92,154 +96,181 @@ WP_Object* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const
 							    const string& model_name, const WP_Vector3D& scaling)
 {
   WP_StaticObject* sobject;
-  cout << "Creating static object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
-       << " " << matrix.data[13] << " " << matrix.data[14] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
-       << " " << scaling.data[2] << endl;
+  WP_Model* model;
+try
+  {
+    cout << "Creating static object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
+	 << " " << matrix.data[13] << " " << matrix.data[14] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
+	 << " " << scaling.data[2] << endl;
   
-  sobject = new WP_StaticObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name);
-  if (!sobject)
-    {
-      return (WP_Object*)0;
-    }
+    sobject = new WP_StaticObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name);
+    if (!sobject)
+      {
+	return (WP_Object*)0;
+      }
 
-  string m_name = "../MODELS/" + model_name;
+    //check if it's an internal object
 
-  sobject->name_id = unique++;
-  WP_Model* model = findInstance(m_name);
-  if (model)
-    {
-      model->count++;
-      sobject->model = model;
-      static_objects.push_back(sobject);
-    }
-  else
-    {
-      try
-	{
-	  /*	  if (hasValidExtension(m_name.c_str(), "3ds"))
-	    {
-	      //3DS autodesk 3D studio max support
-	      model = new WP_Model_3DS(m_name, scaling); 
-	      if (!model->init())
-		{
-		  throw("");
-		}
-	      sobject->model = model;
-	      static_objects.push_back(sobject);
-	    }
-	    else */if (hasValidExtension(m_name.c_str(), "md2"))
-	    {
-	      //quake2 md2 file
-	      model = new WP_Model_MD2(m_name, scaling);
-	      if (!model->init())
-		{
-		  throw("");
-		}
-	      sobject->model = model;
-	      static_objects.push_back(sobject);
-	    }
-	  else
-	    {
-	      //other formats like for example lightwave format
-	      cerr << "ERROR: Unable to load model " << m_name << "only /*3DS autodesk .3ds and */quake2 md2 file format supported at the moment" << endl;
-	      throw("");
-	    }
-	}
-      catch(...)
-	{
-	  if (sobject)
-	    {
-	      delete sobject;
-	    }
-	  
-	  if (model)
-	    {
-	      delete model;
-	    }
-	  
-	  return (WP_Object*)0;
-	}
-    }
+    int i;
+    bool internal = false;
+    string m_name;
 
-  return sobject;
+    for (i = 0; i < num_internal_objects; ++i)
+      {
+	if (object_name == internal_objects[i])
+	  {
+	    internal = true;
+	    m_name = object_name;
+	    sobject->name_id = unique++;
+	    model = findInstance(m_name);
+	    if (model)
+	      {
+		model->count++;
+		sobject->model = model;
+		static_objects.push_back(sobject);
+	      }
+	    else
+	      {
+		model = new WP_MetaBall(m_name, scaling);
+		if (!model->init())
+		  {
+		    throw("");
+		  }
+		sobject->model = model;
+		static_objects.push_back(sobject);
+	      }
+	    break;
+	  }
+      }
+      
+    if (!internal)
+      {
+	m_name = "../MODELS/" + model_name;
+	sobject->name_id = unique++;
+	model = findInstance(m_name);
+	if (model)
+	  {
+	    model->count++;
+	    sobject->model = model;
+	    static_objects.push_back(sobject);
+	  }
+	else
+	  {
+	    if (hasValidExtension(m_name.c_str(), "md2"))
+	      {
+		//quake2 md2 file
+		model = new WP_Model_MD2(m_name, scaling);
+		if (!model->init())
+		  {
+		    throw("");
+		  }
+		sobject->model = model;
+		static_objects.push_back(sobject);
+	      }
+	    else
+	      {
+		//other formats like for example lightwave format
+		cerr << "ERROR: Unable to load model " << m_name << "only quake2 md2 file format supported at the moment" << endl;
+		throw("");
+	      }
+	  }
+      }
+  }
+catch(...)
+  {
+    delete sobject;
+    delete model;
+    return (WP_Object*)0;
+  }
+ return sobject;
 }
 
 WP_Object* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, 
 							    const string& model_name, const WP_Vector3D& scaling, const WP_Vector3D& velocity)
 {
   WP_DynamicObject* dobject;
+  WP_Model* model;
+try
+  {
 
-  cout << "Creating dynamic object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
-       << " " << matrix.data[13] << " " << matrix.data[14] << " with vector " << velocity.data[0] << " " << velocity.data[1] << " " 
-       << velocity.data[2] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
-       << " " << scaling.data[2] << endl;
+    cout << "Creating dynamic object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
+	 << " " << matrix.data[13] << " " << matrix.data[14] << " with vector " << velocity.data[0] << " " << velocity.data[1] << " " 
+	 << velocity.data[2] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
+	 << " " << scaling.data[2] << endl;
 
-  dobject = new WP_DynamicObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name, velocity);
-  if (!dobject)
-    {
-      return (WP_Object*)0;
-    }
+    dobject = new WP_DynamicObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name, velocity);
+    if (!dobject)
+      {
+	return (WP_Object*)0;
+      }
 
-  string m_name = "../MODELS/" + model_name;
+    //check if it's an internal object
 
-  dobject->name_id = unique++;
-  WP_Model* model = findInstance(m_name);
-  if (model)
-    {
-      model->count++;
-      dobject->model = model;
-      dynamic_objects.push_back(dobject);
-    }
-  else
-    {
-      try
-	{
-	  /*	  if (hasValidExtension(m_name.c_str(), "3ds"))
-	    {
-	      //3DS autodesk 3D studio max support
-	      model = new WP_Model_3DS(m_name, scaling); 
-	      if (!model->init())
-		{
-		  throw("");
-		}
-	      dobject->model = model;
-	      dynamic_objects.push_back(dobject);
-	    }
-	    else*/ if (hasValidExtension(m_name.c_str(), "md2"))
-	    {
-	      //quake2 MD2 file
-	      model = new WP_Model_MD2(m_name, scaling);
-	      if (!model->init())
-		{
-		  throw("");
-		}
-	      dobject->model = model;
-	      dynamic_objects.push_back(dobject);
-	    }
-	  else
-	    {
-	      //other formats like for example lightwave format
-	      cout << "ERROR: Unable to load model " << m_name << "\nonly /*3DS autodesk .3ds and */quake2 md2 fileformat supported at the moment" << endl;
-	      throw("");
-	    }
-	}
-      catch(...)
-	{
-	  if (dobject)
-	    {
-	      delete dobject;
-	    }
+    int i;
+    bool internal = false;
+    string m_name;
 
-	  if (model)
-	    {
-	      delete model;
-	    }
+    for (i = 0; i < num_internal_objects; ++i)
+      {
+	if (object_name == internal_objects[i])
+	  {
+	    internal = true;
+	    m_name = object_name;
+	    dobject->name_id = unique++;
+	    model = new WP_MetaBall(m_name, scaling);
+	    if (!model->init())
+	      {
+		throw("");
+	      }
+	    dobject->model = model;
+	    dynamic_objects.push_back(dobject);
+	    break;
+	  }
+      }
 
-	  return (WP_Object*)0;
-	}
-    }
+    if (!internal)
+      {
+	m_name = "../MODELS/" + model_name;
+	dobject->name_id = unique++;
+
+	/*model = findInstance(m_name);
   
-  return dobject;
+	if (model) //FIXME add pssibility to share animated models (current frame, interpolation etc) disabled for now 
+	{
+	model->count++;
+	dobject->model = model;
+	dynamic_objects.push_back(dobject);
+	}
+	else
+	{
+	*/
+     
+	if (hasValidExtension(m_name.c_str(), "md2"))
+	  {
+	    //quake2 MD2 file
+	    model = new WP_Model_MD2(m_name, scaling);
+	    if (!model->init())
+	      {
+		throw("");
+	      }
+	    dobject->model = model;
+	    dynamic_objects.push_back(dobject);
+	  }
+	else
+	  {
+	    //other formats like for example lightwave format
+	    cout << "ERROR: Unable to load model " << m_name << "\nonly quake2 md2 fileformat supported at the moment" << endl;
+	    throw("");
+	  }
+      }
+  }
+catch(...)
+  {
+    delete dobject;
+    delete model;
+    return (WP_Object*)0;
+  }
+ return dobject;
 }
 
 WP_Object* WP_ObjectManager::getObject(const string& name) const

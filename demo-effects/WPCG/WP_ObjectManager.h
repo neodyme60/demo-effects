@@ -570,6 +570,13 @@ protected:
    * this unsigned integer is used to give all created objects a unique identifier
    */
   unsigned int unique;
+
+  static const unsigned char num_internal_objects;
+
+  /**
+   * static array of const strings representing internal objects like for example WP_MetaBall
+   */
+  static const string internal_objects[];
 };
 #endif
 
