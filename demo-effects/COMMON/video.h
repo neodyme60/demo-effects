@@ -23,10 +23,18 @@
 #define SCREEN_HEIGHT 360
 
 SDL_Surface* screen;
-
 /* Information about the current video settings. */
 static const SDL_VideoInfo* info = 0;
 
-int TDEC_init_video(Uint16 width, Uint16 height, int bpp, int flags);
+/* 2D */
+/* this function will first call TDEC_init_video */
+int TDEC_set_video(Uint16 width, Uint16 height, int bpp, int flags);
+
+/* 3D */
+/* call TDEC_init_video, set SDL_GL_Attributes, then call this function */
+int TDEC_set_video_GL(Uint16 width, Uint16 height, int bpp, int flags);
+
+/* global functions */
+int TDEC_init_video();
 
 #endif

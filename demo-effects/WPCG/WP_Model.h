@@ -27,7 +27,7 @@ using namespace std;
 #include "WPCG.h"
 
 /**
- * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding sphere for frustum culling and its collision hull for accurate collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
+ * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding sphere for frustum culling and in the future its bounding hull for collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
@@ -61,7 +61,7 @@ class WP_Model
   virtual ~WP_Model();
   
   /**
-   * this function is draws the model according to its world matrix into the 3D scene but only if its bounding sphere is in the viewing frustum
+   * this function draws the model according to its world matrix into the 3D scene but only if its bounding sphere is in the viewing frustum
    * @param matrix a WP_Matrix3D object representing the world matrix of the model indicating where and how the model is rendered into the scene
    */
   void drawOpenGL(const WP_Matrix3D& matrix) const;
@@ -103,7 +103,7 @@ class WP_Model
 
  protected:
   /**
-   * this nested class represents a 3D mesh. Currently the meshes are stored in so called OpenGL display lists\n
+   * this nested class represents a 3D mesh. Currently the meshes are stored in OpenGL display lists\n
    * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
    *
    *  This program is free software; you can redistribute it and/or modify it under
@@ -135,7 +135,7 @@ class WP_Model
        * @param _faces a pointer to an array of <i>_numberFaces</i> WP_Triangle objects representing the faces (triangles) in the mesh
        * @param _tex_id the OpenGL texture ID of the texture belonging to this mesh
        * @param _material a WP_Material object holding the OpenGL material values of this mesh
-       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and collision hull)
+       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and in the future its collision hull)
        * @param compute_vertex_normals a boolean indicating if this function should compute the vertex normals or not. Default is true. 
        * @param create_display_list a boolean indicating if this function should create a display list or not. Default is true. 
        */
@@ -181,14 +181,14 @@ class WP_Model
       
       /**
        * this function computes the maximum values of the vertices in the mesh. This to determine the size of the mesh its bounding sphere
-       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and collision hull)
+       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and in the future its collision hull)
        * @return a WP_Point3D object holding the maximum values of the mesh
        */
       WP_Point3D getMaxPoint(WP_Matrix3D* scaling_matrix) const;
 
       /**
        * this function computes the minimum values of the vertices in the mesh. This to determine the size of the mesh its bounding sphere
-       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and collision hull)
+       * @param scaling_matrix a pointer to a WP_Vector3D object representing the mesh its scaling matrix (used for scaling of bounding sphere and in the future its collision hull)
        * @return a WP_Point3D object holding the minimum values of the mesh
        */
       WP_Point3D getMinPoint(WP_Matrix3D* scaling_matrix) const;
@@ -361,6 +361,31 @@ class WP_Model_MD2: public WP_Model
    * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
    */
   bool initModel();
+
+ protected:
+
+  // nested class WP_MD2_HEADER 
+  class WP_MD2_HEADER
+  {
+  public:
+    int magic; 
+    int version; 
+    int skinWidth; 
+    int skinHeight; 
+    int frameSize; 
+    int numSkins; 
+    int numVertices; 
+    int numTexCoords; 
+    int numTriangles; 
+    int numGlCommands; 
+    int numFrames; 
+    int offsetSkins; 
+    int offsetTexCoords; 
+    int offsetTriangles; 
+    int offsetFrames; 
+    int offsetGlCommands; 
+    int offsetEnd; 
+  }; 
 };
 
 #endif

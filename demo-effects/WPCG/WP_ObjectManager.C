@@ -22,6 +22,8 @@
 #include "WP_Camera.h"
 #include "WP_ObjectManager.h"
 
+WP_Math* WP_DynamicObject::math = WP_Math::getInstance();
+
 WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0), roll(0), inFrustum(true)
 {
   //determine dir and up vectors, it is assumed that the object is orientated correctly thus facing north (0.0f, 0.0f, -1.0f) and up is (0.0f, 1.0f, 0.0f)
@@ -91,15 +93,16 @@ WP_Object* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const
 {
   WP_StaticObject* sobject;
   cout << "Creating static object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
-       << " " << matrix.data[13] << " " << matrix.data[14] << endl;
+       << " " << matrix.data[13] << " " << matrix.data[14] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
+       << " " << scaling.data[2] << endl;
   
-  sobject = new WP_StaticObject(matrix, object_name);
+  sobject = new WP_StaticObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name);
   if (!sobject)
     {
       return (WP_Object*)0;
     }
 
-  string m_name = "MODELS/" + model_name;
+  string m_name = "../MODELS/" + model_name;
 
   sobject->name_id = unique++;
   WP_Model* model = findInstance(m_name);
@@ -168,15 +171,16 @@ WP_Object* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, cons
 
   cout << "Creating dynamic object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
        << " " << matrix.data[13] << " " << matrix.data[14] << " with vector " << velocity.data[0] << " " << velocity.data[1] << " " 
-       << velocity.data[2] << endl;
+       << velocity.data[2] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
+       << " " << scaling.data[2] << endl;
 
-  dobject = new WP_DynamicObject(matrix, object_name, velocity);
+  dobject = new WP_DynamicObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name, velocity);
   if (!dobject)
     {
       return (WP_Object*)0;
     }
 
-  string m_name = "MODELS/" + model_name;
+  string m_name = "../MODELS/" + model_name;
 
   dobject->name_id = unique++;
   WP_Model* model = findInstance(m_name);
@@ -710,7 +714,7 @@ WP_Object* WP_ObjectManager::pickObject(int x, int y)
 //**************************************************************************************
 
 WP_DynamicObject::WP_DynamicObject(const WP_Matrix3D& _matrix, const string& name, const WP_Vector3D& _velocity):
-  WP_Object(_matrix, name), velocity(_velocity), math(WP_Math::getInstance())
+  WP_Object(_matrix, name), velocity(_velocity)
 {
   //orientate object according to velocity vector, object should be orientated according to 0 degrees on a compass 
 
@@ -742,8 +746,7 @@ WP_DynamicObject::WP_DynamicObject(const WP_Matrix3D& _matrix, const string& nam
 }
 
 WP_DynamicObject::WP_DynamicObject(const WP_Matrix3D& _matrix, const string& name, scalar _heading, scalar _speed, 
-				   scalar _pitch):WP_Object(_matrix, name), speed(_speed), 
-						  math(WP_Math::getInstance())
+				   scalar _pitch):WP_Object(_matrix, name), speed(_speed)
 {
   heading = _heading;
   pitch = _pitch;

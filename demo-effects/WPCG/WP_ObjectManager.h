@@ -29,7 +29,7 @@ class WP_Model;
 class WP_Camera;
 
 /**
- * this abstract class represents an object in the 3D scene.Every object consists of the necessary matrices, a name and a pointer to a .3ds model, in this way it is possible to use the same models for different instances of the object\n
+ * this abstract class represents an object in the 3D scene.Every object consists of the necessary matrices, a name and a pointer to a model, in this way it is possible to use the same models for different instances of the object\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
@@ -306,7 +306,7 @@ class WP_DynamicObject: public WP_Object
   void setVelocityVector(const WP_Vector3D& vector);
 
   /**
-   * this function moves the object according its velocity vector, moves its collision hull and checks for collision
+   * this function moves the object according its velocity vector
    */
   void move();
 
@@ -355,7 +355,7 @@ class WP_DynamicObject: public WP_Object
   /**
    * a pointer to the only instance of the WP_Math class
    */
-  WP_Math* math;
+  static WP_Math* math;
 };
 
 /**
@@ -396,7 +396,7 @@ public:
    * @return a pointer to a WP_Object representing the newly created static object
    */
   WP_Object* createStaticObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name,
-				const WP_Vector3D& scaling);
+				const WP_Vector3D& scaling = WP_Vector3D());
 
   /**
    * this function is used for the creation of a dynamic object
@@ -408,7 +408,7 @@ public:
    * @return a pointer to a WP_Object representing the newly created dynamic object
    */
   WP_Object* createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name, 
-				 const WP_Vector3D& scaling, const WP_Vector3D& velocity);
+				 const WP_Vector3D& scaling = WP_Vector3D(), const WP_Vector3D& velocity = WP_Vector3D());
 
   /**
    * this function returns a pointer to an object with name <i>name</i>

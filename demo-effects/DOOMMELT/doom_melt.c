@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
 
   printf("\nPress Space to melt DOOM style\n");
   
-  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, 
+  if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, 
 		 SDL_HWACCEL | SDL_HWSURFACE | SDL_DOUBLEBUF/* | SDL_FULLSCREEN;*/))
    {
      quit(1);

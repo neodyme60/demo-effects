@@ -142,7 +142,7 @@ WP_TextureManager::WP_Texture::WP_Texture(const char* _name):texture_id(0), text
 {  
   try
     {
-      sprintf(name, "TEXTURES/%s",_name);
+      sprintf(name, "../TEXTURES/%s",_name);
       
       WP_Image image;
       if (image.loadImage(name))

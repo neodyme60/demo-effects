@@ -16,9 +16,9 @@
 
 #include "video.h"
 
-int TDEC_init_video( Uint16 width, Uint16 height, int bpp, int flags)
+int TDEC_init_video()
 {
-  /* First, initialize SDL's video and timer subsystem. */
+  /* First, initialize SDL's video. */
   
   if( SDL_Init( SDL_INIT_VIDEO) < 0 ) 
     {
@@ -27,7 +27,7 @@ int TDEC_init_video( Uint16 width, Uint16 height, int bpp, int flags)
 	       SDL_GetError( ) );
       return 0;
     }
-  
+
   /* Let's get some video information. */
   info = SDL_GetVideoInfo( );
   
@@ -38,10 +38,38 @@ int TDEC_init_video( Uint16 width, Uint16 height, int bpp, int flags)
     return 0;
   }
   
+  return 1;
+}
+
+int TDEC_set_video( Uint16 width, Uint16 height, int bpp, int flags)
+{
+  if (TDEC_init_video())
+    {  
+  
+      /*
+       * Set the video mode
+       */
+      if( (screen = SDL_SetVideoMode( width, height, bpp, flags )) == 0 ) 
+	{
+	  /* 
+	   * This could happen for a variety of reasons,
+	   * including DISPLAY not being set, the specified
+	   * resolution not being available, etc.
+	   */
+	  fprintf( stderr, "Video mode set failed: %s\n",
+		   SDL_GetError( ) );
+	  return 0;
+	}
+    }
+  return 1;
+}
+
+int TDEC_set_video_GL(Uint16 width, Uint16 height, int bpp, int flags)
+{
   /*
    * Set the video mode
    */
-  if( (screen = SDL_SetVideoMode( width, height, bpp, flags )) == 0 ) 
+  if( (screen = SDL_SetVideoMode( width, height, bpp, SDL_OPENGL | flags )) == 0 ) 
     {
       /* 
        * This could happen for a variety of reasons,
@@ -55,7 +83,6 @@ int TDEC_init_video( Uint16 width, Uint16 height, int bpp, int flags)
 
   return 1;
 }
-
 
 
 

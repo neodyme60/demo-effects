@@ -150,7 +150,8 @@ int main( int argc, char* argv[] )
     return -1;
   }
   
-  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWSURFACE | SDL_HWACCEL | SDL_HWPALETTE/* | SDL_FULLSCREEN*/))
+  if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWSURFACE | SDL_HWACCEL | SDL_HWPALETTE/* | 
+SDL_FULLSCREEN*/))
     quit(1);
   
   TDEC_init_timer();

@@ -43,14 +43,15 @@ class WP_Vector3D;
  *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
  */
 
-/**
- * an enumeration of the kind of position stored in a WP_Light object, being point or vector
- */
-enum WP_Light_Pos_Kind {point, vector};
-
 class WP_Light
 { 
  public:
+
+  /**
+   * an enumeration of the kind of position stored in a WP_Light object, being point or vector
+   */
+  enum WP_Light_Pos_Kind {point, vector};
+
   WP_Light()
     {
       k = point;

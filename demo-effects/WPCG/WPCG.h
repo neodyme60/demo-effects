@@ -26,5 +26,9 @@
 #include "WP_SkyDome.h"
 #include "WP_Terrain.h"
 #include "WP_Quad.h"
+#include "WP_Camera.h"
+#include "WP_ObjectManager.h"
+#include "WP_Model.h"
+#include "WP_TextureManager.h"
 
 #endif
