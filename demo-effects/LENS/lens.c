@@ -27,6 +27,7 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
 #define LENS_WIDTH 150
 #define LENS_ZOOM  40
 
@@ -112,12 +113,6 @@ void init()
     }
     
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, backing->format->palette->colors, 0, backing->format->palette->ncolors);
-
-    if (backing->w != SCREEN_WIDTH || backing->h != SCREEN_HEIGHT) {
-        fprintf(stderr, "backing.png must have dimensions (%d, %d)\n",
-                SCREEN_WIDTH, SCREEN_HEIGHT);
-        quit(3);
-    }
 
     /* blit it to the screen */
     SDL_BlitSurface(backing, NULL, screen, &dst);

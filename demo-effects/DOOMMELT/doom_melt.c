@@ -25,6 +25,7 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
 #define COL_WIDTH 2
 #define NUM_COLS SCREEN_WIDTH / COL_WIDTH
 

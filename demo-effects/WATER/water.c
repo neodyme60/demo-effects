@@ -26,6 +26,8 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
+
 static const float max_array = SCREEN_WIDTH * SCREEN_HEIGHT;
 static const short amplitudes[4] = { -250, -425, -350, -650};
 static SDL_Surface *image = 0;

@@ -186,8 +186,8 @@ void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
 
   /* copy scanlines left of middle column */
 
-  j = (original->w >> 1) + 1;
-  rest = 0.0;
+  j = original->w >> 1;
+  rest = skip_columns;
   o.x = j;
   c.x = j;
 
@@ -205,8 +205,8 @@ void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
   
   /* copy scanlines right of middle column */
 
-  j = (original->w >> 1);
-  rest = 0.0;
+  j = original->w >> 1;
+  rest = skip_columns;
   o.x = j;
   c.x = j;
 
@@ -253,8 +253,8 @@ void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
 
   /* copy scanlines above middle scanline */
 
-  j = (original->h >> 1) + 1;
-  rest = 0.0;
+  j = original->h >> 1;
+  rest = skip_scanlines;
   o.y = j;
   c.y = j;
 
@@ -272,8 +272,8 @@ void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
   
   /* copy scanlines below middle scanline */
 
-  j = (original->h >> 1);
-  rest = 0.0;
+  j = original->h >> 1;
+  rest = skip_scanlines;
   o.y = j;
   c.y = j;
 
@@ -367,13 +367,13 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
 
   skip_pixels = percentage / 100.0;
 
-  j = (original->w >> 1) + 1;
+  j = original->w >> 1;
   
   index = j * original->format->BytesPerPixel;
   original_pixel += index;
   copy_pixel += index;
 
-  rest = 0.0;
+  rest = skip_pixels;
 
   /* copy pixels left from middle pixel */
 
@@ -394,12 +394,12 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
   
   /* copy pixels right from middle pixel */
 
-  j = (original->w >> 1);
+  j = original->w >> 1;
   index = j * original->format->BytesPerPixel;
   original_pixel = o + index;
   copy_pixel = c + index;
   
-  rest = 0.0;
+  rest = skip_pixels;
 
   for (i = j; i < original->w; ++i)
     {

@@ -25,6 +25,7 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
 #define SCALING 3
 
 static Uint8 scaling = 100;
@@ -161,7 +162,7 @@ int main( int argc, char* argv[] )
 	{ /* flipping */
 	  if (!up)
 	    {
-	      if (scaling > SCALING)
+	      if (scaling >= SCALING)
 		{
 		    TDEC_scaley_copy_image(image, screen, scaling);
 
@@ -181,7 +182,7 @@ int main( int argc, char* argv[] )
 	    }
 	  else
 	    {
-	      if (scaling < 99 - SCALING)
+	      if (scaling <= 100 - SCALING)
 		{
 		    TDEC_scaley_copy_image(image, screen, scaling);
 

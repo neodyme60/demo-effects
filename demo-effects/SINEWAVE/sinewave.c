@@ -25,6 +25,8 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
+
 static Uint16 sin_index = 0;
 static Uint8 quiting = 0;
 static Uint8 fadein = 1;

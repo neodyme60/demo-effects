@@ -25,6 +25,8 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
+#define SCREEN_WIDTH 340
+
 static short aSin[512];
 static Uint16 sin_index = 0;
 static Uint16 sin_global_index = 0;
@@ -98,11 +100,8 @@ void init()
 
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, image->format->palette->colors, 0, image->format->palette->ncolors);
 
-    flipped_image = IMG_Load("../GFX/tuXperience.png");
-    if (!image) {
-        fprintf(stderr, "Cannot open file tuXperience.png: %s\n", SDL_GetError());
-        quit(3);
-    }
+    flipped_image = TDEC_copy_surface(image);
+    TDEC_flipy_image(flipped_image);
 
     /*create sin lookup table */
     for (i = 0; i < 512; i++)
