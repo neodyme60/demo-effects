@@ -15,7 +15,7 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 /* This effect was inspired by an article by Sqrt(-1) */
-/* note that the code has not been optimized */
+/* note that the code has not been fully optimized */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,53 +136,12 @@ void init()
   SDL_ShowCursor(SDL_DISABLE);
 }
 
-void bump()
-{
-  static short x, y;
-  Uint16 lightx, lighty;
-  short normalx, normaly;
-  Uint8 *h1 = (Uint8*)heightmap->pixels + heightmap->pitch + 1;
-  Uint8 *s1 = (Uint8*)screen->pixels + screen->pitch + 1;
-  Uint16 temp;
-  
-  lightx = aSin[sin_index];
-  lighty = aSin[sin_index2];
-
-  for (y = 1; y < SCREEN_HEIGHT - 1; ++y)
-    {    
-      temp = lighty - y;
-      for (x = 1; x < SCREEN_WIDTH - 1; ++x)
-	{
-	  normalx = *(h1 + 1) - *h1;
-	  normaly = *h1 - *(h1 - heightmap->pitch);
-	  
-	  normalx += lightx - x;
-	  normaly += temp;
-
-	  if (normalx < 0)
-	    normalx = 0;
-	  else if (normalx > 255)
-	    normalx = 0;
-	  if (normaly < 0)
-	    normaly = 0;
-	  else if (normaly > 255)
-	    normaly = 0;	  
-
-	  *s1++ = (Uint8)reflectionmap[normalx][normaly];
-	  h1++;
-	}
-      s1+= 2;
-      h1+= 2;;
-    }
-  
-  sin_index += 2;
-  sin_index &= 511;
-  sin_index2 += 1;
-  sin_index2 &= 511;
-}
-
 int main( int argc, char* argv[] )
 {
+  Uint16 lightx, lighty, temp;
+  short normalx, normaly, x, y;
+  Uint8 *h1, *s1;
+
   if (argc > 1) {
     printf("Retro 2D Bumpmapping - W.P. van Paassen - 2002\n");
     return -1;
@@ -198,7 +157,7 @@ int main( int argc, char* argv[] )
   
   init();
   
-  TDEC_set_fps(10);
+  TDEC_set_fps(15);
 
   SDL_LockSurface(screen);
 
@@ -209,8 +168,44 @@ int main( int argc, char* argv[] )
     
       process_events();
 
-      bump();
+      lightx = aSin[sin_index];
+      lighty = aSin[sin_index2];
 
+      h1 = (Uint8*)heightmap->pixels + heightmap->pitch + 1;
+      s1 = (Uint8*)screen->pixels + screen->pitch + 1;
+
+      for (y = 1; y < SCREEN_HEIGHT - 1; ++y)
+	{    
+	  temp = lighty - y;
+	  for (x = 1; x < SCREEN_WIDTH - 1; ++x)
+	    {
+	      normalx = *(h1 + 1) - *h1;
+	      normaly = *h1 - *(h1 - heightmap->pitch);
+	  
+	      normalx += lightx - x;
+	      normaly += temp;
+
+	      if (normalx < 0)
+		normalx = 0;
+	      else if (normalx > 255)
+		normalx = 0;
+	      if (normaly < 0)
+		normaly = 0;
+	      else if (normaly > 255)
+		normaly = 0;	  
+	      
+	      *s1++ = (Uint8)reflectionmap[normalx][normaly];
+	      h1++;
+	    }
+	  s1+= 2;
+	  h1+= 2;;
+	}
+      
+      sin_index += 3;
+      sin_index &= 511;
+      sin_index2 += 5;
+      sin_index2 &= 511;
+      
       if (TDEC_fps_ok()) 
 	{
 	  SDL_Flip(screen);

@@ -1,11 +1,17 @@
 Adding the following effects:
 
 tunnel,
+Metaballs
+Dots
 spectrum analyzer
-light, 
-bummapping
-3D
+
 Many more...
+
+Writing the following tools:
+
+2D/3D spline editor
+Texture generator
+Effect viewer
 
 Detecting the user's fps and compiling the effects with the right fps
 

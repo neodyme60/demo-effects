@@ -1,5 +1,5 @@
-This project will try to cover the basics of demo programming, by including all different kind of demo effects. Starting with the retro ones and ending 
-with the latest techniques. 
+This project will try to cover the basics of demo programming, by including all different kind of demo effects. Starting with the 
+retro ones and ending with the latest techniques. 
 
 The Demo Effects Collection uses the great mikmod library for playing musical mods. 
 run configure --enable-mikmod=no if you don't want to use it. The Equalizer effect won't build in that case. 
@@ -17,5 +17,13 @@ Jamie Zawinski	- jwz@jwz.org
 Dan G. Lunde	- danglund@online.no
 Buddy Smith	- nullset@dookie.net
 Ed Sinjiashvili	- edsin@swes.saren.ru
+Nupur Saurabh	- saunup@hotmail.com
+Jason		- involution@mail.lokmail.net
+Radford Spaeth	- scooby11@sonic.net
+Aamir Syed	- amir_syed11@hotmail.com
+Jermain		- smurfshaker1@earthlink.net
+Wanduir Durant	- durant@terra.com.br
+Phillip Thorne	- pethorne@earthlink.net
+
 
 Feel free to send me your favourite effect || become a developer!

@@ -24,7 +24,8 @@
 
 #include "tdec.h"
 
-#define SCREEN_WIDTH 340
+#define SCREEN_WIDTH 500
+#define SCREEN_HEIGHT 300
 
 static const float max_array = SCREEN_WIDTH * SCREEN_HEIGHT;
 static const short amplitudes[4] = { -250, -425, -350, -650};
@@ -90,11 +91,13 @@ void init()
 {
     Uint32 i;
 
-    image = IMG_Load("../GFX/tuxblackbg.png");
+    image = IMG_Load("../GFX/TDEC_2.png");
     if (!image) {
-        fprintf(stderr, "Cannot open file pixmap.png: %s\n", SDL_GetError());
+        fprintf(stderr, "Cannot open file TDEC_2.png: %s\n", SDL_GetError());
         quit(3);
     }
+
+    /* set screen palette */
 
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, image->format->palette->colors, 0, image->format->palette->ncolors);
 

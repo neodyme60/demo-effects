@@ -1,3 +1,4 @@
+08-21-02 Added 2 new effects, added WPCG 3D classes. Extended some of the earlier effects. Extended libTDEC
 08-05-02 Added 3 new effects, fixed some bugs. Changed libcommon into libTDEC and added many new functions, improved old ones. 
 	 Libmikmod is now optional by using --enable-mikmod switch in configure script
 07-22-02 Added 3 new effects, fixed a bug in the lens effect, added image functions to the util library
