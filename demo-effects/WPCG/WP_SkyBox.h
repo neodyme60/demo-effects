@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 //forward declaration
 class WP_Point3D;
 
@@ -59,5 +61,6 @@ public:
  private:
 	GLuint displayID;
 };
+}
 #endif
 

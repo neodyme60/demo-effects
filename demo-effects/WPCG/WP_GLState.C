@@ -16,6 +16,8 @@
 
 #include "WP_GLState.h"
 
+namespace WPCG
+{
 WP_GLState* WP_GLState::_instance = 0;
 
 WP_GLState::WP_GLState(): lighting(false), culling(false), texture2D(false), blending(false), 
@@ -148,5 +150,5 @@ void WP_GLState::disableLighti(GLuint number)
 	break;
 	}
 }
-
+}
 

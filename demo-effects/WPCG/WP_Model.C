@@ -18,12 +18,13 @@
 #include <fstream>
 #include <list>
 #include <cmath>
-#include <GL/gl.h>
-#include "WP_TextureManager.h"
 #include "WP_GLState.h"
 #include "WP_Camera.h"
+#include "WP_TextureManager.h"
 #include "WP_Model.h"
 
+namespace WPCG
+{
 /////////////////////////////WP_Model//////////////////////////////////
 
 WP_Model::WP_Model(){}
@@ -784,4 +785,5 @@ WP_MetaBall::initModel()
   triangles[5] = 2;
 
   return true;
+}
 }

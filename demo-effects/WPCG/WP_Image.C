@@ -21,7 +21,18 @@
 #include "WP_Endian.h"
 #include "WP_Image.h"
 
-WP_Image::WP_Image(): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0){}
+namespace WPCG
+{
+WP_Image::WP_Image(): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0)
+{
+  glPixelZoom(1, -1); //reverse y
+}
+
+WP_Image::WP_Image(int width, int height): rasterpos_x(0), rasterpos_y(0), rows(height), columns(width)
+{
+  pixels = new WP_RGBA[rows * columns];
+  glPixelZoom(1, -1); //reverse y
+}
 
 WP_Image::WP_Image(const string &filename): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0)
 {
@@ -68,7 +79,6 @@ WP_Image& WP_Image::operator=(const WP_Image& image)
   return *this;
 }
 
-
 WP_Image::~WP_Image()
 {
   delete[] pixels;
@@ -77,15 +87,25 @@ WP_Image::~WP_Image()
 void WP_Image::setPixel(int x, int y, const WP_RGBA& p)
 {
   if (x >= 0 && x < columns && y >= 0 && y < rows)
-    pixels[(y * columns) + x] = p;
+    pixels[y * columns + x] = p;
+}
+
+void WP_Image::setFastPixel(int x, int y, const WP_RGBA& p)
+{
+  pixels[y * columns + x] = p;
 }
 
 WP_RGBA* WP_Image::getPixel(int x, int y)
 {
   if (x >= 0 && x < columns && y >= 0 && y < rows)
-    return pixels + ((y * columns) + x);
+    return pixels + (y * columns + x);
   
   return (WP_RGBA*)0; //failure
+}
+
+WP_RGBA* WP_Image::getFastPixel(int x, int y)
+{
+  return pixels + (y * columns + x);
 }
 
 void WP_Image::drawToFrameBuffer() const
@@ -703,4 +723,5 @@ void WP_Image::setTextureGL(GLuint* texture_id, GLint wrap_s, GLint wrap_t,
     {
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,columns, rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
+}
 }

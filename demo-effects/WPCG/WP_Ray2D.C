@@ -17,6 +17,8 @@
 #include "WP_Ray2D.h"
 #include "WP_Line2D.h"
 
+namespace WPCG
+{
 WP_Ray2D::WP_Ray2D(const WP_Point2D& p, const WP_Vector2D& v):start(p), direction(v){}
 
 WP_Ray2D::WP_Ray2D(WP_Line2D& l)
@@ -64,4 +66,4 @@ void WP_Ray2D::draw() const
   WP_Line2D l(start, start + direction);
   l.draw();
 }
-
+}

@@ -2,6 +2,8 @@
 #include <GL/glu.h>
 #include "WP_Init.h"
 
+namespace WPCG
+{
 WP_Init::WP_Init(){}
 
 WP_Init::~WP_Init(){}
@@ -16,4 +18,5 @@ void WP_Init::vSetWindow(scalar left, scalar right, scalar bottom, scalar top)
 void WP_Init::vSetViewPort(GLint left, GLint right, GLint bottom, GLint top)
 {
 	glViewport(left, top, right - left, bottom);
+}
 }

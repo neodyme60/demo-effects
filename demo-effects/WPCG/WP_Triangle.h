@@ -20,6 +20,8 @@
 #include "WP_Def.h"
 #include "WP_Vector3D.h"
 
+namespace WPCG
+{
 //forward declarations
 class WP_Vertex;
 
@@ -161,7 +163,7 @@ public:
 
 	void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const; 
 };
-
+}
 #endif
 
 

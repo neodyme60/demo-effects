@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 class WP_Vector2D; //forward declaration
 
 /**
@@ -80,5 +82,6 @@ public:
    */
   scalar y;
 };
+}
 #endif
 

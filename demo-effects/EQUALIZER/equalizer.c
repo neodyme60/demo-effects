@@ -26,6 +26,7 @@
 #include "mikmod.h"
 #include "tdec.h"
 
+#define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 110
 #define MAX_WIDTH (SCREEN_WIDTH - 80)
 #define MIN_WIDTH 20

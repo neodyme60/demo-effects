@@ -25,6 +25,7 @@
 #include "tdec.h"
 
 #define SCREEN_WIDTH 340
+#define SCREEN_HEIGHT 360
 
 static short aSin[512];
 static Uint16 sin_index = 0;

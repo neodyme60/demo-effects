@@ -14,13 +14,13 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
 #include <cmath>
+#include "WP_Def.h"
 #include "WP_ObjectManager.h"
 #include "WP_Camera.h"
 
+namespace WPCG
+{
 WP_Camera* WP_Camera::_instance = 0;
 
 WP_Camera::WP_Camera(): fixed_object(0), follow_distance(10.0f), 
@@ -389,4 +389,4 @@ void WP_Camera::followObject()
       computeFrustum();
     }
 }
-
+}

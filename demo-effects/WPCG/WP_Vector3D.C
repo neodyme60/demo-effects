@@ -20,6 +20,8 @@
 #include "WP_Matrix3D.h"
 #include "WP_Math.h"
 
+namespace WPCG
+{
 WP_Vector3D::WP_Vector3D()
 {
   data[0] = data[1] = data[2] = data[3] = 0.0;
@@ -212,4 +214,5 @@ scalar WP_Vector3D::getRadsBetween(const WP_Vector3D& v) const
 void WP_Vector3D::print() const
 {
   cout << data[0] << endl << data[1] << endl << data[2] << endl << data[3] << endl;
+}
 }

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "GL/glut.h"
 
 #include "tdec.h"
 #include "WPCG.h"
@@ -28,6 +29,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+WP_Image *logo;
 WP_GLState *state;
 WP_Camera *cam;
 WP_ObjectManager *manager;
@@ -164,8 +166,32 @@ void draw_screen( void )
   glDepthMask(true);
   
   state->enableLighting();
+ 
+  //draw logo
+
+  state->disableDepthTest();
+  state->disableCulling();
+        
+  state->projection();
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+      
+  state->modelview();
+  glPushMatrix();
+  glLoadIdentity();
+
+  logo->drawToFrameBuffer();
+
+  glPopMatrix();
+  state->projection(); 
+  glPopMatrix();
+  state->modelview();
+      
+  state->enableDepthTest();
+  state->enableCulling();
   state->disableBlending();
-  
+
   manager->updateAll();
 
   SDL_GL_SwapBuffers( );
@@ -173,7 +199,7 @@ void draw_screen( void )
 
 void init()
 {
-  Uint16 i;
+  Uint16 i,j;
   
   state = WP_GLState::getInstance();
 
@@ -211,6 +237,21 @@ void init()
   WP_Init init;
   init.vSetViewPort(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);	
 	
+  logo = new WP_Image("../GFX/tdec-small.pcx");
+  logo->rasterpos_x = SCREEN_WIDTH - logo->columns;
+  logo->rasterpos_y = SCREEN_HEIGHT;
+
+  for (i = 0; i < logo->columns; ++i)
+    {
+      for (j = 0; j < logo->rows; ++j)
+	{
+	  WP_RGBA* c = logo->getFastPixel(i, j);
+	  c->a = 64;
+	  logo->setFastPixel(i, j, *c);
+	}
+    }
+  
+
   /*disable events */
   for (i = 0; i < SDL_NUMEVENTS; ++i) {
     if (i != SDL_KEYDOWN && i != SDL_QUIT) {
@@ -236,7 +277,7 @@ int main( int argc, char* argv[] )
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
   
-  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
+  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
 			 /*|SDL_FULLSCREEN*/ ))
     quit(1);
   
@@ -262,6 +303,8 @@ int main( int argc, char* argv[] )
   box = new WP_SkyBox("SKY3_FT.pcx", "SKY3_RT.pcx", "SKY3_BK.pcx", "SKY3_LF.pcx", 0, 0);
   terrain = new WP_Terrain(40, 40, 200, 1.0, 6);
   terrain->setMiddlePoint(WP_Point3D(0.0, 0.0, 0.0));
+
+  TDEC_set_fps(100);
 
   /* time based demo loop */
   while( 1 ) 

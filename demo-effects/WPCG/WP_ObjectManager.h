@@ -18,10 +18,11 @@
 #define WP_OBJECTMANAGER_H
 
 #include <string>
-
 #include <list>
 #include "WPCG.h"
 
+namespace WPCG
+{
 //forward declarations
 class WP_Model;
 class WP_Camera;
@@ -625,6 +626,7 @@ private:
   static void ColCallback1(udword triangleindex, VertexPointers &triangle, udword user_data);
   static void ColCallback2(udword triangleindex, VertexPointers &triangle, udword user_data);
 };
+}
 #endif
 
 

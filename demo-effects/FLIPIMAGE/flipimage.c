@@ -24,6 +24,7 @@
 #include "tdec.h"
 
 #define SCREEN_WIDTH 340
+#define SCREEN_HEIGHT 360
 #define SCALING 3
 
 static Uint8 scaling = 100;

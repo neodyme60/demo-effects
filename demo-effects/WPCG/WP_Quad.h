@@ -21,6 +21,8 @@
 #include "WP_Vector3D.h"
 #include "GL/gl.h"
 
+namespace WPCG
+{
 //forward declarations
 class WP_Vertex;
 
@@ -58,6 +60,7 @@ public:
 	 */
 	WP_Vector3D normal;
 };
+}
 #endif
 
 

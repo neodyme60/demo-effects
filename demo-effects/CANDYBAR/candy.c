@@ -23,6 +23,8 @@
 
 #include "tdec.h"
 
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 static SDL_Surface* copper_surface;
 
 void quit( int code )

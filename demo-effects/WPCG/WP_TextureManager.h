@@ -20,6 +20,8 @@
 #include <list>
 #include "WPCG.h"
 
+namespace WPCG
+{
 /**
  * this singleton class is used for managing and storing all textures in such a way that only necessary textures are resident and textures are shared between models (objects). It makes use internally of WP_Texture objects. These texture objects are able to generate a texture from the following image formats:\n (.bmp), Cut (.cut), Doom flats and textures, Icon (.ico), Jpeg (.jpg, .jpe, .jpeg), Lbm (.lbm), Pcd (.pcd), ZSoft Pcx (.pcx), Pic (.pic), Portable Anymap (.pbm, .pgm, .ppm), Portable Network Graphics (.png), Sgi (.sgi, .bw, .rgb, .rgba), Truevision Targa (.tga) and Tiff (.tif, .tiff) images\n 
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -153,5 +155,5 @@ private:
 	 */
 	static WP_TextureManager* tm_instance;	 
 };
-
+}
 #endif

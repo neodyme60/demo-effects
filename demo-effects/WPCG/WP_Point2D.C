@@ -17,6 +17,8 @@
 #include "WP_Point2D.h"
 #include "WP_Vector2D.h"
 
+namespace WPCG
+{
 WP_Vector2D WP_Point2D::operator-(const WP_Point2D& p) const
 {
 	return WP_Vector2D(x - p.x, y - p.y);
@@ -33,7 +35,7 @@ void WP_Point2D::draw() const
 		glVertex2f(x,y);
 	glEnd();
 }
-
+}
 
 
 

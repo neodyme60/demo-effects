@@ -21,6 +21,9 @@
 #define WP_2D_H
 
 #include "WP_Def.h"
+
+namespace WPCG
+{
 class WP_Point2D; //forward declaration
 
 //////////////////// WP_Draw ////////////////////////////////
@@ -95,6 +98,6 @@ public:
    */
   void vDrawString(void* font, const string &text, GLint xpos, GLint ypos) const;
 };
-
+}
 #endif
 

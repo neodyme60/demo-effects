@@ -23,6 +23,9 @@
 
 #include "tdec.h"
 
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
+
 static Uint16 pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, tpos1, tpos2, tpos3, tpos4;
 static int aSin[512];
 static SDL_Color colors[256];

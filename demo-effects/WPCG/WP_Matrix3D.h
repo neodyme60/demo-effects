@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 /**
  * this class represents a 3D matrix\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -52,19 +54,19 @@ public:
 	 * @param y the y value of the translation or scaling operation
 	 * @param z the z value of the translation or scaling operation
 	 */
-	WP_Matrix3D(int type, scalar x, scalar y, scalar z);
+	WP_Matrix3D(const byte type, scalar x, scalar y, scalar z);
 
 	/**
 	 * @param type the type of the matrix. TRANSLATION_MATRIX for a translation matrix and SCALING_MATRIX for a scaling matrix. Any other value creates the identity matrix
 	 * @param v a WP_Vector3D object containing the x, y and z values to be used for translation or scaling
 	 */
-	WP_Matrix3D(int type, WP_Vector3D* v);
+	WP_Matrix3D(const byte type, WP_Vector3D* v);
 
 	/**
 	 * @param type the type of the matrix. X_ROTATION_MATRIX, Y_ROTATION_MATRIX and Z_ROTATION_MATRIX are supported. Other type values creates the identity matrix
 	 * @param angle the angle of the rotation around the selected axis
 	 */
-	WP_Matrix3D(int type, scalar angle);
+	WP_Matrix3D(const byte type, scalar angle);
 
 	/**
 	 * this constructor builds a camera transformation matrix by which world coordinates are transformed to camera coordinates. This is the same matrix as the OpenGL call gluLookAt() builds and is usefull if a camera implementation is created without the use of gluLookAt(). See F.S. Hill JR, Computer Graphics using OpenGL page 363-365
@@ -247,5 +249,6 @@ private:
 	 */
 	void createZRotation(scalar angle);
 };
+}
 #endif
 

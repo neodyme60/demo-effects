@@ -25,6 +25,7 @@
 #include "tdec.h"
 
 #define SCREEN_WIDTH 340
+#define SCREEN_HEIGHT 360
 #define COL_WIDTH 2
 #define NUM_COLS SCREEN_WIDTH / COL_WIDTH
 

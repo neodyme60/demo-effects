@@ -19,6 +19,8 @@
 #include "WP_Matrix3D.h"
 #include "WP_Ray3D.h"
 
+namespace WPCG
+{
 WP_Ray3D::WP_Ray3D(const WP_Point3D& p, const WP_Vector3D& v):start(p), direction(v){}
 
 float WP_Ray3D::sphere_intersection(const WP_Matrix3D& m) const
@@ -82,4 +84,4 @@ void WP_Ray3D::draw() const
   glVertex3fv(end.data);
   glEnd();
 }
-
+}

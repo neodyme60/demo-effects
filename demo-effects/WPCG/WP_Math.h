@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 /**
  * a singleton class holding sin and cos values for a quick lookup of angles in degrees and for conversions from degrees to radians and vice versa\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -149,5 +151,6 @@ private:
 	 */
 	static WP_Math* _instance;
 };	
+}
 #endif
 

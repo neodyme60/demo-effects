@@ -14,12 +14,11 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/*note that the code has not been optimized*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "GL/glut.h"
 
 #include "tdec.h"
 #include "WPCG.h"
@@ -28,6 +27,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+WP_Image *logo;
 WP_GLState *state;
 WP_Camera *cam;
 WP_ObjectManager *manager;
@@ -96,6 +96,30 @@ void draw_screen( void )
   if (heading >= 360.0)
     heading -= 360.0;
 
+  //draw logo
+
+  state->disableDepthTest();
+  state->disableCulling();
+        
+  state->projection();
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+      
+  state->modelview();
+  glPushMatrix();
+  glLoadIdentity();
+
+  logo->drawToFrameBuffer();
+
+  glPopMatrix();
+  state->projection(); 
+  glPopMatrix();
+  state->modelview();
+      
+  state->enableDepthTest();
+  state->enableCulling();
+
   manager->updateAll();
 
   SDL_GL_SwapBuffers( );
@@ -138,7 +162,11 @@ void init()
   init.vSetViewPort(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);	
 	
   //set background color
-  glClearColor(0.0, 0.0, 0.4, 0.0f);
+  glClearColor(0.0, 0.0, 0.0, 0.0f);
+
+  logo = new WP_Image("../GFX/tdec-small.pcx");
+  logo->rasterpos_x = SCREEN_WIDTH - logo->columns;
+  logo->rasterpos_y = SCREEN_HEIGHT;
 
   Uint16 i;
   /*disable events */
@@ -166,7 +194,7 @@ int main( int argc, char* argv[] )
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
   
-  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
+  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
 			 /*| SDL_FULLSCREEN*/))
     quit(1);
   

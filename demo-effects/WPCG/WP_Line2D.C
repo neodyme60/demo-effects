@@ -17,6 +17,8 @@
 #include "WP_Line2D.h"
 #include "WP_Vector2D.h"
 
+namespace WPCG
+{
 WP_Line2D::WP_Line2D(const WP_Point2D& p1, const WP_Point2D& p2): start(p1), end(p2)
 {
 	normal = end - start;
@@ -38,4 +40,4 @@ void WP_Line2D::draw()
 		glVertex2f(end.x, end.y);
 	glEnd();
 }
-
+}

@@ -18,6 +18,8 @@
 #include "WP_Matrix3D.h"
 #include "WP_Vector3D.h"
 
+namespace WPCG
+{
 /* ASSIGNMENT OPERATOR */
 WP_Point3D& WP_Point3D::operator=(const WP_Point3D& p)
 {
@@ -94,4 +96,4 @@ WP_Vector3D WP_Point3D::toVector() const
 {
   return WP_Vector3D(data[0], data[1], data[2]);
 }
-
+}

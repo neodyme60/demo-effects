@@ -20,6 +20,8 @@
 #include "WP_2D.h"
 #include "WP_Point2D.h"
 
+namespace WPCG
+{
 //////////////////// WP_Draw_2D ////////////////////////////////
 
 WP_Draw_2D::WP_Draw_2D(){}
@@ -75,4 +77,4 @@ void WP_Draw_2D::vDrawString(void* font, const string &text,
       xpos += glutBitmapWidth(font,*iter);
     }
 }
-
+}

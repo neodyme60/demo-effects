@@ -24,6 +24,8 @@
 #include "tdec.h"
 
 #define NUMBER_OF_BOBS 14
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 
 static SDL_Surface* eye_surface;
 static int xpath[512];

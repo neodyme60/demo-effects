@@ -24,6 +24,8 @@
 #include "tdec.h"
 
 #define NUMBER_OF_STARS 1020
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 
 /*star struct*/
 typedef struct 

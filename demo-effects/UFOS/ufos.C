@@ -172,11 +172,11 @@ void init()
   cam->setFrustumAndCamera(90.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 50.0f, eye, look, up);
 	
   manager->addLight(WP_Point3D(10.0, 10.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
-		    WP_Color((float)0.05, (float)0.95, (float)0.35), WP_Color((float)0.05, (float)0.95, (float)0.35),
+		    WP_Color((float)0.05, (float)0.65, (float)0.15), WP_Color((float)0.05, (float)0.65, (float)0.15),
 		    WP_Color((float)0.0, (float)0.0, (float)0.0));
 
   manager->addLight(WP_Point3D(-10.0, 10.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
-		    WP_Color((float)0.95, (float)0.05, (float)0.35), WP_Color((float)0.95, (float)0.05, (float)0.35),
+		    WP_Color((float)0.65, (float)0.05, (float)0.15), WP_Color((float)0.65, (float)0.05, (float)0.15),
 		    WP_Color((float)0.0, (float)0.0, (float)0.0));
 
   WP_Init init;
@@ -211,7 +211,7 @@ int main( int argc, char* argv[] )
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
   
-  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
+  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
 			 /*|SDL_FULLSCREEN*/ ))
     quit(1);
   

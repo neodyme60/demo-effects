@@ -1,5 +1,7 @@
 #include "WP_Endian.h"
 
+namespace WPCG
+{
 WP_Endian* WP_Endian::_instance = 0;
 
 WP_Endian::WP_Endian()
@@ -30,4 +32,5 @@ void WP_Endian::getTypedData(void* destination, byte*& buffer, int size)
 	  buffer++;
 	}
     }
+}
 }

@@ -19,6 +19,9 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
+
 /**
  * this class is used for world window and viewport setting in OpenGL\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -62,6 +65,6 @@ class WP_Init
    */
   void vSetViewPort(GLint left, GLint right, GLint bottom, GLint top);
 };
-
+}
 #endif
 

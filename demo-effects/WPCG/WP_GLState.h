@@ -20,6 +20,9 @@
 #include "GL/gl.h"
 #include "WP_Def.h"
 
+namespace WPCG
+{
+
 /**
  * this singleton class keeps track of OpenGL's internal state and prevents redundant and expensive state changes\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -605,6 +608,7 @@ public:
  private:
 	WP_GLState();
 };
+}
 #endif
 
 

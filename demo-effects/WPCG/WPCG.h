@@ -1,9 +1,9 @@
 #ifndef WPCG_H
 #define WPCG_H
 
+using namespace std;
 #include "../OPCODE-1.2/Opcode.h"
 using namespace Opcode;
-using namespace std;
 
 #include "WP_Def.h"
 #include "WP_Color.h"
@@ -34,5 +34,7 @@ using namespace std;
 #include "WP_ObjectManager.h"
 #include "WP_Model.h"
 #include "WP_TextureManager.h"
+
+using namespace WPCG;
 
 #endif

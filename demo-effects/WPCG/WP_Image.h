@@ -21,6 +21,8 @@
 #include "WP_Def.h"
 #include "WP_RGBA.h"
 
+namespace WPCG
+{
 /**
  * this class is mainly used for image loading and texture creation. Currently, compressed/uncompressed 8 bit (indexed) bmp and uncompressed 24 bit (RGB) bmp and compressed 24 (indexed) bit pcx and compressed 24 bit (RGB) pcx files are supported\n. Note that the .bmp format is always in little endian format\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -43,6 +45,8 @@ class WP_Image
 {
  public:
   WP_Image();
+
+  WP_Image(int width, int height);
 
   WP_Image(const string &filename);
 
@@ -67,12 +71,29 @@ class WP_Image
   void setPixel(int x, int y, const WP_RGBA& p);
 
   /**
+   * this function writes a pixel in the current image without checking the x and y ranges
+   * @param x the column index of the to be placed pixel
+   * @param y the row index of the to be placed pixel
+   * @param p a WP_RGBA object representing the pixel and holding the pixels' RGBA values
+   */
+  void setFastPixel(int x, int y, const WP_RGBA& p);
+
+  /**
    * this functions gets a pixel from the image
    * @param x the column index of the wanted pixel
    * @param y the row index of the wanted pixel
    * @return a pointer to WP_RGBA object holding the pixels' RGBA values
    */
   WP_RGBA* getPixel(int x, int y);
+
+  /**
+   * this functions gets a pixel from the image without checking the ranges
+   * @param x the column index of the wanted pixel
+   * @param y the row index of the wanted pixel
+   * @return a pointer to WP_RGBA object holding the pixels' RGBA values
+   */
+  WP_RGBA* getFastPixel(int x, int y);
+
 
   /**
    * this function draws the image directly to the framebuffer using OpenGL, placing the lower left corner of the pixmap at the current raster position (rasterpos_x and rasterpos_y)
@@ -173,5 +194,6 @@ class WP_Image
    */
   bool loadPCX(const string &file);
 };
+}
 #endif
 

@@ -1454,7 +1454,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=The_Demo_Effects_Collection
- VERSION=0.1.0
+ VERSION=0.2
 
 
 cat >>confdefs.h <<_ACEOF
@@ -4688,7 +4688,7 @@ fi
 CFLAGS="$CFLAGS `sdl-config --cflags`"
 LIBS="$LIBS `sdl-config --libs`"
 
-ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile"
+ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -5245,6 +5245,7 @@ do
   "BUMP2D/Makefile" ) CONFIG_FILES="$CONFIG_FILES BUMP2D/Makefile" ;;
   "TERRAIN/Makefile" ) CONFIG_FILES="$CONFIG_FILES TERRAIN/Makefile" ;;
   "UFOS/Makefile" ) CONFIG_FILES="$CONFIG_FILES UFOS/Makefile" ;;
+  "PLASMACUBE/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLASMACUBE/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

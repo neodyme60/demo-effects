@@ -20,12 +20,14 @@
 #include "WP_Matrix3D.h"
 #include "WP_Math.h"
 
+namespace WPCG
+{
 WP_Matrix3D::WP_Matrix3D()
 {
   createIdentity();
 }
 
-WP_Matrix3D::WP_Matrix3D(int type, scalar x, scalar y, scalar z)
+WP_Matrix3D::WP_Matrix3D(const byte type, scalar x, scalar y, scalar z)
 {
   switch(type)
     {
@@ -77,12 +79,12 @@ WP_Matrix3D::WP_Matrix3D(int type, scalar x, scalar y, scalar z)
     }
 }
 
-WP_Matrix3D::WP_Matrix3D(int type, WP_Vector3D* v)
+WP_Matrix3D::WP_Matrix3D(const byte type, WP_Vector3D* v)
 {
   WP_Matrix3D(type, v->data[0], v->data[1], v->data[2]);
 }
 
-WP_Matrix3D::WP_Matrix3D(int type, scalar angle)
+WP_Matrix3D::WP_Matrix3D(const byte type, scalar angle)
 {
   switch(type)
     {
@@ -581,6 +583,6 @@ void WP_Matrix3D::print() const
   cout << data[2] << "\t " << data[6] << "\t " << data[10] << "\t" << data[14] << endl;
   cout << data[3] << "\t " << data[7] << "\t " << data[11] << "\t " << data[15] << endl << endl;
 }
-
+}
 
 

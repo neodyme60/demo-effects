@@ -26,6 +26,7 @@
 #include "tdec.h"
 
 #define SCREEN_WIDTH 340
+#define SCREEN_HEIGHT 360
 #define LENS_WIDTH 150
 #define LENS_ZOOM  40
 

@@ -25,6 +25,8 @@
 
 #define CHARACTER_WIDTH 16
 #define CHARACTER_HEIGHT 32
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 
 static SDL_Surface* font_surface;
 static SDL_Surface* scroll_surface;

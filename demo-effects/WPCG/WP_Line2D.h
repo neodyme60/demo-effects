@@ -21,6 +21,8 @@
 #include "WP_Point2D.h"
 #include "WP_Vector2D.h"
 
+namespace WPCG
+{
 /**
  * this class represents a 2D line\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -77,5 +79,6 @@ public:
 	 */
 	WP_Vector2D normal;
 };
+}
 #endif
 

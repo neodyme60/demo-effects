@@ -20,6 +20,8 @@
 #include "WP_Def.h"
 #include "WP_Color.h"
 
+namespace WPCG
+{
 /**
  * this class represents OpenGL material\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -104,5 +106,6 @@ public:
 	 */
 	scalar transparency;
 }; 
+}
 #endif
 

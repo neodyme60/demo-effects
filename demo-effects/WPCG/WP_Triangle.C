@@ -17,6 +17,8 @@
 #include "WP_Vertex.h"
 #include "WP_Triangle.h"
 
+namespace WPCG
+{
 void 
 WP_Triangle::drawOpenGL() const
 {	
@@ -161,4 +163,5 @@ WP_TriangleFan::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *ver
 	}
       glEnd();
     }
+}
 }

@@ -76,42 +76,21 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-noinst_LIBRARIES = libOPCODE.a
-libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_OptimizedTree.h      OPC_Ray.cpp  OPC_Triangle.h \
-	OPC_Collider.cpp   OPC_Model.cpp          OPC_Plane.cpp            OPC_Ray.h                OPC_TriBoxOverlap.h \
-        OPC_Collider.h     OPC_Model.h            OPC_Plane.h              OPC_RayTriOverlap.h      OPC_TriTriOverlap.h \
-	OPC_Common.cpp     OPC_OBBCollider.cpp    OPC_PlanesAABBOverlap.h  OPC_Settings.h           OPC_Types.h \
-	OPC_Common.h       OPC_OBBCollider.h      OPC_PlanesCollider.cpp   OPC_SphereAABBOverlap.h  OPC_VolumeCollider.cpp \
-	OPC_AABBCollider.cpp  OPC_Container.cpp  OPC_OBB.cpp            OPC_PlanesCollider.h     OPC_SphereCollider.cpp   \
-	OPC_VolumeCollider.h OPC_AABBCollider.h    OPC_Container.h    OPC_OBB.h	OPC_PlanesTriOverlap.h   OPC_SphereCollider.h \
-	OPC_AABB.cpp          OPC_FPU.h          OPC_Point.cpp            OPC_SphereTriOverlap.h   \
-	OPC_AABB.h            OPC_HPoint.h       OPC_Point.h              OPC_TreeBuilders.cpp     \
-	OPC_AABBTree.cpp      OPC_Matrix3x3.cpp  OPC_Preprocessor.h       OPC_TreeBuilders.h	\
-	OPC_AABBTree.h        OPC_Matrix3x3.h    Opcode.h               OPC_RayAABBOverlap.h     OPC_TreeCollider.cpp	\
-	OPC_BoundingSphere.h  OPC_Matrix4x4.cpp  OPC_RayCollider.cpp      OPC_TreeCollider.h	\
-	OPC_BoxBoxOverlap.h   OPC_Matrix4x4.h    OPC_OptimizedTree.cpp  OPC_RayCollider.h        OPC_Triangle.cpp	\
-	Stdafx.h	Stdafx.cpp
-
-subdir = OPCODE-1.2
+noinst_PROGRAMS = plasmacube
+plasmacube_SOURCES = plasmacube.C 
+plasmacube_LDADD = ../COMMON/libTDEC.a ../WPCG/libWPCG.a ../OPCODE-1.2/libOPCODE.a
+INCLUDES = -I../COMMON/ -I../WPCG
+subdir = PLASMACUBE
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+noinst_PROGRAMS = plasmacube$(EXEEXT)
+PROGRAMS = $(noinst_PROGRAMS)
 
-libOPCODE_a_AR = $(AR) cru
-libOPCODE_a_LIBADD =
-am_libOPCODE_a_OBJECTS = Opcode.$(OBJEXT) OPC_Ray.$(OBJEXT) \
-	OPC_Collider.$(OBJEXT) OPC_Model.$(OBJEXT) OPC_Plane.$(OBJEXT) \
-	OPC_Common.$(OBJEXT) OPC_OBBCollider.$(OBJEXT) \
-	OPC_PlanesCollider.$(OBJEXT) OPC_VolumeCollider.$(OBJEXT) \
-	OPC_AABBCollider.$(OBJEXT) OPC_Container.$(OBJEXT) \
-	OPC_OBB.$(OBJEXT) OPC_SphereCollider.$(OBJEXT) \
-	OPC_AABB.$(OBJEXT) OPC_Point.$(OBJEXT) \
-	OPC_TreeBuilders.$(OBJEXT) OPC_AABBTree.$(OBJEXT) \
-	OPC_Matrix3x3.$(OBJEXT) OPC_TreeCollider.$(OBJEXT) \
-	OPC_Matrix4x4.$(OBJEXT) OPC_RayCollider.$(OBJEXT) \
-	OPC_OptimizedTree.$(OBJEXT) OPC_Triangle.$(OBJEXT) \
-	Stdafx.$(OBJEXT)
-libOPCODE_a_OBJECTS = $(am_libOPCODE_a_OBJECTS)
+am_plasmacube_OBJECTS = plasmacube.$(OBJEXT)
+plasmacube_OBJECTS = $(am_plasmacube_OBJECTS)
+plasmacube_DEPENDENCIES = ../COMMON/libTDEC.a ../WPCG/libWPCG.a \
+	../OPCODE-1.2/libOPCODE.a
+plasmacube_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir)
@@ -120,62 +99,32 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/OPC_AABB.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_AABBCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_AABBTree.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Collider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Common.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Container.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Matrix3x3.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Matrix4x4.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Model.Po ./$(DEPDIR)/OPC_OBB.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_OBBCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_OptimizedTree.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Plane.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_PlanesCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Point.Po ./$(DEPDIR)/OPC_Ray.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_RayCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_SphereCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_TreeBuilders.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_TreeCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_Triangle.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/OPC_VolumeCollider.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Opcode.Po ./$(DEPDIR)/Stdafx.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/plasmacube.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 CXXFLAGS = @CXXFLAGS@
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libOPCODE_a_SOURCES)
-DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-	Makefile.in NEWS configure.in depcomp install-sh missing \
-	mkinstalldirs
-SOURCES = $(libOPCODE_a_SOURCES)
+DIST_SOURCES = $(plasmacube_SOURCES)
+DIST_COMMON = Makefile.am Makefile.in
+SOURCES = $(plasmacube_SOURCES)
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .obj
+.SUFFIXES: .C .o .obj
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  OPCODE-1.2/Makefile
+	  $(AUTOMAKE) --gnu  PLASMACUBE/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
-AR = ar
-
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libOPCODE.a: $(libOPCODE_a_OBJECTS) $(libOPCODE_a_DEPENDENCIES) 
-	-rm -f libOPCODE.a
-	$(libOPCODE_a_AR) libOPCODE.a $(libOPCODE_a_OBJECTS) $(libOPCODE_a_LIBADD)
-	$(RANLIB) libOPCODE.a
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+plasmacube$(EXEEXT): $(plasmacube_OBJECTS) $(plasmacube_DEPENDENCIES) 
+	@rm -f plasmacube$(EXEEXT)
+	$(CXXLINK) $(plasmacube_LDFLAGS) $(plasmacube_OBJECTS) $(plasmacube_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -183,41 +132,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_AABB.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_AABBCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_AABBTree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Collider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Common.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Container.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Matrix3x3.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Matrix4x4.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Model.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_OBB.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_OBBCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_OptimizedTree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Plane.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_PlanesCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Point.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Ray.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_RayCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_SphereCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_TreeBuilders.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_TreeCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_Triangle.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OPC_VolumeCollider.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Opcode.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stdafx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plasmacube.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
 
-.cpp.o:
+.C.o:
 @AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(CXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
-.cpp.obj:
+.C.obj:
 @AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
@@ -288,7 +214,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(PROGRAMS)
 
 installdirs:
 
@@ -318,7 +244,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 
@@ -354,7 +280,7 @@ mostlyclean-am: mostlyclean-compile mostlyclean-generic
 uninstall-am: uninstall-info-am
 
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES distclean distclean-compile \
+	clean-noinstPROGRAMS distclean distclean-compile \
 	distclean-depend distclean-generic distclean-tags distdir dvi \
 	dvi-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am install-info \

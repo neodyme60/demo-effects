@@ -22,6 +22,8 @@
 
 #include "WPCG.h"
 
+namespace WPCG
+{
 /**
  * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding sphere for frustum culling and in the future its bounding hull for collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
  */
@@ -330,6 +332,6 @@ class WP_MetaBall: public WP_NonAnimatedModel
 
   WP_Point3D center;
 };
-
+}
 #endif
 

@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 /**
  * this class is a RGBA container. It holds 4 bytes and can be used directly as a pixel in OpenGL
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -49,7 +51,7 @@ class WP_RGBA
    * @param _a alpha component
    */
   WP_RGBA(byte _r, byte _g, byte _b, 
-	  byte _a):r(_r), g(_g), b(_b),a(_a){}
+	  byte _a = 255):r(_r), g(_g), b(_b),a(_a){}
   
   /**
    * red component
@@ -71,5 +73,6 @@ class WP_RGBA
    */
   byte a;
 };
+}
 #endif
 

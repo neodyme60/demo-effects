@@ -24,6 +24,8 @@
 #include "tdec.h"
 
 #define NUMBER_OF_PARTICLES 500
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 
 static Uint8 fire[SCREEN_WIDTH * SCREEN_HEIGHT];
 static SDL_Color colors[256];

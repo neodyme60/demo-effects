@@ -24,6 +24,8 @@
 
 #include "tdec.h"
 
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
 static SDL_Surface *tile = NULL;
 static int roto[256];
 static int roto2[256];

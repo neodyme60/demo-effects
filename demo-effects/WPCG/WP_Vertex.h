@@ -21,6 +21,8 @@
 #include "WP_Point3D.h"
 #include "WP_Vector3D.h"
 
+namespace WPCG
+{
 /**
  * this class represents a 3D vertex\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -99,5 +101,6 @@ public:
    */
   scalar texCoords[2];
 };
+}
 #endif
 

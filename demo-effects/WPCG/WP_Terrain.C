@@ -23,6 +23,8 @@
 #include "WP_TextureManager.h"
 #include "WP_Terrain.h"
 
+namespace WPCG
+{
 WP_Terrain::WP_Terrain(int width, int height, int number_iterations, scalar resolution, int scale): displayID(0)
 {
   //creates a random 3D terrain
@@ -300,4 +302,5 @@ void WP_Terrain::drawTerrain() const
   glTranslatef(middle.data[0] - displacement_x, middle.data[1], middle.data[2] - displacement_y);
   glCallList(displayID);
   glPopMatrix();
+}
 }

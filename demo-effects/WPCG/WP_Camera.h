@@ -19,6 +19,8 @@
 
 #include "WPCG.h"
 
+namespace WPCG
+{
 //forward declaration
 class WP_Object;
 
@@ -270,5 +272,6 @@ private:
 	 */
 	WP_GLState* state;
 };
+}
 #endif
 

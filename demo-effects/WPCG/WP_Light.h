@@ -17,12 +17,14 @@
 #ifndef WP_LIGHT_H
 #define WP_LIGHT_H
 
+#include "WP_Def.h"
+#include "WP_Color.h"
+
+namespace WPCG
+{
 //forward declarations
 class WP_Point3D;
 class WP_Vector3D;
-
-#include "WP_Def.h"
-#include "WP_Color.h"
 
 /**
  * this class represents a light in OpenGL\n
@@ -51,13 +53,13 @@ class WP_Light
    */
   enum WP_Light_Pos_Kind {point, vector};
 
-  WP_Light()
+  WP_Light():number(0)
     {
       k = point;
       p = new WP_Point3D(0.0, 0.0, 0.0);
     }
 
-  WP_Light(const WP_Point3D& position, const WP_Color& ambient, const WP_Color& diffuse, const WP_Color& specular, const WP_Color& emissive, bool remote = true):ambient_color(ambient), diffuse_color(diffuse), specular_color(specular), emissive_color(emissive)
+  WP_Light(unsigned char _number, const WP_Point3D& position, const WP_Color& ambient, const WP_Color& diffuse, const WP_Color& specular, const WP_Color& emissive, bool remote = true):ambient_color(ambient), diffuse_color(diffuse), specular_color(specular), emissive_color(emissive),number(_number)
     {
       if (remote)
 	{
@@ -168,7 +170,7 @@ class WP_Light
       glPushMatrix();
       if (k == vector)
 	{
-	  glLightfv(GL_LIGHT0, GL_POSITION, v->data);
+	  glLightfv(GL_LIGHT0 + number, GL_POSITION, v->data);
 	  /*	  glBegin(GL_POLYGON);
 	    glVertex3f(v->data[0], v->data[1], v->data[2]);
 	    glVertex3f(v->data[0] + 1.0, v->data[1] + 1.0, v->data[2]);
@@ -177,7 +179,7 @@ class WP_Light
 	}
       else
 	{
-	  glLightfv(GL_LIGHT0, GL_POSITION, p->data);
+	  glLightfv(GL_LIGHT0 + number, GL_POSITION, p->data);
 	  /*glBegin(GL_POLYGON);
 	    glVertex3f(p->data[0], p->data[1], p->data[2]);
 	    glVertex3f(p->data[0] + 1.0, p->data[1] + 1.0, p->data[2]);
@@ -247,6 +249,9 @@ class WP_Light
     WP_Point3D* p;
     WP_Vector3D* v;
   };
+
+  unsigned char number;
 };
+}
 #endif
 

@@ -20,6 +20,8 @@
 #include "WP_Def.h"
 #include "WP_Point3D.h"
 
+namespace WPCG
+{
 //forward declaration
 class WP_Vertex;
 
@@ -63,5 +65,6 @@ public:
 	scalar displacement_x, displacement_y;
 	WP_Point3D middle;
 };
+}
 #endif
 

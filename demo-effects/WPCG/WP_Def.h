@@ -18,21 +18,25 @@
 #define WP_DEF_H
 
 #include "GL/gl.h"
+#include "GL/glu.h"
+#include "GL/glut.h"
 using namespace std;
 
-#define byte unsigned char
-#define scalar GLfloat
-#define PI 3.1415927
-#define DOUBLE_PI 2.0 * PI
-#define HALF_PI 0.5 * PI
-#define RADDEG 57.29578
-#define DEGRAD 0.0174532
-#define TRANSLATION_MATRIX 1
-#define SCALING_MATRIX 2
-#define X_ROTATION_MATRIX 3
-#define Y_ROTATION_MATRIX 4
-#define Z_ROTATION_MATRIX 5
-
+namespace WPCG
+{
+  typedef unsigned char byte;
+  typedef GLfloat scalar;
+  const scalar DOUBLE_PI = 6.2831853071795f;
+  const scalar Pi = 3.1415926535897932384f;
+  const scalar HALF_PI = 1.57079632679f;
+  const scalar RADDEG  = 57.2957795130823208768f;
+  const scalar DEGRAD = 0.01745329251994329577f;
+  const byte TRANSLATION_MATRIX = 1;
+  const byte SCALING_MATRIX = 2;
+  const byte X_ROTATION_MATRIX = 3;
+  const byte Y_ROTATION_MATRIX = 4;
+  const byte Z_ROTATION_MATRIX = 5;
+}
 #endif
 
 

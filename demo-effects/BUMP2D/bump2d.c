@@ -26,6 +26,7 @@
 #include "tdec.h"
 
 #define SCREEN_WIDTH 340
+#define SCREEN_HEIGHT 360
 
 typedef struct
 {

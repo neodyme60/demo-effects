@@ -18,7 +18,8 @@
 #define WP_COLOR_H
 
 #include "WP_Def.h"
-
+namespace WPCG
+{
 /**
  * this class represents an OpenGL color object with an alpha component\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -112,5 +113,6 @@ public:
 	 */
 	scalar components[4];
 };
+}
 #endif
 

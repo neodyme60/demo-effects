@@ -18,6 +18,8 @@
 #include <cmath>
 #include "WP_Math.h"
 
+namespace WPCG
+{
 WP_Math* WP_Math::_instance = 0;
 
 WP_Math::WP_Math()
@@ -72,4 +74,4 @@ scalar WP_Math::fRadToDegree(scalar rad) const
 {
   return rad * RADDEG;
 }		
-
+}

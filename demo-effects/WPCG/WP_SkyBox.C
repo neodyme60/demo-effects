@@ -22,6 +22,8 @@
 #include "WP_TextureManager.h"
 #include "WP_SkyBox.h"
 
+namespace WPCG
+{
 WP_SkyBox::WP_SkyBox(const char* front_texture,
 		     const char* right_texture, 
 		     const char* back_texture,
@@ -213,4 +215,5 @@ void WP_SkyBox::drawSkyBox(const WP_Point3D& p) const
   glTranslatef(p.data[0], p.data[1], p.data[2]);
   glCallList(displayID);
   glPopMatrix();
+}
 }

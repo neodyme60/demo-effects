@@ -20,6 +20,8 @@
 #include "WP_Camera.h"
 #include "WP_ObjectManager.h"
 
+namespace WPCG
+{
 WP_Math* WP_DynamicObject::math = WP_Math::getInstance();
 
 WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0), animate(false),roll(0), inFrustum(true)
@@ -1195,7 +1197,7 @@ WP_ObjectManager::addLight(const WP_Point3D& position, const WP_Color& ambient, 
 {
   if (number_lights < 8)  // maximal 8 light sources are permitted in OpenGL
     {
-      WP_Light* l = new WP_Light(position, ambient, diffuse, specular, emissive, remote);
+      WP_Light* l = new WP_Light(number_lights, position, ambient, diffuse, specular, emissive, remote);
       lights.push_back(l);
 
       glLightfv(GL_LIGHT0 + number_lights, GL_AMBIENT, l->ambient_color.components);  
@@ -1274,7 +1276,7 @@ WP_ObjectManager::WP_CollisionPair::WP_CollisionPair(WP_Object *obj1, WP_Object 
   cache.Model0 = object1->model->getCollisionModel();
   cache.Model1 = object2->model->getCollisionModel(); 
 }
-
+}
 
 
 

@@ -16,6 +16,8 @@
 
 #include "WP_Material.h"
 
+namespace WPCG
+{
 WP_Material::WP_Material()
 { 
 	setDefault();
@@ -66,5 +68,5 @@ void WP_Material::initMaterialGL() const
   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION, emissive.components);
   glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS, specularExponent);
 }
-
+}
 

@@ -18,6 +18,8 @@
 #include <string>
 #include "WP_TextureManager.h"
 
+namespace WPCG
+{
 WP_TextureManager* WP_TextureManager::tm_instance = 0;
 
 WP_TextureManager::WP_TextureManager():mipmapping(false){}
@@ -192,5 +194,5 @@ bool WP_TextureManager::WP_Texture::removeInstance(void* owner)
      }
    return false; //nothing removed
 }
-
+}
 

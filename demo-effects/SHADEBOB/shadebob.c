@@ -23,6 +23,9 @@
 
 #include "tdec.h"
 
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 360
+
 static Uint8 shades[SCREEN_WIDTH * SCREEN_HEIGHT];
 static SDL_Color colors[256];
 static int xpath[512];

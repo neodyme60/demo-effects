@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 //forward declaration
 class WP_Matrix3D;				
 
@@ -209,5 +211,6 @@ public:
 	 */
 	scalar data[4];
 };
+}
 #endif
 

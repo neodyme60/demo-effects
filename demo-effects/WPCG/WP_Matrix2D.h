@@ -19,6 +19,8 @@
 
 #include "WP_Def.h"
 
+namespace WPCG
+{
 /**
  * this class represents a 2D matrix\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -50,13 +52,13 @@ public:
 	 * @param x the x value of the translation or scaling operation
 	 * @param y the y value of the translation or scaling operation
 	 */
-	WP_Matrix2D(int type, scalar x, scalar y);
+	WP_Matrix2D(const byte type, scalar x, scalar y);
 
 	/**
 	 * @param type the type of the matrix. TRANSLATION_MATRIX for a translation matrix and SCALING_MATRIX for a scaling matrix. Any other value creates the identity matrix
 	 * @param v a WP_Vector2D object containing the x and y values to be used for translation or scaling
 	 */
-	WP_Matrix2D(int type, WP_Vector2D* v);
+	WP_Matrix2D(const byte type, WP_Vector2D* v);
 
 	/**
 	 * @param angle the angle in degrees of the rotation matrix
@@ -155,5 +157,6 @@ public:
 	 */ 
 	scalar data[3][3];
 };
+}
 #endif
 

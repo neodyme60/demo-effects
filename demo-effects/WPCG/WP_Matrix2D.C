@@ -19,12 +19,14 @@
 #include "WP_Matrix2D.h"
 #include "WP_Math.h"
 
+namespace WPCG
+{
 WP_Matrix2D::WP_Matrix2D()
 {
   createIdentity();
 }
 
-WP_Matrix2D::WP_Matrix2D(int type, scalar x, scalar y)
+WP_Matrix2D::WP_Matrix2D(const byte type, scalar x, scalar y)
 {
   switch(type)
     {
@@ -60,7 +62,7 @@ WP_Matrix2D::WP_Matrix2D(int type, scalar x, scalar y)
     }
 }
 
-WP_Matrix2D::WP_Matrix2D(int type, WP_Vector2D* v)
+WP_Matrix2D::WP_Matrix2D(const byte type, WP_Vector2D* v)
 {
   WP_Matrix2D(type, v->data[0], v->data[1]);
 }
@@ -226,4 +228,4 @@ void WP_Matrix2D::createIdentity()
   data[2][1] = 0.0;
   data[2][2] = 1.0;
 }
-
+}

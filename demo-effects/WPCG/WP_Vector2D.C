@@ -20,6 +20,8 @@
 #include "WP_Matrix2D.h"
 #include "WP_Line2D.h"
 
+namespace WPCG
+{
 WP_Vector2D::WP_Vector2D()
 { 
   data[0] = data[1] = data[2] = 0.0;
@@ -190,4 +192,4 @@ void WP_Vector2D::draw(scalar startx, scalar starty) const
   WP_Line2D l(WP_Point2D(startx, starty), WP_Point2D(startx + data[0], starty + data[1]));
   l.draw();
 }
-
+}

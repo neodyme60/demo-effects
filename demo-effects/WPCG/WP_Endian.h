@@ -24,6 +24,8 @@ using namespace std;
 #include "WP_Def.h"
 #include "WP_RGBA.h"
 
+namespace WPCG
+{
 /**
  * this singleton class contains utility functions for loading different types on platforms which differ in endiannes (little endian (intel, etc.) or big endian (sparc, etc.)) \n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -79,5 +81,6 @@ private:
 	 */
 	static WP_Endian* _instance;
 };
+}
 #endif
 

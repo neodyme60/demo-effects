@@ -19,9 +19,6 @@
 
 #include "SDL/SDL.h"
 
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 360
-
 SDL_Surface* screen;
 /* Information about the current video settings. */
 static const SDL_VideoInfo* info = 0;

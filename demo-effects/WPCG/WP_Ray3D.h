@@ -21,6 +21,8 @@
 #include "WP_Point3D.h"
 #include "WP_Vector3D.h"
 
+namespace WPCG
+{
 /**
  * this class represents a 3D ray with for example can be used for raytracing\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
@@ -79,4 +81,5 @@ public:
 	 */
 	WP_Vector3D direction;
 };
+}
 #endif

@@ -21,6 +21,8 @@
 #include "WP_Point2D.h"
 #include "WP_Vector2D.h"
 
+namespace WPCG
+{
 class WP_Line2D; //forward declaration
 
 /**
@@ -82,5 +84,6 @@ public:
 	 */
 	WP_Vector2D direction;
 };
+}
 #endif
 
