@@ -53,6 +53,11 @@ void quit( int code )
   exit( code );
 }
 
+inline int rand_fun ()
+{
+    return rand() % 256;
+}
+
 void init_columns ()
 {
   int i, start_x = 1;
@@ -109,11 +114,6 @@ void process_events( void )
             break;
 	}
     }
-}
-
-int rand_fun ()
-{
-    return rand() % 256;
 }
 
 void init()

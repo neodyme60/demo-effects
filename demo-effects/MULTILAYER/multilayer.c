@@ -24,12 +24,6 @@
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
 
-#define PLASMA     0
-#define STARFIELD  1
-#define COPPERBARS 2
-
-static Uint8 background = PLASMA;
-
 void quit( int code )
 {
   /*
@@ -40,13 +34,7 @@ void quit( int code )
   
   SDL_Quit( );
 
-  TDEC_free_fire();
-  if (background == STARFIELD)
-    {
-      TDEC_free_3dstarfield();
-    }
-  TDEC_free_jumping_scroller();
-  TDEC_reset_layering();
+  TDEC_free_layers();
   
   /* Exit program. */
   exit( code );
@@ -88,17 +76,20 @@ void process_events( void )
 void init()
 {
   Uint32 i;
-  SDL_Surface *scrollerlayer, *firelayer;
-  char *text = " tDeC TdEc ";
+  /*SDL_Surface *scrollerlayer, *firelayer;
+    char *text = " tDeC TdEc ";*/
 
-  TDEC_init_layering();
-  TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 4);
+  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 4))
+    {
+      exit(1);
+    }
+  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", SCREEN_WIDTH, 60, 0, 0))
+    {
+      exit(1);
+      }
 
-  scrollerlayer = TDEC_add_layer(SCREEN_WIDTH, 132, 0, SCREEN_HEIGHT - 132, 0xFF);
-  TDEC_init_jumping_scroller(scrollerlayer, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100);
-
-  firelayer = TDEC_add_layer(SCREEN_WIDTH, 60, 0, 300, 0xFF);
-  TDEC_init_fire(firelayer, SCREEN_WIDTH, 60, 0, 0);
+  /*  scrollerlayer = TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF);
+      TDEC_init_sine_scroller(scrollerlayer, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2);*/
 
  /*disable events */
   
@@ -117,72 +108,31 @@ int main( int argc, char* argv[] )
 {
  if (argc > 1)
     {
-      printf("Multi layered effects - W.P. van Paassen - 2003\n");
+      printf("Multi layered run-time pluggable effects - W.P. van Paassen - 2003\n");
       return -1;
     }
 
- if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* | 
-SDL_FULLSCREEN*/))
+ if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* | 
+																     SDL_FULLSCREEN*/))
    quit(1);
 
  TDEC_init_timer();
  TDEC_set_fps(60);
 
- SDL_WM_SetCaption("Multi layered effects", "");
+ SDL_WM_SetCaption("Multi layered run-time pluggable effects", "");
   
  init();
 
  while( 1 ) 
    {
      TDEC_new_time();
-
-     process_events();
-
-     if (TDEC_scroller_ready())
-       {
-	 background++;
-	 background %= 3;
-
-	 TDEC_clear_layer(TDEC_get_layer(TDEC_BACKGROUND_LAYER));
-	 if (background == PLASMA)
-	   {
-	     TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 4);
-	   }
-	 else if (background == STARFIELD)
-	   {
-	     TDEC_init_3dstarfield(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 1020);
-	   }
-	 else
-	   {
-	     TDEC_init_copperbars(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 100);
-	   }
-       }
-
-     if (background == PLASMA)
-       {
-	 TDEC_draw_plasma();
-       }
-     else if (background == STARFIELD)
-       {
-	 TDEC_draw_3dstarfield();
-       }
-     else
-       {
-	 TDEC_draw_copperbars();
-       }
-
-     TDEC_draw_fire();
-     TDEC_draw_jumping_scroller();
      
-     TDEC_flatten_layers();
-
-     if (TDEC_fps_ok())
-       {
-	 TDEC_draw_layers();
-       }
-    }
-  
-  return 0; /* never reached */
+     process_events();
+     
+     TDEC_draw_layers();
+     
+     TDEC_fps_ok();
+   }
 }
 
 

@@ -12,11 +12,11 @@ extern "C" {
 #include "video.h"
 #include "utils.h"
 #include "layers.h"
-#include "plasma.h"
 #include "fire.h"
 #include "scroller.h"
 #include "jumpingscroller.h"
 #include "3dstarfield.h"
+#include "sinescroller.h"
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,11 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <GL/glut.h> header file. */
+#undef HAVE_GL_GLUT_H
+
 /* Define to 1 if you have the <GL/glu.h> header file. */
 #undef HAVE_GL_GLU_H
 
@@ -14,6 +20,9 @@
 
 /* Define to 1 if you have the `GLU' library (-lGLU). */
 #undef HAVE_LIBGLU
+
+/* Define to 1 if you have the `glut' library (-lglut). */
+#undef HAVE_LIBGLUT
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM

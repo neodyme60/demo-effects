@@ -91,11 +91,6 @@ void TDEC_draw_3dstarfield(void)
   int tempx, tempy;  
   Uint16 i;
 
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_LockSurface(surface);
-    }
-
   /* clear screen */
   
   SDL_FillRect(surface, 0, SDL_MapRGB(surface->format, 0, 0, 0));
@@ -123,11 +118,6 @@ void TDEC_draw_3dstarfield(void)
       
       c = &colors[stars[i].color];
       TDEC_put_pixel(surface, tempx, tempy, SDL_MapRGB(surface->format, c->r, c->g, c->b));
-    }
-
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_UnlockSurface(surface);
     }
 }
 

@@ -14,6 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+#include <stdlib.h>
 #include <math.h>
 
 #include "scroller.h"
@@ -31,7 +32,7 @@ typedef struct
 
 static LETTER *letters;
 static Uint8 nletters;
-static Uint32 displacement;
+static Uint16 displacement;
 static Uint16 width;
 static Uint16 height;
 static SDL_Rect frect;
@@ -117,9 +118,9 @@ void TDEC_draw_jumping_scroller(void)
 	  
 	  if (letters[i].xpos < -TDEC_get_character_width())
 	    {
+	      SDL_Rect *r = TDEC_get_font_char();
 	      letters[i].xpos = width;
 	      letters[i].sin_index = 0;
-	      SDL_Rect *r = TDEC_get_font_char();
 	      letters[i].font_pos = r->x;
 	      break;
 	    }

@@ -16,7 +16,7 @@
 
 #include "fps.h"
 
-static Uint32 Ticks = 0, Drawn_Frames = 0, next, now;
+static Uint32 /*Ticks = 0, Drawn_Frames = 0,*/ next, now;
 static unsigned char fps = 60;
 static Uint16 Tick_Interval = 10 ;
 static Uint16 Min_Tick = 10;

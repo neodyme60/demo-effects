@@ -142,8 +142,6 @@ void init()
 
 int main( int argc, char* argv[] )
 {
-  Uint8* image;
-  Uint8 color;
   Uint16 centerx, centery;
   int i, tempx, tempy;  
 

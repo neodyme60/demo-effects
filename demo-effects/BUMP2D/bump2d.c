@@ -96,7 +96,7 @@ void init()
 {
   Uint16 i;
   short x, y;
-  float rad, z;
+  float rad;
   
   heightmap = IMG_Load("../GFX/tuxblackbg.png");
   if (!heightmap) {

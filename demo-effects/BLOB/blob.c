@@ -163,8 +163,7 @@ void init()
 
 int main( int argc, char* argv[] )
 {
-  Uint8* image, *image_start;
-  Uint32 temp;
+  Uint8* image;
   Uint32 start;
   int i, j; 
   Uint8 k;

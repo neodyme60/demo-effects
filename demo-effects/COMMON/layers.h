@@ -22,13 +22,13 @@
 #define NLAYERS 10
 #define TDEC_BACKGROUND_LAYER 0
 
-extern SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha);
+extern SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, const char *module, ...);
 extern SDL_Surface* TDEC_get_backgroundlayer(void);
 extern void TDEC_draw_layers(void);
-extern void TDEC_init_layering(void);
-extern void TDEC_reset_layering(void);
+extern void TDEC_free_layers(void);
 extern SDL_Surface* TDEC_get_layer(Uint8 index);
 extern void TDEC_flatten_layers(void);
 extern void TDEC_clear_layer(SDL_Surface* surface);
+extern void TDEC_remove_layer(void);
 
 #endif

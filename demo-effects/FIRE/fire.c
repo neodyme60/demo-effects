@@ -182,9 +182,9 @@ int main( int argc, char* argv[] )
 	    {
 	      if (i == 0) /* at the left border*/
 		{
-		  temp = fire[j + i];
-		  temp += fire[j + i + 1];
-		  temp += fire[j - SCREEN_WIDTH + i];
+		  temp = fire[j];
+		  temp += fire[j + 1];
+		  temp += fire[j - SCREEN_WIDTH];
 		  temp /=3;
 		}
 	      else if (i == SCREEN_WIDTH - 1) /* at the right border*/

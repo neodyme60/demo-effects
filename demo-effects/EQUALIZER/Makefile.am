@@ -5,5 +5,5 @@ noinst_PROGRAMS=
 endif
 
 equalizer_SOURCES = equalizer.c 
-equalizer_LDADD = ../COMMON/libTDEC.a
+equalizer_LDADD = ../COMMON/libTDEC.la
 INCLUDES= -I../COMMON

@@ -54,8 +54,6 @@ void quit( int code )
 
 void handle_key_down( SDL_keysym* keysym )
 {
-  int i;
-
     switch( keysym->sym )
       {
       case SDLK_ESCAPE:

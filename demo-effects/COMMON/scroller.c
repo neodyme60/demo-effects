@@ -14,6 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+#include "SDL/SDL_image.h"
 #include "scroller.h"
 
 static SDL_Surface *font_surface;

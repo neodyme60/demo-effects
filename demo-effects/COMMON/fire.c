@@ -117,11 +117,6 @@ void TDEC_draw_fire()
   Uint16 temp;
   int i,j, index;  
 
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_LockSurface(surface);
-    }
-
   /* draw random bottom line in fire array */
   
   j = width * (height - 1);
@@ -187,11 +182,6 @@ void TDEC_draw_fire()
 	  TDEC_put_pixel(surface, xpos + j , ypos + i, SDL_MapRGB(surface->format, colors[fire[temp + j]].r, 
 								  colors[fire[temp + j]].g, colors[fire[temp + j]].b));
 	}
-    }
-  
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_UnlockSurface(surface);
     }
 }
 

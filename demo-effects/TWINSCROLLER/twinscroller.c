@@ -191,7 +191,7 @@ void init()
 
 int main( int argc, char* argv[] )
 {
-  Uint32 i, displacement = 0, j = 0, temp;
+  Uint32 i, displacement = 0, j = 0;
   SDL_Rect srect2 = {0, 0, CHARACTER_WIDTH, 1};
   SDL_Rect drect = {0, 0, CHARACTER_WIDTH, 1}; 
   SDL_Rect srect = {0, 2, CHARACTER_WIDTH, SCREEN_HEIGHT + CHARACTER_HEIGHT * 2};

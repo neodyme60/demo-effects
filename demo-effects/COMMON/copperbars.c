@@ -144,11 +144,6 @@ void TDEC_draw_copperbars(void)
 {
   SDL_Rect drect, crect;
 
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_LockSurface(surface);
-    }
-
   drect.x = 0;
   drect.w = surface->w;
   drect.h = 1;
@@ -244,11 +239,6 @@ void TDEC_draw_copperbars(void)
   red %= 360;
   
   TDEC_draw_copper(&drect, 1);
-  
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_UnlockSurface(surface);
-    }
 }
 
 

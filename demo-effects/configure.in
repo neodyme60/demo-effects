@@ -1,13 +1,35 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(COPPERBARS/copper.c)
+AC_INIT(Makefile.am)
+#
+AC_CANONICAL_SYSTEM
+AC_ARG_PROGRAM
+PACKAGE=The_Demo_Effects_Collection
+THE_DEMO_EFFECTS_COLLECTION_VERSION=0.5
+
+AC_PREFIX_DEFAULT("/usr/local/tdec")
 
 AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.5)
+AM_CONFIG_HEADER(config.h)
+
+AC_CONFIG_SUBDIRS(libltdl)
+
+# Configure libltdl
+AC_LIBLTDL_CONVENIENCE(libltdl)
+
+# Configure libtool
+AC_ENABLE_SHARED
+AC_ENABLE_STATIC
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_SETUP
+AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_RANLIB
 AC_PROG_MAKE_SET
+
+AM_SANITY_CHECK
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread, pthread_exit, , [AC_MSG_ERROR([libpthread not found])],)
@@ -77,15 +99,24 @@ AC_CHECK_HEADERS(SDL/SDL_image.h SDL/SDL.h)
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
-dnl Checks for library functions.
-
 dnl Get compile and linking flags
-CFLAGS="$CFLAGS `sdl-config --cflags`"
+CFLAGS="$CFLAGS `sdl-config --cflags` -Wall"
 LIBS="$LIBS `sdl-config --libs`"
 
-AC_OUTPUT(Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile 
-SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile 
-ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile 
-SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile 
-PLASMACUBE/Makefile TWINSCROLLER/Makefile SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile 
-BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile MULTILAYER/Makefile)
+ACLOCAL="aclocal -I m4 \$(ACLOCAL_FLAGS)"
+
+AC_SUBST(ACLOCAL)
+
+includedir="$includedir"
+AC_SUBST(includedir)
+# Substitute INCLTDL and LIBLTDL in the Makefiles
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+
+AC_OUTPUT(Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile 
+CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile 
+BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile 
+FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile 
+DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile TWINSCROLLER/Makefile 
+SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile 
+MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile)
