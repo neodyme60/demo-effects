@@ -23,13 +23,19 @@
 
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
+#define FADE_FACTOR 15
 
 static char plasma;
 static char fire;
 static char copper;
 static char stars;
 static char lens;
+static char fade;
+
+static short alpha = 0xFF;
+
 static Uint8 change = 1;
+static Uint8 quit_it = 0;
 
 void quit( int code )
 {
@@ -52,7 +58,7 @@ void handle_key_down( SDL_keysym* keysym )
     switch( keysym->sym )
       {
       case SDLK_ESCAPE:
-        quit( 0 );
+	quit_it = 1;
         break;
       default:
         break;
@@ -61,21 +67,23 @@ void handle_key_down( SDL_keysym* keysym )
 
 void process_events( void )
 {
-    /* Our SDL event placeholder. */
-    SDL_Event event;
-
-    /* Grab all the events off the queue. */
-    while( SDL_PollEvent( &event ) ) {
-
-        switch( event.type ) {
-        case SDL_KEYDOWN:
-            /* Handle key presses. */
-            handle_key_down( &event.key.keysym );
-            break;
-        case SDL_QUIT:
-            /* Handle quit requests*/
-            quit( 0 );
-            break;
+  /* Our SDL event placeholder. */
+  SDL_Event event;
+  
+  /* Grab all the events off the queue. */
+  while( SDL_PollEvent( &event ) ) 
+    {
+      
+      switch( event.type ) 
+	{
+	case SDL_KEYDOWN:
+	  /* Handle key presses. */
+	  handle_key_down( &event.key.keysym );
+	  break;
+	case SDL_QUIT:
+	  /* Handle quit requests*/
+	  quit_it = 1;
+	  break;
 	}
     }
 }
@@ -144,6 +152,12 @@ void init()
       exit(1);
     }
 
+  if ((fade = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, alpha, "../PLUGINS/FADE/fade",
+		      TDEC_NO_RESTART_CALLBACK)) == -1)
+    {
+      exit(1);
+    }
+
   TDEC_disable_layer(stars);
   TDEC_disable_layer(copper);
   
@@ -184,13 +198,39 @@ int main( int argc, char* argv[] )
      
      process_events();
      
+     if (quit_it)
+       {
+	 TDEC_enable_layer(fade);
+	 if (alpha < 0xFF)
+	   {
+	     /* fade out */
+	     TDEC_set_layer_alpha(fade, alpha);
+	     alpha += FADE_FACTOR;
+	   }
+	 else
+	   {
+	     quit(0);
+	   }
+       }
+     else
+       {
+	 if (alpha > 0)
+	   {
+	     /* fade in */
+	     TDEC_set_layer_alpha(fade, alpha);
+	     alpha -= FADE_FACTOR;
+	   }
+	 else
+	   {
+	     alpha = 0;
+	     TDEC_disable_layer(fade);
+	   }
+       }
+     
      TDEC_draw_layers();
+
      TDEC_set_layer_alpha(copper, TDEC_get_layer_alpha(copper) + 1);
+
      TDEC_fps_ok();
    }
 }
-
-
-
-
-

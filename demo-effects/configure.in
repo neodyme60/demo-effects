@@ -103,9 +103,8 @@ dnl Get compile and linking flags
 CFLAGS="$CFLAGS `sdl-config --cflags` -Wall -std=c89 -U__STRICT_ANSI__ -pedantic"
 LIBS="$LIBS `sdl-config --libs`"
 
-ACLOCAL="aclocal -I m4 \$(ACLOCAL_FLAGS)"
-
-AC_SUBST(ACLOCAL)
+#ACLOCAL="aclocal -I m4 \$(ACLOCAL_FLAGS)"
+#AC_SUBST(ACLOCAL)
 
 includedir="$includedir"
 AC_SUBST(includedir)
@@ -120,4 +119,5 @@ FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-
 DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile TWINSCROLLER/Makefile 
 SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile 
 MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile PLUGINS/SINESCROLLER/Makefile 
-PLUGINS/JUMPINGSCROLLER/Makefile PLUGINS/STARFIELD/Makefile PLUGINS/COPPERBARS/Makefile PLUGINS/LENS/Makefile)
+PLUGINS/JUMPINGSCROLLER/Makefile PLUGINS/STARFIELD/Makefile PLUGINS/COPPERBARS/Makefile PLUGINS/LENS/Makefile 
+PLUGINS/FADE/Makefile)
