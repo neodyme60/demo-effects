@@ -14,7 +14,8 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/*note that the code has not been optimized*/
+/* This effect was inspired by an article by Sqrt(-1) */
+/* note that the code has not been optimized */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +27,9 @@
 #define SCREEN_WIDTH 340
 
 static short aSin[512];
+static float reflectionmap[256][256];
+static Uint16 sin_index = 0;
+static Uint16 sin_index2 = 80;
 static SDL_Surface* image = 0;
 static SDL_Surface* heightmap = 0;
 
@@ -85,34 +89,96 @@ void process_events( void )
 
 void init()
 {
-    Uint16 i;
-    float rad;
-
-    image = IMG_Load("../GFX/tuxblackbg.png");
-    if (!image) {
-        fprintf(stderr, "Cannot open file tuxblackbg.png: %s\n", SDL_GetError());
-        quit(3);
+  Uint16 i;
+  short x, y;
+  float rad, z;
+  
+  image = IMG_Load("../GFX/tuxblackbg.png");
+  if (!image) {
+    fprintf(stderr, "Cannot open file tuxblackbg.png: %s\n", SDL_GetError());
+    quit(3);
+  }
+  
+  heightmap = TDEC_create_heightmap(image);
+  
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, heightmap->format->palette->colors, 0, heightmap->format->palette->ncolors);
+  
+  /*create sin lookup table */
+  for (i = 0; i < 512; i++)
+    {
+      rad =  (float)i * 0.0174532 * 0.703125; 
+      aSin[i] = (short)((sin(rad) * 100.0) + 256.0);
     }
-
-    heightmap = TDEC_create_heightmap(image);
-
-    SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, heightmap->format->palette->colors, 0, heightmap->format->palette->ncolors);
-
-    /*create sin lookup table */
-    for (i = 0; i < 512; i++)
-      {
-	rad =  (float)i * 0.0174532 * 0.703125; 
-	aSin[i] = (short)((sin(rad) * 100.0));
-      }
-
-    /*disable events */
-    for (i = 0; i < SDL_NUMEVENTS; ++i) {
-	if (i != SDL_KEYDOWN && i != SDL_QUIT) {
-	    SDL_EventState(i, SDL_IGNORE);
+  
+  /* create reflection map */
+  
+  for (x = 0; x < 256; ++x)
+    {
+      for (y = 0; y < 256; ++y)
+	{
+	  float X = (x - 128) / 128.0;
+	  float Y = (y - 128) / 128.0;
+	  float Z =  1.0 - sqrt(X * X + Y * Y);
+	  Z *= 255.0;
+	  if (Z < 0.0)
+	    Z = 0.0;
+	  reflectionmap[x][y] = Z;
 	}
     }
   
-    SDL_ShowCursor(SDL_DISABLE);
+  /*disable events */
+  for (i = 0; i < SDL_NUMEVENTS; ++i) {
+    if (i != SDL_KEYDOWN && i != SDL_QUIT) {
+      SDL_EventState(i, SDL_IGNORE);
+    }
+  }
+  
+  SDL_ShowCursor(SDL_DISABLE);
+}
+
+void bump()
+{
+  static short x, y;
+  Uint16 lightx, lighty;
+  short normalx, normaly;
+  Uint8 *h1 = (Uint8*)heightmap->pixels + heightmap->pitch + 1;
+  Uint8 *s1 = (Uint8*)screen->pixels + screen->pitch + 1;
+  Uint16 temp;
+  
+  lightx = aSin[sin_index];
+  lighty = aSin[sin_index2];
+
+  for (y = 1; y < SCREEN_HEIGHT - 1; ++y)
+    {    
+      temp = lighty - y;
+      for (x = 1; x < SCREEN_WIDTH - 1; ++x)
+	{
+	  normalx = *(h1 + 1) - *h1;
+	  normaly = *h1 - *(h1 - heightmap->pitch);
+	  
+	  normalx += lightx - x;
+	  normaly += temp;
+
+	  if (normalx < 0)
+	    normalx = 0;
+	  else if (normalx > 255)
+	    normalx = 0;
+	  if (normaly < 0)
+	    normaly = 0;
+	  else if (normaly > 255)
+	    normaly = 0;	  
+
+	  *s1++ = (Uint8)reflectionmap[normalx][normaly];
+	  h1++;
+	}
+      s1+= 2;
+      h1+= 2;;
+    }
+  
+  sin_index += 2;
+  sin_index &= 511;
+  sin_index2 += 1;
+  sin_index2 &= 511;
 }
 
 int main( int argc, char* argv[] )
@@ -123,7 +189,7 @@ int main( int argc, char* argv[] )
   }
   
   if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /*| 
-SDL_FULLSCREEN*/))
+														    SDL_FULLSCREEN*/))
     quit(1);
   
   TDEC_init_timer();
@@ -132,17 +198,18 @@ SDL_FULLSCREEN*/))
   
   init();
   
-  //  TDEC_set_fps(30);
+  TDEC_set_fps(10);
 
-  SDL_BlitSurface(heightmap, 0, screen, 0);
+  SDL_LockSurface(screen);
 
   /* time based demo loop */
   while( 1 ) 
-    {
-      
+    {  
       TDEC_new_time();
     
       process_events();
+
+      bump();
 
       if (TDEC_fps_ok()) 
 	{

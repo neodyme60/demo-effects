@@ -604,6 +604,88 @@ void TDEC_flipy_image(SDL_Surface* surface)
 
 SDL_Surface* TDEC_create_heightmap(SDL_Surface *source)
 {
+  Uint16 i, j;
+  Uint32 x; 
+  Uint8 index;
+  SDL_Palette *p;
+  SDL_Surface *s;
+  Uint8 *image;
+
+  if (!source->format->palette) /* not an 8-bit source surface */
+    return (SDL_Surface*)0;
+
+  s = TDEC_copy_surface(source);
+
+  p = s->format->palette;
+
+  /* sort palette from dark to light colors using selection sort */
+
+  for (i = 0; i < 256; ++i)
+    {
+      SDL_Color *c = p->colors + i;
+      index = i;
+
+      for (j = i + 1; j < 256; ++j)
+	{
+	  SDL_Color *d = p->colors + j;
+	  Uint8 biggest = 0;
+
+	  /* what is the biggest value? */
+	  if (c->r >= c->g && c->r >= c->b)
+	    {
+	      /* r is biggest */
+	      biggest = c->r;
+	    }
+	  else if (c->g >= c->r && c->g >= c->b)
+	    {
+	      /* g is biggest */
+	      biggest = c->g;
+	    }
+	  else if (c->b >= c->r && c->b >= c->g)
+	    {
+	      /* b is biggest */
+	      biggest = c->b;
+	    }
+
+	  if (d->r <= biggest && d->g <= biggest && d->b <= biggest)
+	    {
+	      if (d->r == biggest || d->g == biggest || d->b == biggest)
+		{
+		  if (d->r + d->g + d->b < c->r + c->g + c->b)
+		    {
+		      /* found darker color */
+		      index = j;
+		      c = d;
+		    }
+		}
+	      else
+		{
+		  /* found darker color */
+		  index = j;
+		  c = d;
+		}
+	    }
+	}
+
+      image = (Uint8*)s->pixels;
+      p->colors[index] = p->colors[i];
+      p->colors[i].r = p->colors[i].g = p->colors[i].b = i;
+      
+      /* swap pixels in image */
+      
+      for (x = 0; x < s->w * s->h; ++x)
+	{
+	  if (*image == index)
+	    *image = i;
+	  image++;
+	}
+    }
+
+  return s;
+}
+
+SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source)
+{
   SDL_Color colors[256];
   Uint16 i, j; 
   Uint8 index;
@@ -698,4 +780,3 @@ SDL_Surface* TDEC_create_heightmap(SDL_Surface *source)
 
   return s;
 }
-

@@ -47,6 +47,7 @@ void TDEC_flipy_copy_image(SDL_Surface* original, SDL_Surface* copy);
 
 /*various */
 SDL_Surface* TDEC_create_heightmap(SDL_Surface *source);
+SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source);
 
 /* local functions */
 static Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate);
