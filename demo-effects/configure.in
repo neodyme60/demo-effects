@@ -4,11 +4,11 @@ AC_INIT(Makefile.am)
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
 PACKAGE=The_Demo_Effects_Collection
-THE_DEMO_EFFECTS_COLLECTION_VERSION=0.6
+THE_DEMO_EFFECTS_COLLECTION_VERSION=0.7
 
 AC_PREFIX_DEFAULT("/usr/local/tdec")
 
-AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.6)
+AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.7)
 AM_CONFIG_HEADER(config.h)
 
 AC_CONFIG_SUBDIRS(libltdl)
@@ -74,15 +74,19 @@ AC_ARG_ENABLE(opengl,
 AM_CONDITIONAL(OPENGL, test x$opengl = xtrue)
 
 if test x$opengl = xtrue; then
+AC_PATH_XTRA
+AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glut.h)
 AC_CHECK_LIB(GL, glPushMatrix, ,[AC_MSG_ERROR([libGL not found])],)
 AC_CHECK_LIB(GLU, gluLookAt, ,[AC_MSG_ERROR([libGLU not found])],)
-AC_CHECK_LIB(glut, glutMainLoop, ,[AC_MSG_ERROR([libglut not found])],)
-AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glut.h)
+AC_CHECK_LIB(glut, glutGetModifiers, ,[AC_MSG_ERROR([libglut not found])], $LIBS $X_LIBS $X_PRE_LIBS -lpthread -lX11 
+-lXi -lXext -lXmu $X_EXTRA_LIBS -lm)
 else
 echo "The use of OpenGL is disabled"
 echo "3D effects depending on OpenGL will not be build "
 echo "run configure --enable-opengl=yes to include OpenGL support"
 fi
+
+LIBS="$LIBS $X_LIBS $X_PRE_LIBS -lpthread -lX11 -lXi -lXext -lXmu $X_EXTRA_LIBS -lm"
 
 #file OPC_TreeCollider.cpp of OPCODE-1.2 generates run-time errors when compiled with optimization -O2 when 
 #using gcc >= 3.0. Therefore this check is made, so when gcc >= 3.0, file OPC_TreeCollider.cpp is compiled with -O1
