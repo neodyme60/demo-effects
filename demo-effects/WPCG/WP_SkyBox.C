@@ -29,6 +29,8 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
 		     const char* top_texture,
 		     const char* bottom_texture):displayID(0)
 {
+  //FIXME create a collision model for each side so frustum culling can be applied
+
   //creates a skybox
 
   WP_TextureManager* tex_manager = WP_TextureManager::getInstance();
@@ -37,11 +39,14 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   GLuint rg_id = tex_manager->getTexture(right_texture, this);
   GLuint bk_id = tex_manager->getTexture(back_texture, this);
   GLuint lf_id = tex_manager->getTexture(left_texture, this);
-  GLuint up_id = tex_manager->getTexture(top_texture, this);
-  GLuint dn_id = tex_manager->getTexture(bottom_texture, this);
+  GLuint up_id;
+  if (top_texture)
+    up_id = tex_manager->getTexture(top_texture, this);
+  GLuint dn_id;
+  if (bottom_texture)
+    dn_id = tex_manager->getTexture(bottom_texture, this);
 
    //create display list 
-
   displayID = glGenLists(1);
   glNewList(displayID, GL_COMPILE);
   glPushMatrix();
@@ -54,7 +59,6 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glDepthMask(false);    
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
   glBindTexture(GL_TEXTURE_2D, ft_id);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
   
@@ -133,46 +137,52 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glVertex3f(-20, 20.0, 20.0);
 
   glEnd();
-  
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
-  glBindTexture(GL_TEXTURE_2D, up_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
 
-  glBegin(GL_QUADS);
+  if (top_texture)
+    {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
+      glBindTexture(GL_TEXTURE_2D, up_id);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
 
-  glTexCoord2f(1.0, 1.0);
-  glVertex3f(20.0, 20.0, -20.0);
+      glBegin(GL_QUADS);
 
-  glTexCoord2f(0.0, 1.0);
-  glVertex3f(20.0, 20.0, 20.0);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(20.0, 20.0, -20.0);
 
-  glTexCoord2f(0.0, 0.0);
-  glVertex3f(-20.0, 20.0, 20.0);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(20.0, 20.0, 20.0);
 
-  glTexCoord2f(1.0, 0.0);
-  glVertex3f(-20, 20.0, -20.0);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(-20.0, 20.0, 20.0);
 
-  glEnd();
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(-20, 20.0, -20.0);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
-  glBindTexture(GL_TEXTURE_2D, dn_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
+      glEnd();
+    }
 
-  glBegin(GL_QUADS);
+  if (bottom_texture)
+    {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
+      glBindTexture(GL_TEXTURE_2D, dn_id);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
 
-  glTexCoord2f(1.0, 1.0);
-  glVertex3f(-20.0, -20.0, -20.0);
+      glBegin(GL_QUADS);
 
-  glTexCoord2f(0.0, 1.0);
-  glVertex3f(-20.0, -20.0, 20.0);
+      glTexCoord2f(1.0, 1.0);
+      glVertex3f(-20.0, -20.0, -20.0);
 
-  glTexCoord2f(0.0, 0.0);
-  glVertex3f(20.0, -20.0, 20.0);
+      glTexCoord2f(0.0, 1.0);
+      glVertex3f(-20.0, -20.0, 20.0);
 
-  glTexCoord2f(1.0, 0.0);
-  glVertex3f(20, -20.0, -20.0);
+      glTexCoord2f(0.0, 0.0);
+      glVertex3f(20.0, -20.0, 20.0);
 
-  glEnd();
+      glTexCoord2f(1.0, 0.0);
+      glVertex3f(20, -20.0, -20.0);
+
+      glEnd();
+    }
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
   WP_GLState::getInstance()->enableDepthTest();
@@ -185,8 +195,8 @@ WP_SkyBox::WP_SkyBox(const char* front_texture,
   glDepthMask(true);
   glPopMatrix();
   glEndList();
-
   tex_manager->mipmapping = true;
+
 }
 
 WP_SkyBox::~WP_SkyBox()

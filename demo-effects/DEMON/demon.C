@@ -192,11 +192,14 @@ int main( int argc, char* argv[] )
   init();
 
   // add quake2 demon model  
-  manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2",
-WP_Vector3D(0.1,0.1,0.1)); 
+  manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2"); 
   // add quake2 demon weapon model
-  manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2",
-WP_Vector3D(0.1,0.1,0.1)); 
+  manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2"); 
+
+  WP_DynamicObject *demon = manager->getDynamicObject();
+  demon->animate = true;
+  WP_DynamicObject *weapon = manager->getDynamicObject("Demon_Weapon");
+  weapon->animate = true;
 
   /* time based demo loop */
   while( 1 ) 

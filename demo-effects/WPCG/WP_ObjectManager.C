@@ -22,7 +22,7 @@
 
 WP_Math* WP_DynamicObject::math = WP_Math::getInstance();
 
-WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0), roll(0), inFrustum(true)
+WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0), animate(false),roll(0), inFrustum(true)
 {
   //determine dir and up vectors, it is assumed that the object is orientated correctly thus facing north (0.0f, 0.0f, -1.0f) and up is (0.0f, 1.0f, 0.0f)
   
@@ -30,9 +30,9 @@ WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_mat
   up = WP_Vector3D(0.0f, 1.0f, 0.0f);
 };
 
-void WP_Object::drawOpenGL() const 
+void WP_Object::drawOpenGL()  
 { 
-    model->drawOpenGL(matrix);
+    model->drawOpenGL(matrix, this);
 }
 
 void WP_Object::print() const
@@ -54,7 +54,11 @@ WP_ObjectManager* WP_ObjectManager::om_instance = 0;
 
 const string WP_ObjectManager::internal_models[] = {"WP_METABALL"};
 
-WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0){}
+WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0)
+{
+  PC.SetFirstContact(true);
+  PC.SetTemporalCoherence(false);
+}
 
 WP_ObjectManager::~WP_ObjectManager()
 {
@@ -91,17 +95,16 @@ bool WP_ObjectManager::hasValidExtension(const char* file, const char* extension
 }
 
 WP_Object* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const string& object_name, 
-							    const string& model_name, const WP_Vector3D& scaling)
+							    const string& model_name)
 {
   WP_StaticObject* sobject;
   WP_Model* model;
 try
   {
     cout << "Creating static object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
-	 << " " << matrix.data[13] << " " << matrix.data[14] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
-	 << " " << scaling.data[2] << endl;
+	 << " " << matrix.data[13] << " " << matrix.data[14] << endl;
   
-    sobject = new WP_StaticObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name);
+    sobject = new WP_StaticObject(matrix, object_name);
     if (!sobject)
       {
 	return (WP_Object*)0;
@@ -127,7 +130,8 @@ try
 	      }
 	    else
 	      {
-		model = new WP_MetaBall(model_name, scaling);
+		//FIXME switch for internal model type
+		model = new WP_MetaBall(model_name);
 		if (!model->init())
 		  {
 		    throw("");
@@ -155,7 +159,7 @@ try
 	    if (hasValidExtension(m_name.c_str(), "md2"))
 	      {
 		//quake2 md2 file
-		model = new WP_Model_MD2(m_name, scaling);
+		model = new WP_Model_MD2(m_name);
 		if (!model->init())
 		  {
 		    throw("");
@@ -182,7 +186,7 @@ catch(...)
 }
 
 WP_Object* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, 
-							    const string& model_name, const WP_Vector3D& scaling, const WP_Vector3D& velocity)
+							    const string& model_name, const WP_Vector3D& velocity)
 {
   WP_DynamicObject* dobject;
   WP_Model* model;
@@ -191,10 +195,9 @@ try
 
     cout << "Creating dynamic object " << object_name << " of model " << model_name << " at position: " << matrix.data[12] 
 	 << " " << matrix.data[13] << " " << matrix.data[14] << " with vector " << velocity.data[0] << " " << velocity.data[1] << " " 
-	 << velocity.data[2] << " scaled by " << scaling.data[0] << " " << scaling.data[1] 
-	 << " " << scaling.data[2] << endl;
+	 << velocity.data[2] << endl;
 
-    dobject = new WP_DynamicObject(WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]) * matrix, object_name, velocity);
+    dobject = new WP_DynamicObject(matrix, object_name, velocity);
     if (!dobject)
       {
 	return (WP_Object*)0;
@@ -211,7 +214,7 @@ try
 	  {
 	    internal = true;
 	    dobject->name_id = unique++;
-	    model = new WP_MetaBall(model_name, scaling);
+	    model = new WP_MetaBall(model_name);
 	    if (!model->init())
 	      {
 		throw("");
@@ -242,7 +245,7 @@ try
 	if (hasValidExtension(m_name.c_str(), "md2"))
 	  {
 	    //quake2 MD2 file
-	    model = new WP_Model_MD2(m_name, scaling);
+	    model = new WP_Model_MD2(m_name);
 	    if (!model->init())
 	      {
 		throw("");
@@ -385,46 +388,84 @@ WP_DynamicObject* WP_ObjectManager::getDynamicObject() const
 
 void WP_ObjectManager::drawObjects() 
 {
-//  cam->meshes_in_frustum = 0;
+  //  cam->meshes_in_frustum = 0;
+  int in_frustum = 0;
 
   cam->followObject();
+  
+  static PlanesCache cache;
 
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	
-      if (cam->inFrustum((*i)->matrix.data[12], (*i)->matrix.data[13],
-			 (*i)->matrix.data[14], (*i)->model->radius))
+      //OBJECT IN FRUSTUM??
+      
+      PC.SetCallback(&ColCallback, udword((*i)->model));
+
+      Matrix4x4 worldmatrix((*i)->matrix.data[0],(*i)->matrix.data[1], (*i)->matrix.data[2], (*i)->matrix.data[3], 
+			    (*i)->matrix.data[4],(*i)->matrix.data[5], (*i)->matrix.data[6], (*i)->matrix.data[7],
+			    (*i)->matrix.data[8],(*i)->matrix.data[9], (*i)->matrix.data[10], (*i)->matrix.data[11],
+			    (*i)->matrix.data[12],(*i)->matrix.data[13], (*i)->matrix.data[14], (*i)->matrix.data[15]);
+      
+      if (PC.Collide(cache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), &worldmatrix))
 	{
-	  (*i)->drawOpenGL();
-	  (*i)->inFrustum = true;
+	  if (PC.GetContactStatus())
+	    {
+	      (*i)->drawOpenGL();
+	      (*i)->inFrustum = true;
+	      in_frustum++;
+	    }
+	  else
+	    {
+	      (*i)->inFrustum = false;
+	    }
 	}
       else
-	{
-	  (*i)->inFrustum = false;
-	}
+	cout << "COLLIDING ERROR" << endl;
+
       i++;
+      
     }
 
   list<WP_DynamicObject*>::const_iterator j = dynamic_objects.begin();
   while (j != dynamic_objects.end())
     {	
-     if (cam->inFrustum((*j)->matrix.data[12], (*j)->matrix.data[13],
-			(*j)->matrix.data[14], (*j)->model->radius))
+      //OBJECT IN FRUSTUM??
+      
+      PC.SetCallback(&ColCallback, udword((*j)->model));
+
+      Matrix4x4 worldmatrix((*j)->matrix.data[0],(*j)->matrix.data[1], (*j)->matrix.data[2], (*j)->matrix.data[3], 
+			    (*j)->matrix.data[4],(*j)->matrix.data[5], (*j)->matrix.data[6], (*j)->matrix.data[7],
+			    (*j)->matrix.data[8],(*j)->matrix.data[9], (*j)->matrix.data[10], (*j)->matrix.data[11],
+			    (*j)->matrix.data[12],(*j)->matrix.data[13], (*j)->matrix.data[14], (*j)->matrix.data[15]);
+      
+      if (PC.Collide(cache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(),&worldmatrix ))
 	{
-	  (*j)->drawOpenGL();
-	  (*j)->inFrustum = true;
+	  if (PC.GetContactStatus())
+	    {
+	      (*j)->drawOpenGL();
+	      (*j)->inFrustum = true;
+	      in_frustum++;
+	    }
+	  else
+	    {
+	      (*j)->inFrustum = false;
+	    }
 	}
-     else
-       {
-	 (*j)->inFrustum = false;
-       }
+      else
+	cout << "COLLIDING ERROR" << endl;
+
       j++;
     }
+  //  cout << in_frustum << endl;
+
 }
 
 void WP_ObjectManager::drawObjectsSelection() 
 {
-  glInitNames(); //init the name stack
+  //FIXME adjust to new frustum culling by OPCODE
+
+  /*  glInitNames(); //init the name stack
 
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
@@ -451,6 +492,7 @@ void WP_ObjectManager::drawObjectsSelection()
 	}
       j++;
     }
+  */
 }
 
 WP_Model* WP_ObjectManager::findInstance(const string& model_name) 
@@ -1069,4 +1111,24 @@ void WP_DynamicObject::print() const
   cout << "Speed: " << speed << endl;
   cout << "Velocity vector: x:" << velocity.data[0] << " y:" << velocity.data[1] << " z:" << velocity.data[2] << endl;
 }
+
+//OPCODE CALLBACKS
+void 
+WP_ObjectManager::ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data)
+{
+  static Point p,q,r;
+
+  WP_Model* model = (WP_Model*)user_data;
+  unsigned int* indices = model->triangles + triangleindex * 3;
+  WP_Vertex* v = model->getVertex(indices[0]);
+  p.Set(v->point.data);
+  triangle.Vertex[0] = &p;
+  v = model->getVertex(indices[1]);
+  q.Set(v->point.data);
+  triangle.Vertex[1] = &q;
+  v = model->getVertex(indices[2]);
+  r.Set(v->point.data);
+  triangle.Vertex[2] = &r;
+}
+
 

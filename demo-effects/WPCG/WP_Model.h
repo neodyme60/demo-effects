@@ -34,11 +34,9 @@ class WP_Model
   
   /**
    * @param the name of the to be loaded model
-   * @param scaling a WP_Vector3D object holding values by which the model is scaled
    */
-  WP_Model(const string& name, const WP_Vector3D& scaling): model_name(name) ,numberTriangles(0), triangles(0), numberVertices(0) 
+  WP_Model(const string& name): model_name(name) ,numberTriangles(0), triangles(0), numberVertices(0) 
     {
-      scaling_matrix = new WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]);
     };
 
   //COPY CONSTRUCTOR
@@ -50,10 +48,10 @@ class WP_Model
   WP_Model& operator=(const WP_Model &model);
   
   /**
-   * this function draws the model according to its world matrix into the 3D scene but only if its bounding sphere is in the viewing frustum
+   * this function draws the model according to its world matrix into the 3D scene 
    * @param matrix a WP_Matrix3D object representing the world matrix of the model indicating where and how the model is rendered into the scene
    */
-  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  virtual void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) = 0;
   
   /**
    * this virtual function should be overriden by child objects. In this function the model must be read and the model's internals must be filled (like for example the meshes, the material etc). Every 3d file format stores this information in a different way there this function can be used to substract the necessary data from it.
@@ -66,27 +64,19 @@ class WP_Model
   bool init();
 
   /**
-   * a WP_Matrix3D object representing the scaling matrix by which the model is scaled (used for correct scaling of bounding sphere and collision hull)
-   */
-  WP_Matrix3D* scaling_matrix;
-
-  /**
-   * a WP_Point3D object holding the position of the center of the model, this is used for the definition of a bounding sphere to determine if the model is in the viewing frustum or not
-   */
-  WP_Point3D center;
-  
-  /**
-   * the radius of the bounding sphere of the model
-   */
-  scalar radius;
-
-  /**
    * the name of the model
    */
   string model_name;
   
   int numberTriangles;
-      
+
+  virtual OPCODE_Model* getCollisionModel() const = 0;
+
+  virtual WP_Vertex* getVertex(unsigned int index) const = 0;
+
+  /**
+   * indices into the vertices array, so every three indices make up an triangle 
+   */
   unsigned int *triangles; 
 
   /**
@@ -149,34 +139,6 @@ class WP_Model
        * the name of the frame
        */
       string name;
-
-      /**
-       * a WP_Point3D object holding the position of the center of the frame, this is used for the definition of a bounding sphere to determine if the frame is in the viewing frustum or not
-       */
-      WP_Point3D center;
-
-      /**
-       * the radius of the bounding sphere of the frame
-       */
-      scalar radius;
-
-      /**
-       * this function computes the maximum values of the vertices in the frame. This to determine the size of the model its bounding sphere
-       * @return a WP_Point3D object holding the maximum values of the model
-       */
-      WP_Point3D getMaxPoint() const;
-  
-      /**
-       * this function computes the maximum values of the vertices in the frame. This to determine the size of the model its bounding sphere
-       * @return a WP_Point3D object holding the minimum values of the model
-       */
-      WP_Point3D getMinPoint() const;
-
-      /**
-       * this function computes the bounding sphere of the frame for a quick checking if the frame is in the viewing frustum
-       * @param scaling_matrix a pointer to a WP_Vector3D object representing the frame its scaling matrix (used for scaling of bounding sphere and in the future for the collision hull)
-       */
-      void computeBoundingSphere(WP_Matrix3D* scaling_matrix);
     };
 };
 
@@ -187,41 +149,52 @@ class WP_Model
  */
  
 class WP_NonAnimatedModel: public WP_Model
- {
+{
  public:
-   WP_NonAnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling)
-{
-  frame = new WP_Frame(this);
-};
-
+  WP_NonAnimatedModel(const string& name):WP_Model(name)
+    {
+      frame = new WP_Frame(this);
+    };
+  
   virtual ~WP_NonAnimatedModel()
-{
-  delete frame;
-};
-
-//COPY CONSTRUCTOR
-WP_NonAnimatedModel(const WP_NonAnimatedModel& namodel):WP_Model(namodel)
-{
-  frame = new WP_Frame(*namodel.frame);
-}
-
+    {
+      delete frame;
+    };
+  
+  //COPY CONSTRUCTOR
+  WP_NonAnimatedModel(const WP_NonAnimatedModel& namodel):WP_Model(namodel)
+    {
+      frame = new WP_Frame(*namodel.frame);
+    }
+  
   //ASSIGNMENT OPERATOR
   WP_NonAnimatedModel& operator=(const WP_NonAnimatedModel &namodel)
-{
-  if (this == &namodel)
-    return *this;
-
-  WP_Model::operator=(namodel);
+    {
+      if (this == &namodel)
+	return *this;
+      
+      WP_Model::operator=(namodel);
+      
+      delete frame;
+      frame = new WP_Frame(*namodel.frame);
+      
+      return *this;
+    }
   
-  delete frame;
-  frame = new WP_Frame(*namodel.frame);
+  OPCODE_Model* getCollisionModel() const
+    {
+      return &frame->collision_model;
+    }
 
-  return *this;
-}
-
-  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  WP_Vertex* getVertex(unsigned int index) const
+    {
+      return &frame->vertices[index];
+    }
+  
+  
+  virtual void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) = 0;
   virtual bool initModel() = 0;
-
+  
  protected:
   WP_Frame* frame;
 
@@ -238,7 +211,7 @@ WP_NonAnimatedModel(const WP_NonAnimatedModel& namodel):WP_Model(namodel)
 class WP_AnimatedModel: public WP_Model
  {
  public:
-  WP_AnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling),
+  WP_AnimatedModel(const string& name):WP_Model(name),
     frames(0), numberFrames(0), currentFrame(0), interpolate(0.0){}; 
 
   //COPY CONSTRUCTOR
@@ -249,8 +222,18 @@ class WP_AnimatedModel: public WP_Model
   //ASSIGNMENT OPERATOR
   WP_AnimatedModel& operator=(const WP_AnimatedModel &amodel);
 
-  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  virtual void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) = 0;
   virtual bool initModel() = 0;
+
+  OPCODE_Model* getCollisionModel() const
+    {
+      return &frames[0].collision_model;
+    }
+
+  WP_Vertex* getVertex(unsigned int index) const
+    {
+      return &frames[0].vertices[index];
+    }
 
 protected:
 
@@ -272,9 +255,8 @@ class WP_Model_MD2: public WP_AnimatedModel
  public:
   /**
    * @param name the name of the file containing the .md2 model
-   * @param scaling a WP_Vector3D object holding values by which the model is scaled
    */
-  WP_Model_MD2(const string& name, const WP_Vector3D& scaling);
+  WP_Model_MD2(const string& name);
 
   //COPY CONSTRUCTOR
   WP_Model_MD2(const WP_Model_MD2 &md2model);
@@ -292,10 +274,10 @@ class WP_Model_MD2: public WP_AnimatedModel
   //ASSIGNMENT OPERATOR
   WP_Model_MD2& operator=(const WP_Model_MD2 &md2model);
 
-  void drawOpenGL(const WP_Matrix3D& matrix);
+  void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object);
   
   /**
-   * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
+   * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automatically called by the base class WP_Model by a call to its <i>init</i> function
    */
   bool initModel();
 
@@ -332,17 +314,17 @@ class WP_Model_MD2: public WP_AnimatedModel
 class WP_MetaBall: public WP_NonAnimatedModel
 {
  public:
-  WP_MetaBall(const string& name, const WP_Vector3D& scaling);
+  WP_MetaBall(const string& name);
   WP_MetaBall(const WP_MetaBall &ball);
 
   WP_MetaBall::~WP_MetaBall(){};
 
   WP_MetaBall& operator=(const WP_MetaBall &ball);
 
-  void drawOpenGL(const WP_Matrix3D& matrix);
+  void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object);
   
   /**
-   * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
+   * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automatically called by the base class WP_Model by a call to its <i>init</i> function
    */
   bool initModel();
 

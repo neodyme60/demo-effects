@@ -30,19 +30,23 @@ WP_Model::WP_Model(){}
 
 WP_Model::~WP_Model()
 {
-  delete scaling_matrix;
   WP_TextureManager::getInstance()->removeTextures(this);
+  delete[] triangles;
 }
 
 //COPY CONSTRUCTOR
 WP_Model::WP_Model(const WP_Model &model)
 {
-  scaling_matrix = new WP_Matrix3D(*model.scaling_matrix);
-  center = model.center;
-  radius = model.radius;
   model_name = model.model_name;
   count = model.count;
   tex_id = model.tex_id;
+
+  int i = 0;
+  numberTriangles = model.numberTriangles;
+  triangles = new unsigned int[numberTriangles * 3];
+
+  for (; i < numberTriangles * 3; ++i)
+    triangles[i] = model.triangles[i];
 }
 
 WP_Model& WP_Model::operator=(const WP_Model &model)
@@ -50,13 +54,18 @@ WP_Model& WP_Model::operator=(const WP_Model &model)
   if (this == &model)
     return *this;
 
-  delete scaling_matrix;
-  scaling_matrix = new WP_Matrix3D(*model.scaling_matrix);
-  center = model.center;
-  radius = model.radius;
   model_name = model.model_name;
   count = model.count;
   tex_id = model.tex_id;
+
+  delete[] triangles;
+  int i = 0;
+  numberTriangles = model.numberTriangles;
+  triangles = new unsigned int[numberTriangles * 3];
+
+  for (; i < numberTriangles * 3; ++i)
+    triangles[i] = model.triangles[i];
+
   return *this;
 }
 
@@ -83,8 +92,6 @@ WP_Model::WP_Frame::WP_Frame(const WP_Model::WP_Frame &frame)
   material = frame.material;
   collision_model = frame.collision_model;
   name = frame.name;
-  center = frame.center;
-  radius = frame.radius;
 }
 
 WP_Model::WP_Frame& WP_Model::WP_Frame::operator=(const WP_Model::WP_Frame &frame)
@@ -103,48 +110,7 @@ WP_Model::WP_Frame& WP_Model::WP_Frame::operator=(const WP_Model::WP_Frame &fram
   collision_model = frame.collision_model;
   material = frame.material;
   name =  frame.name;
-  center = frame.center;
-  radius = frame.radius;
   return *this;
-}
-
-WP_Point3D 
-WP_Model::WP_Frame::getMaxPoint() const
-{
-}
-
-WP_Point3D 
-WP_Model::WP_Frame::getMinPoint() const
-{
-}
-void WP_Model::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
-{
-  /* //set center and determine sphere radius
-  
-  WP_Point3D _max = getMaxPoint(scaling_matrix);
-  WP_Point3D _min = getMinPoint(scaling_matrix);
-  
-  center.data[0] = _min.data[0] + ((_max.data[0] - _min.data[0]) / 2.0);
-  center.data[1] = _min.data[1] + ((_max.data[1] - _min.data[1]) / 2.0);
-  center.data[2] = _min.data[2] + ((_max.data[2] - _min.data[2]) / 2.0);
-  
-  scalar x_size = _max.data[0] - _min.data[0];
-  scalar y_size = _max.data[1] - _min.data[1];
-  scalar z_size = _max.data[2] - _min.data[2];
-  
-  if (x_size >= y_size && x_size >= z_size)
-    {
-      radius = (x_size / 2.0) * 1.35;
-    }
-  else if (y_size >= x_size && y_size >= z_size)
-    {
-      radius = (y_size / 2.0) * 1.35;
-    }
-  else
-    {
-      radius = (z_size / 2.0) * 1.35;
-    }
-  */
 }
 
 ////////////////////////////////// WP_AnimatedModel ////////////////////////////////////
@@ -193,13 +159,35 @@ bool
 WP_AnimatedModel::finalizeAll()
 {
 
- //init OPCODE_Model for every frame
+ //FIXME init OPCODE_Model for every frame
+ // for testing only of the first frame a collision model is created
 
   OPCODECREATE OPCC;
 
+  OPCC.NbTris = numberTriangles;
+  OPCC.NbVerts = numberVertices;
 
+  OPCC.Tris = triangles;
 
-  
+  //convert WP_Vertex to Point of OPC library
+
+  Point* points = new Point[numberVertices];
+
+  int i = 0;
+
+  for (; i < numberVertices; ++i)
+      points[i].Set(frames[0].vertices[i].point.data);
+
+  OPCC.Verts = points;
+
+  OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
+  OPCC.NoLeaf = true;
+  OPCC.Quantized = true;
+
+  frames[0].collision_model.Build(OPCC);
+
+  delete[] points;
+
   return true;
 }
 
@@ -209,10 +197,34 @@ WP_AnimatedModel::finalizeAll()
 bool 
 WP_NonAnimatedModel::finalizeAll()
 {
-
  //init OPCODE_Model for only frame
 
   OPCODECREATE OPCC;
+
+  OPCC.NbTris = numberTriangles;
+  OPCC.NbVerts = numberVertices;
+
+  OPCC.Tris = triangles;
+
+  //convert WP_Vertex to Point of OPC library
+
+  Point* points = new Point[numberVertices];
+
+  int i = 0;
+
+  for (; i < numberVertices; ++i)
+      points[i].Set(frame->vertices[i].point.data);
+
+  OPCC.Verts = points;
+
+  OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
+  OPCC.NoLeaf = true;
+  OPCC.Quantized = true;
+
+  frame->collision_model.Build(OPCC);
+
+  delete[] points;
+
   return true;
 }
 
@@ -385,7 +397,7 @@ WP_NonAnimatedModel::finalizeAll()
       WP_Vector3D(-0.688191, -0.587785, -0.425325), 
     };
 
-WP_Model_MD2::WP_Model_MD2(const string& name, const WP_Vector3D& scaling): WP_AnimatedModel(name, scaling){}
+WP_Model_MD2::WP_Model_MD2(const string& name): WP_AnimatedModel(name){}
 
 //COPY CONSTRUCTOR
 //FIXME get rid of dynamic cast !!!
@@ -523,6 +535,25 @@ bool WP_Model_MD2::initModel()
       numberFrames = header.numFrames;
       frames = new WP_Frame[numberFrames];
       
+      numberTriangles = header.numTriangles;
+      triangles = new unsigned int[numberTriangles * 3];
+
+      numberVertices = header.numVertices;
+
+      p = buffer + header.offsetTriangles;
+
+      for (k = 0; k < header.numTriangles; ++k)
+	{
+	  short index1, index2, index3;
+	  endian->getTypedData(&index1, p, sizeof(short));
+	  endian->getTypedData(&index2, p, sizeof(short));
+	  endian->getTypedData(&index3, p, sizeof(short));
+	  triangles[k * 3] = index1;
+	  triangles[k * 3 + 1] = index2;
+	  triangles[k * 3 + 2] = index3;
+	  p += 3 * sizeof(short);
+	}
+
       p = buffer + header.offsetFrames;
 
       /* create matrix which will orientate model into internal objectmanager orientation, being facing north and standing straight up*/
@@ -540,7 +571,8 @@ bool WP_Model_MD2::initModel()
 	  endian->getTypedData(&z, p, sizeof(float));
       
 	  WP_Matrix3D scale(SCALING_MATRIX, x, y, z);
-      
+	  WP_Matrix3D internal_scale(SCALING_MATRIX, 0.1, 0.1, 0.1);
+	  
 	  endian->getTypedData(&x, p, sizeof(float));
 	  endian->getTypedData(&y, p, sizeof(float));
 	  endian->getTypedData(&z, p, sizeof(float));
@@ -561,7 +593,7 @@ bool WP_Model_MD2::initModel()
 	      point *= scale;
 	      point *= translate;
 	      point *= internal_orientation;
-	  
+	      point *= internal_scale;
 	      endian->getTypedData(&x, p, sizeof(byte));
 	  
 	      (frames + k)->vertices[j] = WP_Vertex(point, quake2_normals[x]);
@@ -646,21 +678,23 @@ bool WP_Model_MD2::initModel()
 }
 
 void 
-WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix) 
+WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) 
 {
   glPushMatrix();
   glMultMatrixf(matrix.data); 
   
   glCullFace(GL_FRONT); 
 
-  //animation
-  if (interpolate >= 1.0)
+  if (object->animate)
     {
-      currentFrame++;
-      currentFrame %= numberFrames;
-      interpolate = 0.0;
+      if (interpolate >= 1.0)
+	{
+	  currentFrame++;
+	  currentFrame %= numberFrames;
+	  interpolate = 0.0;
+	}
+      interpolate += 0.1;  
     }
-  interpolate += 0.1;  
 
   list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
   glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -682,7 +716,7 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix)
 
 ////////////////////////// WP_MetaBall ////////////////////
 
-WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_NonAnimatedModel(name, scaling){}
+WP_MetaBall::WP_MetaBall(const string& name):WP_NonAnimatedModel(name){}
 
 WP_MetaBall::WP_MetaBall(const WP_MetaBall &ball):WP_NonAnimatedModel(ball)
 {
@@ -702,22 +736,49 @@ WP_MetaBall::operator=(const WP_MetaBall &ball)
 }
 
 void 
-WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix)
+WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object)
 {
+  int i = 0;
   glPushMatrix();
   glMultMatrixf(matrix.data); 
 
-  //fixme to be done
+  for (; i < numberTriangles; ++i)
+    {
+      glBegin(GL_POLYGON);
+      glVertex3fv(frame->vertices[triangles[i * 3]].point.data);
+      glVertex3fv(frame->vertices[triangles[i * 3 + 1]].point.data);
+      glVertex3fv(frame->vertices[triangles[i * 3 + 2]].point.data);
+      glEnd();
+    }
   
-  glEnd();
   glPopMatrix();
 }
 
 /**
- * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
+ * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automatically called by the base class WP_Model by a call to its <i>init</i> function
  */
 bool 
 WP_MetaBall::initModel()
 {
+  //create test_model for collision detection test
+
+  numberVertices = 4;
+  numberTriangles = 2;
+  triangles = new unsigned int[6];
+  frame = new WP_Frame(this);
+  frame->vertices = new WP_Vertex[4];
+
+  frame->vertices[0].point = WP_Point3D(-1.0, -1.0, 0.0);
+  frame->vertices[1].point = WP_Point3D(-1.0, 1.0, 0.0);
+  frame->vertices[2].point = WP_Point3D(1.0, -1.0, 0.0);
+  frame->vertices[3].point = WP_Point3D(1.0, 1.0, 0.0);
+
+  triangles[0] = 0;
+  triangles[1] = 1;
+  triangles[2] = 2;
+  triangles[3] = 1;
+  triangles[4] = 3;
+  triangles[5] = 2;
+
   return true;
 }

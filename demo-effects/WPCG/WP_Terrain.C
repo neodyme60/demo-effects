@@ -208,9 +208,6 @@ WP_Terrain::WP_Terrain(int width, int height, int number_iterations, scalar reso
   WP_TextureManager* tex_manager = WP_TextureManager::getInstance();
   tex_manager->mipmapping = true;
   GLuint ft_id = tex_manager->getTexture("terrain.pcx", this);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
-  glBindTexture(GL_TEXTURE_2D, ft_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
  
   //create display list
 
@@ -218,6 +215,8 @@ WP_Terrain::WP_Terrain(int width, int height, int number_iterations, scalar reso
   glNewList(displayID, GL_COMPILE);
   glPushMatrix();
   WP_GLState::getInstance()->enableTexture2D(); 
+  glBindTexture(GL_TEXTURE_2D, ft_id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1); //priority of current texture set high
 
   int mod = 0;
   //send terrain to OpenGL
@@ -249,6 +248,7 @@ WP_Terrain::WP_Terrain(int width, int height, int number_iterations, scalar reso
     }
  
   WP_GLState::getInstance()->disableTexture2D(); 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 0); //priority of last texture set low because it will not be used anymore
   glPopMatrix();
   glEndList();
 

@@ -64,10 +64,22 @@ void handle_key_down( SDL_keysym* keysym )
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		
 	state->disableCulling();
 	break;
+      case SDLK_u:
+	cam->yaw(1);
+	break;
+      case SDLK_y:
+	cam->yaw(-1);
+	break;
+      case SDLK_o:
+	cam->roll(1);
+	break;
+      case SDLK_p:
+	cam->roll(-1);
+	break;
       case SDLK_w:
 	cam->pitch(1);
 	break;
-      case SDLK_x:
+      case SDLK_q:
 	cam->pitch(-1);
 	break;
       case SDLK_a:
@@ -76,7 +88,13 @@ void handle_key_down( SDL_keysym* keysym )
       case SDLK_s:
 	cam->rotate(0, 350,0);
 	break;
-	*/
+      case SDLK_z:
+	cam->slide(0,0,1);
+	break;
+      case SDLK_x:
+	cam->slide(0,0,-1);
+	break;
+	*/	
      default:
         break;
       }
@@ -109,7 +127,8 @@ void draw_screen( void )
 	
   WP_DynamicObject *demon = manager->getDynamicObject();
   WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
-  demon->setNewHeading(heading); //FIXME the model's orientation should be changed in the MD2 file so the heading can be used instead of roll
+  
+  demon->setNewHeading(heading); 
   weapon->setNewHeading(heading);
   heading += 0.6;
 
@@ -118,14 +137,12 @@ void draw_screen( void )
   
   box->drawSkyBox(cam->eye);
 
-  //  glShadeModel(GL_FLAT);
   terrain->drawTerrain();
-  //glShadeModel(GL_SMOOTH);
 
   //draw waterplane
-
+  
   state->disableLighting();
-  state->disableFog();
+  //  state->disableFog();
   state->enableBlending();
   glDepthMask(false);
 
@@ -146,10 +163,10 @@ void draw_screen( void )
   glEnd();
 
   glDepthMask(true);
-
+  
   state->enableLighting();
   state->disableBlending();
-
+  
   manager->drawObjects();
 
   SDL_GL_SwapBuffers( );
@@ -240,19 +257,21 @@ int main( int argc, char* argv[] )
   init();
 
   // add quake2 demon model  
-  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 54.0, 0.0), "Demon", "tris1.MD2",
-			       WP_Vector3D(0.1,0.1,0.1)); 
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon", "tris1.MD2"); 
   // add quake2 demon weapon model
-  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 54.0, 0.0), "Demon_Weapon", "weapon.MD2",
-			       WP_Vector3D(0.1,0.1,0.1)); 
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon_Weapon", "weapon.MD2"); 
+  WP_DynamicObject *demon = manager->getDynamicObject();
+  WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
+  demon->animate = true;
+  weapon->animate = true;
 
   cam->follow_distance = 10.0;
   cam->follow_angleX = 10;
-  cam->fixed_object = manager->getDynamicObject();;
+  cam->fixed_object = manager->getDynamicObject();
 
-  box = new WP_SkyBox("SKY3_FT.pcx", "SKY3_RT.pcx", "SKY3_BK.pcx", "SKY3_LF.pcx", "SKY3_UP.pcx", "SKY3_DN.pcx");
+  box = new WP_SkyBox("SKY3_FT.pcx", "SKY3_RT.pcx", "SKY3_BK.pcx", "SKY3_LF.pcx", 0, 0);
   terrain = new WP_Terrain(40, 40, 200, 1.5, 6);
-  terrain->setMiddlePoint(WP_Point3D(0.0, 0.0,0.0));
+  terrain->setMiddlePoint(WP_Point3D(0.0, 0.0, 0.0));
 
   /* time based demo loop */
   while( 1 ) 

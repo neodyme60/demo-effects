@@ -51,7 +51,7 @@
 #define ICECODE_API
 #define ICECORE_API
 #define OPCODE_API
-#define MESHMERIZER_API
+//#define MESHMERIZER_API
 #define FALSE false
 #define TRUE true
 #endif

@@ -52,7 +52,7 @@ class WP_Object
   /**
    * this function is used for drawing the object in OpenGL
    */
-  void drawOpenGL() const; 
+  void drawOpenGL(); 
 
   /**
    * this WP_Matrix3D object holds the world matrix of the object. This matrix is used to render the object on the correct position in the correct orientation in the 3D scene
@@ -93,6 +93,8 @@ class WP_Object
    * Roll is an aviation term and an airplane rolls by rotating about its longitudinal axis (running from tail to nose). The roll is the amount of rotation relative to the horizontal plane.
    */
   scalar roll;
+
+  bool animate;
   
   /**
    * this function prints the actual state of the object to standard output
@@ -385,23 +387,20 @@ public:
    * @param matrix a WP_Matrix3D object holding the world matrix of this object
    * @param object_name the name of the object
    * @param model_name the name of the 3D model belonging to the object
-   * @param scaling a WP_Vector3D object holding the values by which the object is scaled
    * @return a pointer to a WP_Object representing the newly created static object
    */
-  WP_Object* createStaticObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name,
-				const WP_Vector3D& scaling = WP_Vector3D());
+  WP_Object* createStaticObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name);
 
   /**
    * this function is used for the creation of a dynamic object
    * @param matrix a WP_Matrix3D object holding the world matrix of this object
    * @param object_name the name of the object
    * @param model_name the name of the 3D model belonging to the object
-   * @param scaling a WP_Vector3D object holding the values by which the object is scaled
    * @param velocity a WP_Vector3D object representing the velocity vector of the object
    * @return a pointer to a WP_Object representing the newly created dynamic object
    */
   WP_Object* createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name, 
-				 const WP_Vector3D& scaling = WP_Vector3D(), const WP_Vector3D& velocity = WP_Vector3D());
+				 const WP_Vector3D& velocity = WP_Vector3D());
 
   /**
    * this function returns a pointer to an object with name <i>name</i>
@@ -570,6 +569,12 @@ private:
    * static array of const strings representing internal models like for example WP_MetaBall
    */
   static const string internal_models[];
+
+  PlanesCollider PC;
+
+//OPCODE CALLBACKS
+
+  static void ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data);
 };
 #endif
 

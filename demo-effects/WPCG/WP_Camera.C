@@ -66,7 +66,7 @@ void WP_Camera::setModelViewMatrixGL()
 {
   matrix = WP_Matrix3D(eye.toVector(), u, v, n);
   glLoadMatrixf(matrix.data);
-  computeFrustum();
+  computeFrustum(); //FIXME don't compute the frustum planes everytime, just translate, rotate etc them
 }
 
 void WP_Camera::setPickingVolume(int width, int height, int x, int y) 
@@ -105,7 +105,10 @@ void WP_Camera::computeFrustum()
   scalar   proj[16];
   scalar   modl[16];
   scalar   clip[16];
+  scalar   coords[4];
   scalar   t;
+
+  //FIXME instead of recalculating frustum reorientate frustum planes
   
   /* Get the current PROJECTION matrix from OpenGL */
   glGetFloatv( GL_PROJECTION_MATRIX, proj );
@@ -135,82 +138,94 @@ void WP_Camera::computeFrustum()
   clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
   
   /* Extract the numbers for the RIGHT plane */
-  frustum[0][0] = clip[ 3] - clip[ 0];
-  frustum[0][1] = clip[ 7] - clip[ 4];
-  frustum[0][2] = clip[11] - clip[ 8];
-  frustum[0][3] = clip[15] - clip[12];
+  coords[0] = clip[ 3] - clip[ 0];
+  coords[1] = clip[ 7] - clip[ 4];
+  coords[2] = clip[11] - clip[ 8]; 
+  coords[3] = clip[15] - clip[12];
   
   /* Normalize the result */
-  t = sqrt( frustum[0][0] * frustum[0][0] + frustum[0][1] * frustum[0][1] + frustum[0][2] * frustum[0][2] );
-  frustum[0][0] /= t;
-  frustum[0][1] /= t;
-  frustum[0][2] /= t;
-  frustum[0][3] /= t;
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
+
+  frustum[0].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
   
   /* Extract the numbers for the LEFT plane */
-  frustum[1][0] = clip[ 3] + clip[ 0];
-  frustum[1][1] = clip[ 7] + clip[ 4];
-  frustum[1][2] = clip[11] + clip[ 8];
-  frustum[1][3] = clip[15] + clip[12];
+  coords[0] = clip[ 3] + clip[ 0];
+  coords[1] = clip[ 7] + clip[ 4];
+  coords[2] = clip[11] + clip[ 8];
+  coords[3] = clip[15] + clip[12];
   
   /* Normalize the result */
-  t = sqrt( frustum[1][0] * frustum[1][0] + frustum[1][1] * frustum[1][1] + frustum[1][2] * frustum[1][2] );
-  frustum[1][0] /= t;
-  frustum[1][1] /= t;
-  frustum[1][2] /= t;
-  frustum[1][3] /= t;
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
+
+  frustum[1].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
   
   /* Extract the BOTTOM plane */
-  frustum[2][0] = clip[ 3] + clip[ 1];
-  frustum[2][1] = clip[ 7] + clip[ 5];
-  frustum[2][2] = clip[11] + clip[ 9];
-  frustum[2][3] = clip[15] + clip[13];
+  coords[0] = clip[ 3] + clip[ 1];
+  coords[1] = clip[ 7] + clip[ 5];
+  coords[2] = clip[11] + clip[ 9];
+  coords[3] = clip[15] + clip[13];
   
   /* Normalize the result */
-  t = sqrt( frustum[2][0] * frustum[2][0] + frustum[2][1] * frustum[2][1] + frustum[2][2] * frustum[2][2] );
-  frustum[2][0] /= t;
-  frustum[2][1] /= t;
-  frustum[2][2] /= t;
-  frustum[2][3] /= t;
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
   
+  frustum[2].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
+
   /* Extract the TOP plane */
-  frustum[3][0] = clip[ 3] - clip[ 1];
-  frustum[3][1] = clip[ 7] - clip[ 5];
-  frustum[3][2] = clip[11] - clip[ 9];
-  frustum[3][3] = clip[15] - clip[13];
+  coords[0] = clip[ 3] - clip[ 1];
+  coords[1] = clip[ 7] - clip[ 5];
+  coords[2] = clip[11] - clip[ 9];
+  coords[3] = clip[15] - clip[13];
   
   /* Normalize the result */
-  t = sqrt( frustum[3][0] * frustum[3][0] + frustum[3][1] * frustum[3][1] + frustum[3][2] * frustum[3][2] );
-  frustum[3][0] /= t;
-  frustum[3][1] /= t;
-  frustum[3][2] /= t;
-  frustum[3][3] /= t;
-  
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
+ 
+  frustum[3].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
+ 
   /* Extract the FAR plane */
-  frustum[4][0] = clip[ 3] - clip[ 2];
-  frustum[4][1] = clip[ 7] - clip[ 6];
-  frustum[4][2] = clip[11] - clip[10];
-  frustum[4][3] = clip[15] - clip[14];
+  coords[0] = clip[ 3] - clip[ 2];
+  coords[1] = clip[ 7] - clip[ 6];
+  coords[2] = clip[11] - clip[10];
+  coords[3] = clip[15] - clip[14];
   
   /* Normalize the result */
-  t = sqrt( frustum[4][0] * frustum[4][0] + frustum[4][1] * frustum[4][1] + frustum[4][2] * frustum[4][2] );
-  frustum[4][0] /= t;
-  frustum[4][1] /= t;
-  frustum[4][2] /= t;
-  frustum[4][3] /= t;
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
   
+  frustum[4].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
+
   /* Extract the NEAR plane */
-  frustum[5][0] = clip[ 3] + clip[ 2];
-  frustum[5][1] = clip[ 7] + clip[ 6];
-  frustum[5][2] = clip[11] + clip[10];
-  frustum[5][3] = clip[15] + clip[14];
+  coords[0] = clip[ 3] + clip[ 2];
+  coords[1] = clip[ 7] + clip[ 6];
+  coords[2] = clip[11] + clip[10];
+  coords[3] = clip[15] + clip[14];
   
   /* Normalize the result */
-  t = sqrt( frustum[5][0] * frustum[5][0] + frustum[5][1] * frustum[5][1] + frustum[5][2] * frustum[5][2] );
-  frustum[5][0] /= t;
-  frustum[5][1] /= t;
-  frustum[5][2] /= t;
-  frustum[5][3] /= t;
+  t = sqrt( coords[0] * coords[0] + coords[1] * coords[1] + coords[2] * coords[2] );
+  coords[0] /= t;
+  coords[1] /= t;
+  coords[2] /= t;
+  coords[3] /= t;
+
+  frustum[5].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
 }
 
 void WP_Camera::slide(scalar deltaU, scalar deltaV, scalar deltaN)
@@ -291,6 +306,8 @@ WP_Ray3D WP_Camera::createRayForTracing(int x, int y) const
 
 void WP_Camera::followObject()
 {
+  //FIXME only update if object changed orientation
+
   if (fixed_object)
     {
       WP_Point3D center(fixed_object->getXPos(), fixed_object->getYPos(), fixed_object->getZPos());
@@ -366,49 +383,8 @@ void WP_Camera::followObject()
       v = n;
       v.crossProduct(u); //no need to check if crossproduct failed because we no for sure that n and u are not pointing in the same direction
       rotate(0, 0, follow_angleZ);
+
+      computeFrustum();
     }
 }
 
-//return 0.0 on failure else the distance of the object to the camera
-scalar WP_Camera::inFrustum(scalar x, scalar y, scalar z, scalar radius) const
-{
-  scalar d;
-  
-  d = frustum[0][0] * x + frustum[0][1] * y + frustum[0][2] * z + frustum[0][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  d = frustum[1][0] * x + frustum[1][1] * y + frustum[1][2] * z + frustum[1][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  d = frustum[2][0] * x + frustum[2][1] * y + frustum[2][2] * z + frustum[2][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  d = frustum[3][0] * x + frustum[3][1] * y + frustum[3][2] * z + frustum[3][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  d = frustum[4][0] * x + frustum[4][1] * y + frustum[4][2] * z + frustum[4][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  d = frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3];
-  if( d <= -radius )
-    {
-      return 0.0f;
-    }
-  
-  return d + radius; //object in frustum
-}

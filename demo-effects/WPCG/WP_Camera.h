@@ -132,16 +132,6 @@ public:
 	WP_Ray3D createRayForTracing(int x, int y) const; 
 
 	/**
-	 * this function checks if an object is in the viewing volume (frustum) and should be passed to OpenGL for rendering. It determines if an object is in the viewing volume by determining if the object its bounding sphere is in the frustum.
-	 * @param x the x coordinate of the object its center
-	 * @param y the y coordinate of the object its center
-	 * @param z the z coordinate of the object its center
-	 * @param radius the radius of the object its bounding sphere
-	 * @return 0.0 in case of failure (object not in frustum), the distance to the camera otherwise (object in frustum)
-	 */
-	scalar inFrustum(scalar x, scalar y, scalar z, scalar radius) const;
-
-	/**
 	 * a WP_Point3D object representing the eye (position) of the camera
 	 */
 	WP_Point3D eye;
@@ -206,6 +196,11 @@ public:
 	 */
 	bool normal_viewing_volume;
 
+	Plane* getFrustum() 
+	  {
+	    return frustum;
+	  }
+
 private:
 	WP_Camera();
 
@@ -247,7 +242,7 @@ private:
 	/**
 	 * a 2D array of 6 rows of 4 scalars holding the a, b, c and d components of the 6 frustum's plane, where a, b, and c define the plane's normal and d the distance of the plane from the origin 
 	 */
-	scalar frustum[6][4];
+	Plane frustum[6];
 
 	/**
 	 * a pointer to the only instance of this object
