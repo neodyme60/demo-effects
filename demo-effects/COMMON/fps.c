@@ -34,6 +34,11 @@ void TDEC_new_time()
      next = SDL_GetTicks() + Tick_Interval;
 }
 
+int TDEC_get_fps()
+{
+  return 1000 / (Ticks / Drawn_Frames);
+}
+
 int TDEC_fps_ok()
 {
   now = SDL_GetTicks();

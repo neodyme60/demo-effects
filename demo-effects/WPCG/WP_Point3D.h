@@ -55,6 +55,15 @@ public:
   
   ~WP_Point3D(){};
 
+  //copy constructor
+
+  WP_Point3D(const WP_Point3D& p)
+    {
+      data[0] = p.data[0];
+      data[1] = p.data[1];
+      data[2] = p.data[2];
+    }
+
   /**
    * assignment operator
    * @param p the WP_Point3D object which is copied to this object

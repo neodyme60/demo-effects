@@ -100,14 +100,15 @@ public:
 	/**
 	 * this function sets the view volume and the camera in OpenGL. See F.S. Hill,JR Computer Graphics using OpenGL, page 360
 	 * @param v the viewangle in degrees, this sets the angle between the top and bottom walls of the view volume (frustum)
-	 * @param a the aspect ratio, this sets the aspect ratio of any window parallel to the xy-plane
+	 * @param width the screen width
+	 * @param height the screen height
 	 * @param n the near plane, this sets the distance from the eye to the near plane 
 	 * @param f the far plane, this sets the distance from the eye to the far plane
 	 * @param _eye a WP_point3D object representing the eye and therefore the position of the camera
 	 * @param _look a WP_Point3D object representing the point at which the camera is looking
 	 * @param _up a WP_Vector3D object representing the upward direction of the camera
 	 */
-	void setFrustumAndCamera(scalar _viewAngle, scalar _aspectRatio, scalar _nearPlane, scalar _farPlane, 
+	void setFrustumAndCamera(scalar _viewAngle, unsigned int width, unsigned int height, scalar _nearPlane, scalar _farPlane, 
 				 const WP_Point3D& _eye, const WP_Point3D& _look, const WP_Vector3D& _up);
 
 	/**
@@ -179,17 +180,17 @@ public:
 	/**
 	 * this variable keeps track of the object meshes currently in the camera's viewing volume (frustum)
 	 */
-	int meshes_in_frustum;
+	int objects_in_frustum;
 
 	/**
 	 * this variable describes the screen width and thus the width of the viewport
 	 */
-	int screen_width;
+	unsigned int screen_width;
 
 	/**
 	 * this variable describes the screen height and thus the height of the viewport
 	 */
-	int screen_height;
+	unsigned int screen_height;
 
 	/**
 	 * this boolean is used for telling if the current viewing volume is defined for selection or framebuffer rendering

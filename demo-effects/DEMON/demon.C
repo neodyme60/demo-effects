@@ -96,15 +96,13 @@ void draw_screen( void )
   if (heading >= 360.0)
     heading -= 360.0;
 
-  manager->drawObjects();
+  manager->updateAll();
 
   SDL_GL_SwapBuffers( );
 }
 
 void init()
 {
-  Uint16 i;
-  
   state = WP_GLState::getInstance();
 
   WP_TextureManager::getInstance()->mipmapping = true;
@@ -115,7 +113,6 @@ void init()
   state->enableCulling();
 	
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL
-  glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); //GL_FASTEST
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
@@ -123,20 +120,11 @@ void init()
   glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
   glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_FALSE);
 	
-  //state->enableNormalize();
-  //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-  WP_Light light;
-  light.setPosition(0.0, 3.0, 0.0, 1.0);
-  light.diffuse_color = WP_Color((float).75,(float).75,(float).75);
-  glLightfv(GL_LIGHT0, GL_POSITION, light.getPointPosition()->data);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, light.diffuse_color.components);
-
-  state->enableLighti(0);
-
-  state->enableLighting();
-
   manager = WP_ObjectManager::getInstance();
+
+  manager->addLight(WP_Point3D(0.0, 3.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
+		    WP_Color((float)0.75, (float)0.75, (float)0.75), WP_Color((float)0.0, (float)0.0, (float)0.0),
+		    WP_Color((float)0.0, (float)0.0, (float)0.0));
 
   cam = WP_Camera::getInstance();
   
@@ -144,18 +132,15 @@ void init()
   WP_Point3D look(0.0, 0.0, 0.0);
   WP_Vector3D up(0.0, 1.0, 0.0);
   
-  cam->setFrustumAndCamera(60.0, ((float)SCREEN_WIDTH) / ((float)SCREEN_HEIGHT), 0.1f, 100.0f, eye, look, up);
+  cam->setFrustumAndCamera(60.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 100.0f, eye, look, up);
 	
-  cam->screen_width = SCREEN_WIDTH;
-  cam->screen_height = SCREEN_HEIGHT;
-
   WP_Init init;
   init.vSetViewPort(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);	
 	
-
   //set background color
   glClearColor(0.0, 0.0, 0.4, 0.0f);
 
+  Uint16 i;
   /*disable events */
   for (i = 0; i < SDL_NUMEVENTS; ++i) {
     if (i != SDL_KEYDOWN && i != SDL_QUIT) {

@@ -14,8 +14,6 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/*note that the code has not been optimized*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -23,6 +21,7 @@
 
 #include "tdec.h"
 #include "WPCG.h"
+#include "GL/glut.h"
 
 //redefine width and height
 #define SCREEN_WIDTH 800
@@ -31,11 +30,9 @@
 WP_GLState *state;
 WP_Camera *cam;
 WP_ObjectManager *manager;
-WP_Model *model;
-WP_SkyBox* box;
-WP_Terrain* terrain;
-
-scalar heading = 0.0;
+WP_Terrain *terrain;
+WP_DynamicObject *ufo;
+WP_Draw_2D draw;
 
 void quit( int code )
 {      
@@ -60,41 +57,10 @@ void handle_key_down( SDL_keysym* keysym )
       case SDLK_ESCAPE:
 	quit(1);
         break;
-	/*      case SDLK_t:
+      case SDLK_t:
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);		
 	state->disableCulling();
 	break;
-      case SDLK_u:
-	cam->yaw(1);
-	break;
-      case SDLK_y:
-	cam->yaw(-1);
-	break;
-      case SDLK_o:
-	cam->roll(1);
-	break;
-      case SDLK_p:
-	cam->roll(-1);
-	break;
-      case SDLK_w:
-	cam->pitch(1);
-	break;
-      case SDLK_q:
-	cam->pitch(-1);
-	break;
-      case SDLK_a:
-	cam->rotate(0, 10,0);
-	break;
-      case SDLK_s:
-	cam->rotate(0, 350,0);
-	break;
-      case SDLK_z:
-	cam->slide(0,0,1);
-	break;
-      case SDLK_x:
-	cam->slide(0,0,-1);
-	break;
-	*/	
      default:
         break;
       }
@@ -123,52 +89,50 @@ void process_events( void )
 
 void draw_screen( void )
 {
-  glClear(/*GL_COLOR_BUFFER_BIT |*/ GL_DEPTH_BUFFER_BIT);
-
-  WP_DynamicObject *demon = manager->getDynamicObject();
-  WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
-  
-  demon->setNewHeading(heading); 
-  weapon->setNewHeading(heading);
-  heading += 0.6;
-
-  if (heading >= 360.0)
-    heading -= 360.0;
-  
-  box->drawSkyBox(cam->eye);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   terrain->drawTerrain();
   
-  //draw waterplane
-  
-  state->disableLighting();
-  state->enableBlending();
-  glDepthMask(false);
+  ufo->changeHeading(0.5);
 
-  glBegin(GL_POLYGON);
-  glNormal3f(0.0, 1.0, 0.0);
-  glColor4f(0.0, 0.0, 0.7, 0.2);
-  glVertex3f(-30.0, 0.5, -30.0);
-  glNormal3f(0.0, 1.0, 0.0);
-  glColor4f(0.0, 0.0, 0.7, 0.2);
-  glVertex3f(-30.0, .5, 30.0);
-  glNormal3f(0.0, 1.0, 0.0);
-  glColor4f(0.0, 0.0, 0.7, 0.2);
-  glVertex3f(30.0, 0.5, 30.0);
-  glNormal3f(0.0, 1.0, 0.0);
-  glColor4f(0.0, 0.0, 0.7, 0.2);
-  glVertex3f(30.0, .5, -30.0);
- 
-  glEnd();
-
-  glDepthMask(true);
-  
-  state->enableLighting();
-  state->disableBlending();
-  
   manager->updateAll();
+  
+  //draw text
 
-  SDL_GL_SwapBuffers( );
+  state->disableDepthTest();
+  state->disableLighting();
+  state->disableCulling();
+        
+  state->projection();
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+      
+  state->modelview();
+  glPushMatrix();
+  glLoadIdentity();
+  glColor3f(0.0f, 1.0f, 0.0f);
+
+  char fps[20];
+  sprintf(fps, "FPS: %i", TDEC_get_fps());
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, string(fps), 10,  SCREEN_HEIGHT - 20);
+
+  sprintf(fps, "In frustum: %i", cam->objects_in_frustum);
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, string(fps), 10,  SCREEN_HEIGHT - 40);
+      
+  sprintf(fps, "Collisions: %i", manager->number_collisions);
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, string(fps), 10,  SCREEN_HEIGHT - 60);
+
+  glPopMatrix();
+  state->projection(); 
+  glPopMatrix();
+  state->modelview();
+      
+  state->enableDepthTest();
+  state->enableLighting();	
+  state->enableCulling();
+
+  SDL_GL_SwapBuffers();
 }
 
 void init()
@@ -203,11 +167,15 @@ void init()
   WP_Vector3D up(0.0, 1.0, 0.0);
 
   cam->setFrustumAndCamera(90.0, SCREEN_WIDTH, SCREEN_HEIGHT, 0.1f, 50.0f, eye, look, up);
-
-  manager->addLight(WP_Point3D(1.0, 1.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
-		    WP_Color((float)0.35, (float)0.75, (float)0.25), WP_Color((float)0.35, (float)0.75, (float)0.25),
-		    WP_Color((float)0.0, (float)0.0, (float)0.0));
 	
+  manager->addLight(WP_Point3D(10.0, 10.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
+		    WP_Color((float)0.05, (float)0.95, (float)0.35), WP_Color((float)0.05, (float)0.95, (float)0.35),
+		    WP_Color((float)0.0, (float)0.0, (float)0.0));
+
+  manager->addLight(WP_Point3D(-10.0, 10.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
+		    WP_Color((float)0.95, (float)0.05, (float)0.35), WP_Color((float)0.95, (float)0.05, (float)0.35),
+		    WP_Color((float)0.0, (float)0.0, (float)0.0));
+
   WP_Init init;
   init.vSetViewPort(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);	
 	
@@ -224,7 +192,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   if (argc > 1) {
-    printf("Retro Terrain - W.P. van Paassen - 2002\n");
+    printf("3D collision and frustum culling demo - W.P. van Paassen - 2002\n");
     return -1;
   }
   
@@ -242,24 +210,24 @@ int main( int argc, char* argv[] )
   
   TDEC_init_timer();
   
-  SDL_WM_SetCaption("Retro Terrain effect ", "");
+  SDL_WM_SetCaption("3D Collision and culling demo ", "");
   
   init();
 
   // add quake2 demon model  
-  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon", "tris1.MD2"); 
-  // add quake2 demon weapon model
-  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon_Weapon", "weapon.MD2"); 
-  WP_DynamicObject *demon = manager->getDynamicObject();
-  WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
-  demon->animate = true;
-  weapon->animate = true;
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 00.0, 5.4, 00.0), "UFO", "ufo.MD2", WP_Vector3D(0.0, 0.0, 0.05)); 
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, -4.0, 4.6, 7.0), "UFO2", "ufo.MD2"); 
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, -8.0, 6.0, -3.0), "UFO3", "ufo.MD2"); 
+  manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, -4.0, 4.5, -6.0), "UFO4", "ufo.MD2");
+
+  manager->createCollisionPairs();
+
+  ufo = manager->getDynamicObject();
 
   cam->follow_distance = 10.0;
   cam->follow_angleX = 10;
   cam->fixed_object = manager->getDynamicObject();
 
-  box = new WP_SkyBox("SKY3_FT.pcx", "SKY3_RT.pcx", "SKY3_BK.pcx", "SKY3_LF.pcx", 0, 0);
   terrain = new WP_Terrain(40, 40, 200, 1.0, 6);
   terrain->setMiddlePoint(WP_Point3D(0.0, 0.0, 0.0));
 

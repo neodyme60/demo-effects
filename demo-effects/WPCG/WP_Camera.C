@@ -24,17 +24,19 @@
 WP_Camera* WP_Camera::_instance = 0;
 
 WP_Camera::WP_Camera(): fixed_object(0), follow_distance(10.0f), 
-			follow_angleX(0), follow_angleY(0), follow_angleZ(0), meshes_in_frustum(0),
+			follow_angleX(0), follow_angleY(0), follow_angleZ(0), objects_in_frustum(0),
 			normal_viewing_volume(true), math(WP_Math::getInstance()),
 			state(WP_GLState::getInstance()){}
 
-void WP_Camera::setFrustumAndCamera(scalar _viewAngle, scalar _aspectRatio, scalar _nearPlane, scalar _farPlane, 
+void WP_Camera::setFrustumAndCamera(scalar _viewAngle, unsigned int width, unsigned int height, scalar _nearPlane, scalar _farPlane, 
 				    const WP_Point3D& _eye, const WP_Point3D& _look, const WP_Vector3D& _up)
 {
   viewAngle		= _viewAngle;
-  aspectRatio		= _aspectRatio;
+  aspectRatio		= ((float)width) / ((float)height);
   nearPlane		= _nearPlane;
   farPlane		= _farPlane;
+  screen_width = width;
+  screen_height = height;
   
   state->projection();
   glPushMatrix();
@@ -99,7 +101,7 @@ void WP_Camera::setRenderVolume()
     }
 }
  
-//code by Mark Morley (www.markmorley.com)
+//frustum code by Mark Morley (www.markmorley.com)
 void WP_Camera::computeFrustum()
 {
   scalar   proj[16];

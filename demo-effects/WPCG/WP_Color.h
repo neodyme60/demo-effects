@@ -68,6 +68,15 @@ public:
 
 	~WP_Color(){};
 
+	//copy constructor
+	WP_Color(const WP_Color& c)
+	  {
+	    components[0] = c.components[0];
+	    components[1] = c.components[1];
+	    components[2] = c.components[2];
+	    components[3] = c.components[3];   
+	  }
+
 	/**
 	 * assigment operator
 	 * @param c the to be copied color

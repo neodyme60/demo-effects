@@ -1,5 +1,8 @@
-09-04-02 Added 1 new 3D terrain effect. Added many inprovements to the WPCG 2D/3D library.
-08-21-02 Added 2 new effects, added WPCG 3D classes. Extended some of the earlier effects. Extended libTDEC
+11-23-02 Added many improvements to the WPCG 2D/3D library, among others 3D collision detection using the OPCODE 
+library v1.2 of Pierre Terdiman. Many bug fixes in WPCG and 3D terrain effect. Added 3D collision detection and 
+frustum culling effect called ufos using OPCODE.
+09-04-02 Added 1 new 3D terrain effect. Added many inprovements to the WPCG 2D/3D 
+library. 08-21-02 Added 2 new effects, added WPCG 3D classes. Extended some of the earlier effects. Extended libTDEC
 08-05-02 Added 3 new effects, fixed some bugs. Changed libcommon into libTDEC and added many new functions, improved old ones. 
 	 Libmikmod is now optional by using --enable-mikmod switch in configure script
 07-22-02 Added 3 new effects, fixed a bug in the lens effect, added image functions to the util library

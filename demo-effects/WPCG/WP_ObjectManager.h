@@ -95,6 +95,8 @@ class WP_Object
   scalar roll;
 
   bool animate;
+
+  PlanesCache planesCache;
   
   /**
    * this function prints the actual state of the object to standard output
@@ -109,6 +111,8 @@ class WP_Object
     {
       return matrix.data[12];
     };
+
+  virtual void onCollision() = 0;
   
   /**
    * this function returns the y position of the center of the object in the 3D scene
@@ -198,9 +202,14 @@ class WP_StaticObject: public WP_Object
   friend class WP_ObjectManager;
   
  public:
-  ~WP_StaticObject(){};
+  virtual ~WP_StaticObject(){};
 
- private:
+  void onCollision()
+    {
+      // collision handling 
+    }
+
+ protected:
   WP_StaticObject(){};
   
   /**
@@ -209,6 +218,7 @@ class WP_StaticObject: public WP_Object
    */
   WP_StaticObject(const WP_Matrix3D& _matrix, const string& name):
     WP_Object(_matrix, name){};
+
 };
 
 /**
@@ -234,7 +244,7 @@ class WP_DynamicObject: public WP_Object
   friend class WP_ObjectManager;
   
  public:
-  ~WP_DynamicObject(){};
+  virtual ~WP_DynamicObject(){};
   
   /**
    * a WP_Vector3D object representing the velocity vector of the object
@@ -310,7 +320,12 @@ class WP_DynamicObject: public WP_Object
    */
   void print() const;
 
- private:
+  void onCollision()
+    {
+      // collision handling
+    }
+
+ protected:
   WP_DynamicObject(){};
 
   /**
@@ -389,7 +404,7 @@ public:
    * @param model_name the name of the 3D model belonging to the object
    * @return a pointer to a WP_Object representing the newly created static object
    */
-  WP_Object* createStaticObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name);
+  WP_StaticObject* createStaticObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name);
 
   /**
    * this function is used for the creation of a dynamic object
@@ -399,8 +414,10 @@ public:
    * @param velocity a WP_Vector3D object representing the velocity vector of the object
    * @return a pointer to a WP_Object representing the newly created dynamic object
    */
-  WP_Object* createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name, 
+  WP_DynamicObject* createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, const string& model_name, 
 				 const WP_Vector3D& velocity = WP_Vector3D());
+
+  void addLight(const WP_Point3D& position, const WP_Color& ambient, const WP_Color& diffuse, const WP_Color& specular, const WP_Color& emissive, bool remote = true);  
 
   /**
    * this function returns a pointer to an object with name <i>name</i>
@@ -484,20 +501,10 @@ public:
   bool removeAll();
 
   /**
-   * this function draws all objects currently in the camera's viewing volume (frustum)
-   */
-  void drawObjects();
-
-  /**
    * this function draws all objects currently in the camera's viewing volume to the selection buffer. In this way it is possible to determine which object in the 3D scene was picked by the user
    */
   void drawObjectsSelection();
   
-  /**
-   * this function moves all <b>dynamic</b> objects according their velocity vector
-   */
-  void moveObjects();
-
   /**
    * this function determines if an object was picked according to mouse input and returns this object
    * @param x the x coordinate of the mouse-click
@@ -506,8 +513,21 @@ public:
    */
   WP_Object* pickObject(int x, int y);
 
+  unsigned int number_collisions;
+
+  void createCollisionPairs();
+
+  void updateAll();
+
 private:
   WP_ObjectManager();
+
+  /**
+   * this function draws all objects currently in the camera's viewing volume (frustum)
+   */
+  void drawObjects();
+
+  void checkCollisions();
 
   /**
    * a list of pointers to WP_StaticObject objects containing all static objects
@@ -518,6 +538,13 @@ private:
    * a list of pointers to WP_DynamicObject objects containing all dynamic objects
    */
   list<WP_DynamicObject*> dynamic_objects; 
+
+  /**
+   * a list of remote or local lights in the scene
+   */
+  list<WP_Light*> lights;
+
+  unsigned char number_lights;
 
   /**
    * a pointer to the only instance of the WP_ObjectManager class (singleton)
@@ -570,11 +597,33 @@ private:
    */
   static const string internal_models[];
 
+  // nested class 
+
+  class WP_CollisionPair
+    {
+    public:
+      WP_CollisionPair(WP_Object *obj1, WP_Object *obj2);
+      ~WP_CollisionPair(){};
+      
+      WP_Object *object1;
+      WP_Object *object2;
+      BVTCache cache;
+    };
+
+
+  /**
+   * a list of pointers to WP_CollisionPair objects
+   */
+  list<WP_ObjectManager::WP_CollisionPair*> collision_pairs; 
+
+
   PlanesCollider PC;
+  AABBTreeCollider TC;
 
 //OPCODE CALLBACKS
 
-  static void ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data);
+  static void ColCallback1(udword triangleindex, VertexPointers &triangle, udword user_data);
+  static void ColCallback2(udword triangleindex, VertexPointers &triangle, udword user_data);
 };
 #endif
 

@@ -20,6 +20,7 @@
 #ifndef WP_2D_H
 #define WP_2D_H
 
+#include "WP_Def.h"
 class WP_Point2D; //forward declaration
 
 //////////////////// WP_Draw ////////////////////////////////
@@ -81,7 +82,7 @@ public:
    * this function draws a 2D polyline (a line containing multiple line segments) to the screen
    * @param points an array of points representing the polyline
    * @param number the number of points in the array or the number of line segments in the polyline
-   * @param closed a boolean indicating if the polyline is closed (start and endpoint will be connected and in doing a polygon is created) or not
+   * @param closed a boolean indicating if the polyline is closed (start and endpoint will be connected and in doing so a polygon is created) or not
    */
   void vDrawPolyLine(WP_Point2D* points, GLint number, bool closed) const;
   
@@ -92,7 +93,7 @@ public:
    * @param xpos the x position of the start of the text (text is written from left to right)
    * @param ypos the y position of the start of the text (text is written from left to right)
    */
-  void vDrawString(void* font, const char* text, GLint xpos, GLint ypos) const;
+  void vDrawString(void* font, const string &text, GLint xpos, GLint ypos) const;
 };
 
 #endif

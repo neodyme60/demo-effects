@@ -29,5 +29,6 @@ void TDEC_print_fps();
 void TDEC_new_time();
 int TDEC_fps_ok();
 void TDEC_init_timer();
+int TDEC_get_fps();
 
 #endif

@@ -54,7 +54,8 @@ AM_CONDITIONAL(OPENGL, test x$opengl = xtrue)
 if test x$opengl = xtrue; then
 AC_CHECK_LIB(GL, glPushMatrix, ,[AC_MSG_ERROR([libGL not found])],)
 AC_CHECK_LIB(GLU, gluLookAt, ,[AC_MSG_ERROR([libGLU not found])],)
-AC_CHECK_HEADERS(GL/gl.h GL/glu.h)
+AC_CHECK_LIB(glut, glutMainLoop, ,[AC_MSG_ERROR([libglut not found])],)
+AC_CHECK_HEADERS(GL/gl.h GL/glu.h GL/glut.h)
 fi
 
 AC_CHECK_LIB(m, abs, , [AC_MSG_ERROR([libm not found])],)
@@ -75,4 +76,4 @@ LIBS="$LIBS `sdl-config --libs`"
 AC_OUTPUT(Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile 
 SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile 
 ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile 
-SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile)
+SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile)

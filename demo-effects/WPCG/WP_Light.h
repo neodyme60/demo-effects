@@ -57,6 +57,20 @@ class WP_Light
       p = new WP_Point3D(0.0, 0.0, 0.0);
     }
 
+  WP_Light(const WP_Point3D& position, const WP_Color& ambient, const WP_Color& diffuse, const WP_Color& specular, const WP_Color& emissive, bool remote = true):ambient_color(ambient), diffuse_color(diffuse), specular_color(specular), emissive_color(emissive)
+    {
+      if (remote)
+	{
+	  k = vector;
+	  v = new WP_Vector3D(position.data[0], position.data[1], position.data[2]);
+	}
+      else
+	{
+	  k = point;
+	  p = new WP_Point3D(position);
+	}
+    }
+
   //COPY CONSTRUCTOR
   WP_Light(const WP_Light &light)
     {
@@ -155,7 +169,7 @@ class WP_Light
       if (k == vector)
 	{
 	  glLightfv(GL_LIGHT0, GL_POSITION, v->data);
-	  /*glBegin(GL_POLYGON);
+	  /*	  glBegin(GL_POLYGON);
 	    glVertex3f(v->data[0], v->data[1], v->data[2]);
 	    glVertex3f(v->data[0] + 1.0, v->data[1] + 1.0, v->data[2]);
 	    glVertex3f(v->data[0] + 1.0, v->data[1], v->data[2]);

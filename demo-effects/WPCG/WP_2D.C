@@ -64,14 +64,15 @@ void WP_Draw_2D::vDrawPolyLine(WP_Point2D* points, GLint number, bool closed) co
 	glFlush();
 }
 
-void WP_Draw_2D::vDrawString(void* font, const char* text,
+void WP_Draw_2D::vDrawString(void* font, const string &text,
 			  GLint xpos, GLint ypos) const
 {
-  for (; *text != '\0'; text++)
+  string::const_iterator iter = text.begin();
+  for(;iter != text.end();++iter)
     {
       glRasterPos2i(xpos, ypos);
-      glutBitmapCharacter(font, *text);
-      xpos += glutBitmapWidth(font,*text);
+      glutBitmapCharacter(font, *iter);
+      xpos += glutBitmapWidth(font,*iter);
     }
 }
 

@@ -54,10 +54,14 @@ WP_ObjectManager* WP_ObjectManager::om_instance = 0;
 
 const string WP_ObjectManager::internal_models[] = {"WP_METABALL"};
 
-WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0)
+WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0), number_lights(0), number_collisions(0)
 {
   PC.SetFirstContact(true);
-  PC.SetTemporalCoherence(false);
+  PC.SetTemporalCoherence(true);
+  TC.SetFirstContact(true);
+  TC.SetFullBoxBoxTest(true);
+  TC.SetFullPrimBoxTest(true);
+  TC.SetTemporalCoherence(true);
 }
 
 WP_ObjectManager::~WP_ObjectManager()
@@ -94,7 +98,7 @@ bool WP_ObjectManager::hasValidExtension(const char* file, const char* extension
   return strcasecmp(++copy, extension) == 0;
 }
 
-WP_Object* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const string& object_name, 
+WP_StaticObject* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const string& object_name, 
 							    const string& model_name)
 {
   WP_StaticObject* sobject;
@@ -107,7 +111,7 @@ try
     sobject = new WP_StaticObject(matrix, object_name);
     if (!sobject)
       {
-	return (WP_Object*)0;
+	return (WP_StaticObject*)0;
       }
 
     //check if it's an internal object
@@ -180,12 +184,12 @@ catch(...)
   {
     delete sobject;
     delete model;
-    return (WP_Object*)0;
+    return (WP_StaticObject*)0;
   }
  return sobject;
 }
 
-WP_Object* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, 
+WP_DynamicObject* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, 
 							    const string& model_name, const WP_Vector3D& velocity)
 {
   WP_DynamicObject* dobject;
@@ -200,7 +204,7 @@ try
     dobject = new WP_DynamicObject(matrix, object_name, velocity);
     if (!dobject)
       {
-	return (WP_Object*)0;
+	return (WP_DynamicObject*)0;
       }
 
     //check if it's an internal object
@@ -265,7 +269,7 @@ catch(...)
   {
     delete dobject;
     delete model;
-    return (WP_Object*)0;
+    return (WP_DynamicObject*)0;
   }
  return dobject;
 }
@@ -386,34 +390,67 @@ WP_DynamicObject* WP_ObjectManager::getDynamicObject() const
   return 0; //no instance available
 }
 
+void 
+WP_ObjectManager::checkCollisions()
+{
+  number_collisions = 0;
+
+  list<WP_CollisionPair*>::const_iterator i = collision_pairs.begin();
+  while (i != collision_pairs.end())
+    {	
+      Matrix4x4 worldmatrixd((*i)->object1->matrix.data[0],(*i)->object1->matrix.data[1], (*i)->object1->matrix.data[2], (*i)->object1->matrix.data[3], 
+			     (*i)->object1->matrix.data[4],(*i)->object1->matrix.data[5], (*i)->object1->matrix.data[6], (*i)->object1->matrix.data[7],
+			     (*i)->object1->matrix.data[8],(*i)->object1->matrix.data[9], (*i)->object1->matrix.data[10], (*i)->object1->matrix.data[11],
+			     (*i)->object1->matrix.data[12],(*i)->object1->matrix.data[13], (*i)->object1->matrix.data[14], (*i)->object1->matrix.data[15]);
+
+      TC.SetCallback0(&ColCallback1, udword((*i)->object1->model));
+      TC.SetCallback1(&ColCallback2, udword((*i)->object2->model));
+
+      Matrix4x4 worldmatrixs((*i)->object2->matrix.data[0],(*i)->object2->matrix.data[1], (*i)->object2->matrix.data[2], (*i)->object2->matrix.data[3], 
+			     (*i)->object2->matrix.data[4],(*i)->object2->matrix.data[5], (*i)->object2->matrix.data[6], (*i)->object2->matrix.data[7],
+			     (*i)->object2->matrix.data[8],(*i)->object2->matrix.data[9], (*i)->object2->matrix.data[10], (*i)->object2->matrix.data[11],
+			     (*i)->object2->matrix.data[12],(*i)->object2->matrix.data[13], (*i)->object2->matrix.data[14], (*i)->object2->matrix.data[15]);
+      
+      if (TC.Collide((*i)->cache, &worldmatrixd, &worldmatrixs))
+	{
+	  if (TC.GetContactStatus())
+	    {
+	      (*i)->object1->onCollision();
+	      (*i)->object2->onCollision();
+	      number_collisions++;
+	    }
+	}
+      else
+	cout << "COLLIDING ERROR" << endl;
+      i++;
+    }
+}
+
 void WP_ObjectManager::drawObjects() 
 {
-  //  cam->meshes_in_frustum = 0;
-  int in_frustum = 0;
+  cam->objects_in_frustum = 0;
 
   cam->followObject();
   
-  static PlanesCache cache;
-
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback, udword((*i)->model));
+      PC.SetCallback(&ColCallback1, udword((*i)->model));
 
       Matrix4x4 worldmatrix((*i)->matrix.data[0],(*i)->matrix.data[1], (*i)->matrix.data[2], (*i)->matrix.data[3], 
 			    (*i)->matrix.data[4],(*i)->matrix.data[5], (*i)->matrix.data[6], (*i)->matrix.data[7],
 			    (*i)->matrix.data[8],(*i)->matrix.data[9], (*i)->matrix.data[10], (*i)->matrix.data[11],
 			    (*i)->matrix.data[12],(*i)->matrix.data[13], (*i)->matrix.data[14], (*i)->matrix.data[15]);
       
-      if (PC.Collide(cache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), &worldmatrix))
+      if (PC.Collide((*i)->planesCache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), &worldmatrix))
 	{
 	  if (PC.GetContactStatus())
 	    {
 	      (*i)->drawOpenGL();
 	      (*i)->inFrustum = true;
-	      in_frustum++;
+	      cam->objects_in_frustum++;
 	    }
 	  else
 	    {
@@ -432,20 +469,20 @@ void WP_ObjectManager::drawObjects()
     {	
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback, udword((*j)->model));
+      PC.SetCallback(&ColCallback1, udword((*j)->model));
 
       Matrix4x4 worldmatrix((*j)->matrix.data[0],(*j)->matrix.data[1], (*j)->matrix.data[2], (*j)->matrix.data[3], 
 			    (*j)->matrix.data[4],(*j)->matrix.data[5], (*j)->matrix.data[6], (*j)->matrix.data[7],
 			    (*j)->matrix.data[8],(*j)->matrix.data[9], (*j)->matrix.data[10], (*j)->matrix.data[11],
 			    (*j)->matrix.data[12],(*j)->matrix.data[13], (*j)->matrix.data[14], (*j)->matrix.data[15]);
       
-      if (PC.Collide(cache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(),&worldmatrix ))
+      if (PC.Collide((*j)->planesCache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(),&worldmatrix ))
 	{
 	  if (PC.GetContactStatus())
 	    {
 	      (*j)->drawOpenGL();
 	      (*j)->inFrustum = true;
-	      in_frustum++;
+	      cam->objects_in_frustum++;
 	    }
 	  else
 	    {
@@ -457,8 +494,6 @@ void WP_ObjectManager::drawObjects()
 
       j++;
     }
-  //  cout << in_frustum << endl;
-
 }
 
 void WP_ObjectManager::drawObjectsSelection() 
@@ -693,17 +728,23 @@ bool WP_ObjectManager::removeAll()
     }
   dynamic_objects.clear();
 
-  return removed == count;
-}
+ list<WP_CollisionPair*>::iterator k = collision_pairs.begin();
+ while (k != collision_pairs.end())
+   {
+     delete (*k);
+     ++k;
+   }
+ collision_pairs.clear();
 
-void WP_ObjectManager::moveObjects() 
-{
-  list<WP_DynamicObject*>::iterator j = dynamic_objects.begin();
-  while (j != dynamic_objects.end())
-    {	
-      (*j)->move();
-      j++;
-    }
+ list<WP_Light*>::const_iterator l = lights.begin();
+ while (l != lights.end())
+   {
+     delete (*l);
+     ++l;
+   }
+ lights.clear();
+
+  return removed == count;
 }
 
 WP_Object* WP_ObjectManager::pickObject(int x, int y)
@@ -1114,7 +1155,7 @@ void WP_DynamicObject::print() const
 
 //OPCODE CALLBACKS
 void 
-WP_ObjectManager::ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data)
+WP_ObjectManager::ColCallback1(udword triangleindex, VertexPointers &triangle, udword user_data)
 {
   static Point p,q,r;
 
@@ -1130,5 +1171,110 @@ WP_ObjectManager::ColCallback(udword triangleindex, VertexPointers &triangle, ud
   r.Set(v->point.data);
   triangle.Vertex[2] = &r;
 }
+
+void 
+WP_ObjectManager::ColCallback2(udword triangleindex, VertexPointers &triangle, udword user_data)
+{
+  static Point p,q,r;
+
+  WP_Model* model = (WP_Model*)user_data;
+  unsigned int* indices = model->triangles + triangleindex * 3;
+  WP_Vertex* v = model->getVertex(indices[0]);
+  p.Set(v->point.data);
+  triangle.Vertex[0] = &p;
+  v = model->getVertex(indices[1]);
+  q.Set(v->point.data);
+  triangle.Vertex[1] = &q;
+  v = model->getVertex(indices[2]);
+  r.Set(v->point.data);
+  triangle.Vertex[2] = &r;
+}
+
+void 
+WP_ObjectManager::addLight(const WP_Point3D& position, const WP_Color& ambient, const WP_Color& diffuse, const WP_Color& specular, const WP_Color& emissive, bool remote)
+{
+  if (number_lights < 8)  // maximal 8 light sources are permitted in OpenGL
+    {
+      WP_Light* l = new WP_Light(position, ambient, diffuse, specular, emissive, remote);
+      lights.push_back(l);
+
+      glLightfv(GL_LIGHT0 + number_lights, GL_AMBIENT, l->ambient_color.components);  
+      glLightfv(GL_LIGHT0 + number_lights, GL_DIFFUSE, l->diffuse_color.components);  
+      glLightfv(GL_LIGHT0 + number_lights, GL_SPECULAR,l->specular_color.components);  
+      glLightfv(GL_LIGHT0 + number_lights, GL_EMISSION,l->emissive_color.components);  
+      WP_GLState::getInstance()->enableLighti(number_lights);
+      if (number_lights == 0)
+	{
+	  WP_GLState::getInstance()->enableLighting();
+	  glEnable(GL_COLOR_MATERIAL);
+	  glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+	}
+      number_lights++;
+    }
+}  
+
+void 
+WP_ObjectManager::updateAll()
+{
+  //move dynamic objects
+  list<WP_DynamicObject*>::iterator j = dynamic_objects.begin();
+  while (j != dynamic_objects.end())
+    {	
+      (*j)->move();
+      j++;
+    }
+
+  checkCollisions();
+  drawObjects();
+
+  //do lighting
+  list<WP_Light*>::iterator k = lights.begin();
+  while (k != lights.end())
+    {	
+      (*k)->drawOpenGL();
+      k++;
+    }
+}
+
+void
+WP_ObjectManager::createCollisionPairs()
+{
+  list<WP_DynamicObject*>::const_iterator i = dynamic_objects.begin();
+  
+  while (i != dynamic_objects.end())
+    {
+      // create dynamic - static pairs
+
+      list<WP_StaticObject*>::const_iterator j = static_objects.begin();
+      while (j != static_objects.end())
+	{
+	  WP_ObjectManager::WP_CollisionPair *pair = new WP_ObjectManager::WP_CollisionPair((*i), (*j));
+	  collision_pairs.push_back(pair);
+	  ++j;
+	}
+
+      // create dynamic - dynamic pairs
+
+      list<WP_DynamicObject*>::const_iterator k = i;
+      ++k;
+
+      while (k != dynamic_objects.end())
+	{
+	  WP_ObjectManager::WP_CollisionPair *pair = new WP_ObjectManager::WP_CollisionPair((*i), (*k));
+	  collision_pairs.push_back(pair);
+	  ++k;
+	}
+      ++i;
+    }
+}
+
+WP_ObjectManager::WP_CollisionPair::WP_CollisionPair(WP_Object *obj1, WP_Object *obj2)
+  :object1(obj1), object2(obj2)
+{
+  cache.Model0 = object1->model->getCollisionModel();
+  cache.Model1 = object2->model->getCollisionModel(); 
+}
+
+
 
 

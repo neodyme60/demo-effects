@@ -3976,8 +3976,78 @@ echo "$as_me: error: libGLU not found" >&2;}
 fi
 
 
+echo "$as_me:$LINENO: checking for glutMainLoop in -lglut" >&5
+echo $ECHO_N "checking for glutMainLoop in -lglut... $ECHO_C" >&6
+if test "${ac_cv_lib_glut_glutMainLoop+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lglut  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
 
-for ac_header in GL/gl.h GL/glu.h
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char glutMainLoop ();
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+glutMainLoop ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_glut_glutMainLoop=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_glut_glutMainLoop=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_glut_glutMainLoop" >&5
+echo "${ECHO_T}$ac_cv_lib_glut_glutMainLoop" >&6
+if test $ac_cv_lib_glut_glutMainLoop = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGLUT 1
+_ACEOF
+
+  LIBS="-lglut $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: libglut not found" >&5
+echo "$as_me: error: libglut not found" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+
+for ac_header in GL/gl.h GL/glu.h GL/glut.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -4618,7 +4688,7 @@ fi
 CFLAGS="$CFLAGS `sdl-config --cflags`"
 LIBS="$LIBS `sdl-config --libs`"
 
-ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile"
+ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -5174,6 +5244,7 @@ do
   "DEMON/Makefile" ) CONFIG_FILES="$CONFIG_FILES DEMON/Makefile" ;;
   "BUMP2D/Makefile" ) CONFIG_FILES="$CONFIG_FILES BUMP2D/Makefile" ;;
   "TERRAIN/Makefile" ) CONFIG_FILES="$CONFIG_FILES TERRAIN/Makefile" ;;
+  "UFOS/Makefile" ) CONFIG_FILES="$CONFIG_FILES UFOS/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

@@ -59,6 +59,15 @@ public:
 
 	~WP_Vector3D(){};
 
+	// copy constructor
+
+	WP_Vector3D(const WP_Vector3D& v)
+	  {
+	    data[0] = v.data[0];
+	    data[1] = v.data[1];
+	    data[2] = v.data[2];
+	  }
+
 	/**
 	 * assignment operator
 	 * @param v the WP_Vector3D object which is copied to this object
