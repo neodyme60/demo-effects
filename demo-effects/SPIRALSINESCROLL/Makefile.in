@@ -76,24 +76,20 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-@OPENGL_TRUE@noinst_PROGRAMS = ufos
-@OPENGL_FALSE@noinst_PROGRAMS = 
-
-ufos_SOURCES = ufos.C 
-ufos_LDADD = ../COMMON/libTDEC.a ../WPCG/libWPCG.a ../OPCODE-1.2/libOPCODE.a
-INCLUDES = -I../COMMON/ -I../WPCG
-subdir = UFOS
+noinst_PROGRAMS = spiralsinescroll
+spiralsinescroll_SOURCES = spiralsinescroll.c 
+spiralsinescroll_LDADD = ../COMMON/libTDEC.a
+INCLUDES = -I../COMMON
+subdir = SPIRALSINESCROLL
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-@OPENGL_TRUE@noinst_PROGRAMS = ufos$(EXEEXT)
-@OPENGL_FALSE@noinst_PROGRAMS =
+noinst_PROGRAMS = spiralsinescroll$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 
-am_ufos_OBJECTS = ufos.$(OBJEXT)
-ufos_OBJECTS = $(am_ufos_OBJECTS)
-ufos_DEPENDENCIES = ../COMMON/libTDEC.a ../WPCG/libWPCG.a \
-	../OPCODE-1.2/libOPCODE.a
-ufos_LDFLAGS =
+am_spiralsinescroll_OBJECTS = spiralsinescroll.$(OBJEXT)
+spiralsinescroll_OBJECTS = $(am_spiralsinescroll_OBJECTS)
+spiralsinescroll_DEPENDENCIES = ../COMMON/libTDEC.a
+spiralsinescroll_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir)
@@ -102,32 +98,31 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/ufos.Po
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-CXXLD = $(CXX)
-CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
-	-o $@
-CXXFLAGS = @CXXFLAGS@
-DIST_SOURCES = $(ufos_SOURCES)
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/spiralsinescroll.Po
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+CFLAGS = @CFLAGS@
+DIST_SOURCES = $(spiralsinescroll_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(ufos_SOURCES)
+SOURCES = $(spiralsinescroll_SOURCES)
 
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .o .obj
+.SUFFIXES: .c .o .obj
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  UFOS/Makefile
+	  $(AUTOMAKE) --gnu  SPIRALSINESCROLL/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-ufos$(EXEEXT): $(ufos_OBJECTS) $(ufos_DEPENDENCIES) 
-	@rm -f ufos$(EXEEXT)
-	$(CXXLINK) $(ufos_LDFLAGS) $(ufos_OBJECTS) $(ufos_LDADD) $(LIBS)
+spiralsinescroll$(EXEEXT): $(spiralsinescroll_OBJECTS) $(spiralsinescroll_DEPENDENCIES) 
+	@rm -f spiralsinescroll$(EXEEXT)
+	$(LINK) $(spiralsinescroll_LDFLAGS) $(spiralsinescroll_OBJECTS) $(spiralsinescroll_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -135,23 +130,23 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ufos.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spiralsinescroll.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
 
-.C.o:
+.c.o:
 @AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXXCOMPILE) -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `test -f '$<' || echo '$(srcdir)/'`$<
 
-.C.obj:
+.c.obj:
 @AMDEP_TRUE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXXCOMPILE) -c -o $@ `cygpath -w $<`
-CXXDEPMODE = @CXXDEPMODE@
+@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c `cygpath -w $<`
+CCDEPMODE = @CCDEPMODE@
 uninstall-info-am:
 
 ETAGS = etags

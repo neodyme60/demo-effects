@@ -76,14 +76,17 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-noinst_PROGRAMS = plasmacube
+@OPENGL_TRUE@noinst_PROGRAMS = plasmacube
+@OPENGL_FALSE@noinst_PROGRAMS = 
+
 plasmacube_SOURCES = plasmacube.C 
 plasmacube_LDADD = ../COMMON/libTDEC.a ../WPCG/libWPCG.a ../OPCODE-1.2/libOPCODE.a
 INCLUDES = -I../COMMON/ -I../WPCG
 subdir = PLASMACUBE
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-noinst_PROGRAMS = plasmacube$(EXEEXT)
+@OPENGL_TRUE@noinst_PROGRAMS = plasmacube$(EXEEXT)
+@OPENGL_FALSE@noinst_PROGRAMS =
 PROGRAMS = $(noinst_PROGRAMS)
 
 am_plasmacube_OBJECTS = plasmacube.$(OBJEXT)

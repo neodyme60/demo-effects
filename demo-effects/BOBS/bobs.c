@@ -149,6 +149,8 @@ SDL_FULLSCREEN*/))
       m += 20;
     }
   
+  TDEC_set_fps(50);
+
   /* time based demo loop */
   while( 1 ) {
     
@@ -190,8 +192,7 @@ SDL_FULLSCREEN*/))
     
     if (TDEC_fps_ok())
       {
-	SDL_UpdateRects(screen, NUMBER_OF_BOBS, oldrects);
-	SDL_UpdateRects(screen, NUMBER_OF_BOBS, rects);
+	SDL_Flip(screen);
       }
   }
   

@@ -1,3 +1,5 @@
+12-15-02 Added 3 new effects, fixed a bug in WPCG's lighting system and added a namespace to it. Added logo to 3D 
+effects.
 11-27-02 Added many improvements to the WPCG 2D/3D library, among others 3D collision detection using the 3D OPCODE 
 library v1.2 of Pierre Terdiman, collision handling and a proper lighting system. 
 Many bug fixes and enhancements in WPCG. The demon and 3D terrain effect were corrected. Added 3D collision 

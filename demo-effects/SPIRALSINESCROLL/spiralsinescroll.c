@@ -27,16 +27,21 @@
 #define CHARACTER_HEIGHT 32
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
+#define STOPTIME 3000
 
 static SDL_Surface* font_surface;
 static SDL_Surface* scroll_surface;
-static SDL_Surface* copper_surface;
 static SDL_Surface* copy_surface;
+static SDL_Surface* flipped_surface;
 
 static short aSin[360];
-static char text[] = " A 1 pixel sinus scroller - pretty retro isn't it? - cheers -   W.P. van Paassen -       starting over again in -      9  8  7  6  5  4  3  2  1                    ";
+static short aSin2[SCREEN_WIDTH + CHARACTER_WIDTH];
+static Uint16 sin_index = 0;
+static char text[] = " The Demo Effects Collection   \"     - cheers -           W.P. van Paassen         \"  -    starting over again in -      9  8  7  6  5  4  3  2  1          ";
 static char characters[] = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 static char* text_pointer = text;
+static Uint8 stopscroller = 0;
+static Uint32 time;
 
 void quit( int code )
 {
@@ -48,8 +53,8 @@ void quit( int code )
   
   SDL_FreeSurface(scroll_surface);
   SDL_FreeSurface(font_surface);
-  SDL_FreeSurface(copper_surface);
   SDL_FreeSurface(copy_surface);
+  SDL_FreeSurface(flipped_surface);
 
   SDL_Quit( );
 
@@ -103,6 +108,12 @@ Uint16 compute_font_pos(char scroll_char)
       text_pointer = text;
       scroll_char = *text_pointer++;
     }
+  else if (scroll_char =='"')
+    {
+      stopscroller = 1;
+      time = SDL_GetTicks();
+      return 0;
+    }
 
   while (*p++ != scroll_char)
     {
@@ -125,7 +136,6 @@ void print_character(void)
   frect.x = compute_font_pos(*text_pointer++);
 
   /*copy character to scroll_screen */
-      
   SDL_BlitSurface(font_surface, &frect, scroll_surface, &srect);  
 }
 
@@ -135,8 +145,6 @@ void init()
   float rad;
   Uint16 i;
   short centery = SCREEN_HEIGHT >> 1;
-  SDL_Color colors[129];
-  SDL_Rect r = {0,0, SCREEN_WIDTH, 1};
   
   /*create sin lookup table */
   for (i = 0; i < 360; i++)
@@ -145,6 +153,12 @@ void init()
       aSin[i] = centery + (short)((sin(rad) * 45.0));
     }
   
+  for (i = 0; i < SCREEN_WIDTH + CHARACTER_WIDTH; i++)
+    {
+      rad =  (float)i * 0.0174532 * (360.0 / (SCREEN_WIDTH + CHARACTER_WIDTH)) ; /* spread 360 degrees over SCREEN_WIDTH  + CHARACTER_WIDTH values */ 
+      aSin2[i] = (short)((sin(rad) * 100.0));
+    }
+
   /* create scroll surface, this surface must be wider than the screenwidth to print the characters outside the screen */
   
   s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH + CHARACTER_WIDTH * 2, CHARACTER_HEIGHT, 8, r_mask, g_mask, b_mask, a_mask); 
@@ -153,43 +167,18 @@ void init()
   
   SDL_FreeSurface(s);
   
+  /* create copy surface */
+  
+  copy_surface = TDEC_copy_surface(scroll_surface);
+
+  /* create flipped surface */
+  
+  flipped_surface = TDEC_copy_surface(copy_surface);
+
   /* load font */
   
   font_surface = IMG_Load("../GFX/font.pcx");
 
-  /*create copper surface*/
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8,  r_mask, g_mask, b_mask, a_mask); 
-  
-  copper_surface = SDL_DisplayFormat(s);
-  
-  for (i = 0; i < 32; ++i)
-    {
-      colors[i].r = i << 3;
-      colors[i].g = 255 - ((i << 3) + 1); 
-      colors[i].b = 0;
-      colors[i+32].r = 255;
-      colors[i+32].g = (i << 3) + 1;
-      colors[i+32].b = 0;
-      colors[i+64].r = 255 - ((i << 3) + 1);
-      colors[i+64].g = 255 - ((i << 3) + 1);
-      colors[i+64].b = i << 3;
-      colors[i+96].r = 0;
-      colors[i+96].g = i << 3;
-      colors[i+96].b = 255 - (i << 3); 
-    }
-  
-  for (i = 0; i < 128; ++i)
-    {
-      SDL_FillRect(copper_surface, &r, SDL_MapRGB(copper_surface->format, colors[i].r, colors[i].g, colors[i].b));
-      r.y++;
-    }
-  
-  SDL_FreeSurface(s);
-  
-  /* create copy surface */
-  
-  copy_surface = TDEC_copy_surface(copper_surface); 
-  
   /*disable events */
 
   for (i = 0; i < SDL_NUMEVENTS; ++i)
@@ -209,14 +198,11 @@ int main( int argc, char* argv[] )
   SDL_Rect srect2 = {0, 0, 1, CHARACTER_HEIGHT};
   SDL_Rect drect = {0, 0, 1, CHARACTER_HEIGHT}; 
   SDL_Rect srect = {2, 0, SCREEN_WIDTH + (CHARACTER_WIDTH * 2), CHARACTER_HEIGHT};
-  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, 130};
-  SDL_Rect crect1 = {0, 1, SCREEN_WIDTH, 127};
-  SDL_Rect crect2 = {0, 0, SCREEN_WIDTH, 127};
-  SDL_Rect crect3 = {0, 127, SCREEN_WIDTH, 1}; 
+  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, SCREEN_HEIGHT / 2 + 45};
   
   if (argc > 1)
     {
-      printf("Retro Sinus Scroller - W.P. van Paassen - 2002\n");
+      printf("Retro Spiral Sine Scroller - W.P. van Paassen - 2002\n");
       return -1;
     }
 
@@ -225,11 +211,9 @@ int main( int argc, char* argv[] )
 
   TDEC_init_timer();
 
-  SDL_WM_SetCaption("Retro - Sinus Scroller - ", "");
+  SDL_WM_SetCaption("Retro - Spiral Sine Scroller - ", "");
   
   init();
-
-  SDL_SetColorKey(screen, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 0xFF, 0xFF, 0xFF));
 
   TDEC_set_fps(50);
 
@@ -239,25 +223,44 @@ int main( int argc, char* argv[] )
       TDEC_new_time();
 
       process_events();
-
+      
       /* scroll scroll_surface to the left */
 
-      SDL_BlitSurface(scroll_surface, &srect, scroll_surface, 0);
-      displacement += 2;
-      
-      /* print character? */
-      if (displacement > 12)
+      if (!stopscroller)
 	{
-	  print_character();
-	  displacement = 0;
+	  SDL_BlitSurface(scroll_surface, &srect, scroll_surface, 0);
+	  displacement += 2;
+
+	  /* print character? */
+	  if (displacement > 12)
+	    {
+	      print_character();
+	      displacement = 0;
+	    }
+	}
+      else
+	{
+	  if (SDL_GetTicks() - time >= STOPTIME)
+	    stopscroller = 0;
 	}
       
-      /* scroll copper bars up */
-      
-      temp = *(Uint32*)copper_surface->pixels;
-      SDL_BlitSurface(copper_surface, &crect1, copper_surface, &crect2);
-      SDL_FillRect(copper_surface, &crect3, temp);
-      
+      SDL_FillRect(copy_surface, 0, 0);
+
+      /* fill flipped surface */
+
+      SDL_BlitSurface(scroll_surface, 0, flipped_surface, 0);
+      TDEC_flipx_image(flipped_surface);
+
+      for (i = 0; i < scroll_surface->w; ++i)
+	{
+	  if (aSin2[sin_index] > 0)
+	    TDEC_scale_copy_vscanline(scroll_surface, copy_surface, i, aSin2[sin_index]);
+	  else
+	    TDEC_scale_copy_vscanline(flipped_surface, copy_surface, i, -aSin2[sin_index]);
+	  sin_index++;
+	  sin_index %= SCREEN_WIDTH + CHARACTER_WIDTH;
+	}
+
       /* clean sinus area */
       
       SDL_FillRect(screen, &frect, 0);
@@ -269,16 +272,10 @@ int main( int argc, char* argv[] )
 	  srect2.x = CHARACTER_WIDTH + i;
 	  drect.x = i;
 	  drect.y = aSin[(j + i) % 360];
-	  SDL_BlitSurface(scroll_surface, &srect2, screen, &drect);
+	  SDL_BlitSurface(copy_surface, &srect2, screen, &drect);
 	}
       j += 6;
       j %= 360;
-      
-      /* blend copper and sinus scroll*/
-        
-      SDL_BlitSurface(copper_surface, 0, copy_surface, 0);
-      SDL_BlitSurface(screen, &frect, copy_surface, 0);
-      SDL_BlitSurface(copy_surface, 0, screen, &frect);
       
       if (TDEC_fps_ok())
 	SDL_Flip(screen);
@@ -286,8 +283,3 @@ int main( int argc, char* argv[] )
   
   return 0; /* never reached */
 }
-
-
-
-
-

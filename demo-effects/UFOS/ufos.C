@@ -238,6 +238,8 @@ int main( int argc, char* argv[] )
   terrain = new WP_Terrain(40, 40, 200, 1.0, 6);
   terrain->setMiddlePoint(WP_Point3D(0.0, 0.0, 0.0));
 
+  TDEC_set_fps(75);
+  
   /* time based demo loop */
   while( 1 ) 
     {

@@ -162,7 +162,7 @@ SDL_FULLSCREEN*/))
   
   init();
 
-  TDEC_set_fps(40);
+  TDEC_set_fps(50);
 
   SDL_SetColorKey(eye_surface, SDL_SRCCOLORKEY, 0);
 

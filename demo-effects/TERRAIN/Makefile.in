@@ -76,14 +76,17 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-noinst_PROGRAMS = terrain
+@OPENGL_TRUE@noinst_PROGRAMS = terrain
+@OPENGL_FALSE@noinst_PROGRAMS = 
+
 terrain_SOURCES = terrain.C 
 terrain_LDADD = ../COMMON/libTDEC.a ../WPCG/libWPCG.a ../OPCODE-1.2/libOPCODE.a
 INCLUDES = -I../COMMON/ -I../WPCG
 subdir = TERRAIN
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-noinst_PROGRAMS = terrain$(EXEEXT)
+@OPENGL_TRUE@noinst_PROGRAMS = terrain$(EXEEXT)
+@OPENGL_FALSE@noinst_PROGRAMS =
 PROGRAMS = $(noinst_PROGRAMS)
 
 am_terrain_OBJECTS = terrain.$(OBJEXT)

@@ -1,3 +1,8 @@
+0.2 Added three new effects. First a 3D PLASMACUBE effect which is lighted by two coloured lights. Second a 2D Spiral 
+Sine scroller effect called SPIRALSINESCROLL and last a 2D Twin sine scroller (butterfly) called TWINSCROLLER.
+Furthermore, fixed a bug in the lighting system of WPCG, added the WPCG namespace to it and changed some defines into 
+consts. All 3D effects are now accompanied by the TDEC logo in the upper right corner.
+
 0.1 Pierre Terdiman's fantastic OPCODE 3D Collision Detection Library is now part of TDEC and is used by the WPCG 
 library for 3D frustum culling and collision detection. A demo called ufos was added to demonstrate these features.
 The WPCG library was improved and enchanced. Many bugs were fixed and a proper lighting system and collision 
