@@ -33,11 +33,12 @@ static SDL_Surface* font_surface;
 static SDL_Surface* scroll_surface;
 static SDL_Surface* copy_surface;
 static SDL_Surface* flipped_surface;
+static SDL_Color colors[5];
 
 static short aSin[360];
 static short aSin2[SCREEN_WIDTH + CHARACTER_WIDTH];
 static Uint16 sin_index = 0;
-static char text[] = " The Demo Effects Collection   \"     - cheers -           W.P. van Paassen         \"  -    starting over again in -      9  8  7  6  5  4  3  2  1          ";
+static char text[] = " THE DEMO EFFECTS COLLECTION   \"     - CHEERS -           W.P. VAN PAASSEN         \"  -    STARTING OVER AGAIN IN -      9  8  7  6  5  4  3  2  1          ";
 static char characters[] = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 static char* text_pointer = text;
 static Uint8 stopscroller = 0;
@@ -150,7 +151,7 @@ void init()
   for (i = 0; i < 360; i++)
     {
       rad =  (float)i * 0.0174532; 
-      aSin[i] = centery + (short)((sin(rad) * 45.0));
+      aSin[i] = centery + (short)((sin(rad) * 75.0));
     }
   
   for (i = 0; i < SCREEN_WIDTH + CHARACTER_WIDTH; i++)
@@ -166,7 +167,7 @@ void init()
   scroll_surface = SDL_DisplayFormat(s);
   
   SDL_FreeSurface(s);
-  
+ 
   /* create copy surface */
   
   copy_surface = TDEC_copy_surface(scroll_surface);
@@ -178,6 +179,16 @@ void init()
   /* load font */
   
   font_surface = IMG_Load("../GFX/font.pcx");
+
+  /* create palette */
+
+  colors[1].g = 64; 
+  colors[2].g = 128;
+  colors[3].g = 200; 
+  colors[4].g = 255; 
+
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 5); 
+  SDL_SetPalette(copy_surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 5); 
 
   /*disable events */
 
@@ -198,11 +209,14 @@ int main( int argc, char* argv[] )
   SDL_Rect srect2 = {0, 0, 1, CHARACTER_HEIGHT};
   SDL_Rect drect = {0, 0, 1, CHARACTER_HEIGHT}; 
   SDL_Rect srect = {2, 0, SCREEN_WIDTH + (CHARACTER_WIDTH * 2), CHARACTER_HEIGHT};
-  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 45, SCREEN_WIDTH, 112};
+  SDL_Rect frect = {0, SCREEN_HEIGHT / 2 - 75, SCREEN_WIDTH, 182};
+  SDL_Rect rs = {0, 0, 1, CHARACTER_HEIGHT};
+  SDL_Rect rs2 = {0, 0, 1, CHARACTER_HEIGHT};
+  Uint8* image;
   
   if (argc > 1)
     {
-      printf("Retro Spiral Sine Scroller - W.P. van Paassen - 2002\n");
+      printf("Retro Bar Sine Scroller - W.P. van Paassen - 2002\n");
       return -1;
     }
 
@@ -211,12 +225,14 @@ int main( int argc, char* argv[] )
 
   TDEC_init_timer();
 
-  SDL_WM_SetCaption("Retro - Spiral Sine Scroller - ", "");
+  SDL_WM_SetCaption("Retro - Bar Sine Scroller - ", "");
   
   init();
 
   TDEC_set_fps(50);
 
+  SDL_SetColorKey(copy_surface, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 0x00, 0x00, 0x00)); 
+      
   /* time based demo loop */
   while( 1 ) 
     {
@@ -243,26 +259,63 @@ int main( int argc, char* argv[] )
 	  if (SDL_GetTicks() - time >= STOPTIME)
 	    stopscroller = 0;
 	}
+
       
-      SDL_FillRect(copy_surface, 0, 0);
-
+      SDL_FillRect(copy_surface, 0, 0);   
+      
       /* fill flipped surface */
-
+      
       SDL_BlitSurface(scroll_surface, 0, flipped_surface, 0);
-      TDEC_flipx_image(flipped_surface);
-
+      TDEC_flipx_image(flipped_surface);      
+      
       for (i = 0; i < scroll_surface->w; ++i)
 	{
 	  if (aSin2[sin_index] > 0)
-	    TDEC_scale_copy_vscanline(scroll_surface, copy_surface, i, aSin2[sin_index]);
+	    {
+	      TDEC_scale_copy_vscanline(scroll_surface, copy_surface, i, aSin2[sin_index]);
+	      rs.x = i;
+	      SDL_FillRect(screen, &rs2, 0);
+	      image = (Uint8*)(screen->pixels + 12 * screen->w);
+	      *image = 1;
+	      image += screen->w;
+	      *image = 2;
+	      image += screen->w;
+	      *image = 3;
+	      image += screen->w;
+	      *image = 4;
+	      image += screen->w;
+	      *image = 3;
+	      image += screen->w;
+	      *image = 2;
+	      image += screen->w;
+	      *image = 1;
+	      SDL_BlitSurface(copy_surface, &rs, screen, &rs2);
+	      SDL_BlitSurface(screen, &rs2, copy_surface, &rs);
+	    }
 	  else
-	    TDEC_scale_copy_vscanline(flipped_surface, copy_surface, i, -aSin2[sin_index]);
+	    {
+	      TDEC_scale_copy_vscanline(flipped_surface, copy_surface, i, -aSin2[sin_index]);
+	      image = (Uint8*)(copy_surface->pixels + 12 * copy_surface->w + i);
+	      *image = 1;
+	      image += copy_surface->w;
+	      *image = 2;
+	      image += copy_surface->w;
+	      *image = 3;
+	      image += copy_surface->w;
+	      *image = 4;
+	      image += copy_surface->w;
+	      *image = 3;
+	      image += copy_surface->w;
+	      *image = 2;
+	      image += copy_surface->w;
+	      *image = 1;
+	    }
 	  sin_index++;
 	  sin_index %= SCREEN_WIDTH + CHARACTER_WIDTH;
 	}
-
-      /* clean sinus area */
       
+      /* clean sinus area */
+      SDL_FillRect(screen, &rs2, 0);
       SDL_FillRect(screen, &frect, 0);
       
       /* create sinus in scroll */
@@ -274,9 +327,9 @@ int main( int argc, char* argv[] )
 	  drect.y = aSin[(j + i) % 360];
 	  SDL_BlitSurface(copy_surface, &srect2, screen, &drect);
 	}
-      j += 6;
+      j += 1;
       j %= 360;
-      
+
       if (TDEC_fps_ok())
 	SDL_Flip(screen);
     }
