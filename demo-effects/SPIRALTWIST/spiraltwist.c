@@ -25,14 +25,11 @@
 #include <SDL/SDL_image.h>
 #include "tdec.h"
 
-#define SCALING 3
-
-static Uint8 scaling = 100;
-static Uint8 backside = 0;
-static Uint8 up = 0;
-static Uint8 starting = 1;
-static Uint8 quiting = 0;
+static short aSin[512];
+static Uint16 sin_index = 0;
+static Uint16 sin_global_index = 0;
 static SDL_Surface *image = 0;
+static SDL_Surface *flipped_image = 0;
 
 void quit( int code )
 {      
@@ -44,6 +41,8 @@ void quit( int code )
   
   if (image) 
     SDL_FreeSurface(image);
+  if (flipped_image) 
+    SDL_FreeSurface(flipped_image);
 
   SDL_Quit( );
 
@@ -58,7 +57,7 @@ void handle_key_down( SDL_keysym* keysym )
     switch( keysym->sym )
       {
       case SDLK_ESCAPE:
-	quiting = 1;
+	quit(1);
         break;
       default:
         break;
@@ -80,7 +79,7 @@ void process_events( void )
       break;
     case SDL_QUIT:
       /* Handle quit requests */    
-      quiting = 1;
+      quit(1);
       break;
     }
   }
@@ -89,6 +88,7 @@ void process_events( void )
 void init()
 {
     Uint16 i;
+    float rad;
 
     image = IMG_Load("../GFX/tuxblackbg.png");
     if (!image) {
@@ -97,6 +97,19 @@ void init()
     }
 
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, image->format->palette->colors, 0, image->format->palette->ncolors);
+
+    flipped_image = IMG_Load("../GFX/tuXperience.png");
+    if (!image) {
+        fprintf(stderr, "Cannot open file tuXperience.png: %s\n", SDL_GetError());
+        quit(3);
+    }
+
+    /*create sin lookup table */
+    for (i = 0; i < 512; i++)
+      {
+	rad =  (float)i * 0.0174532 * 0.703125; 
+	aSin[i] = (short)((sin(rad) * 100.0));
+      }
 
     /*disable events */
     for (i = 0; i < SDL_NUMEVENTS; ++i) {
@@ -110,11 +123,10 @@ void init()
 
 int main( int argc, char* argv[] )
 {
-  SDL_Rect s, d;
-  short i;
+  Uint16 i;
 
   if (argc > 1) {
-    printf("Retro FlipImage - W.P. van Paassen - 2002\n");
+    printf("Retro Spiraltwist - W.P. van Paassen - 2002\n");
     return -1;
   }
   
@@ -123,16 +135,12 @@ int main( int argc, char* argv[] )
   
   TDEC_init_timer();
   
-  SDL_WM_SetCaption("Retro FlipImage effect ", "");
+  SDL_WM_SetCaption("Retro Spiraltwist effect ", "");
   
   init();
-
-  s.x = d.x = 0;
-  s.y = d.y = i = image->h;
-  s.w = image->w;
-  s.h = d.h = 1;
-  d.w = screen->w;
   
+  TDEC_set_fps(25);
+
   /* time based demo loop */
   while( 1 ) 
     {
@@ -140,67 +148,26 @@ int main( int argc, char* argv[] )
     
       process_events();
 
-      if (starting)
+      sin_index = sin_global_index;
+      
+      SDL_FillRect(screen, 0, 0);
+
+      for (i = 0; i < image->h; ++i)
 	{
-	  if (i < 0)
-	    starting = 0;
+	  if (aSin[sin_index] < 0)
+	    TDEC_scale_copy_scanline(flipped_image, screen, i, -aSin[sin_index++]);
 	  else
-	    {
-	      short j;
-	      
-	      s.y = d.y = i--;
-	      
-	      for (j = i; j >= 0; --j)
-		{
-		  SDL_BlitSurface(image, &s, screen, &d);
-		  d.y = j;
-		}
-	    }
+	    TDEC_scale_copy_scanline(image, screen, i, aSin[sin_index++]);
+
+	  sin_index &= 511;
 	}
-      else 
-	{ /* flipping */
-	  if (!up)
-	    {
-	      if (scaling > SCALING)
-		{
-		    TDEC_scaley_copy_image(image, screen, scaling);
-
-		  scaling -= SCALING;
-		}
-	      else
-		{
-		  backside = !backside;
-		    TDEC_flipx_image(image);
-
-		  if (backside)
-		    TDEC_fadeout(image, 60);		   
-		  else
-		    TDEC_fadein(image, screen->format->palette, 60);
-		  up = 1;
-		}
-	    }
-	  else
-	    {
-	      if (scaling < 99 - SCALING)
-		{
-		    TDEC_scaley_copy_image(image, screen, scaling);
-
-		  scaling += SCALING;
-		}
-	      else
-		  up = 0;
-	    }
-	}
-
+     
+      sin_global_index += 4;
+      sin_global_index &= 511;
+      
       if (TDEC_fps_ok()) 
 	{
 	  SDL_Flip(screen);
-	}
-      
-      if (quiting)
-	{
-	  if (TDEC_fadeout(screen, 4))
-	      quit(0);	
 	}
     }
   
