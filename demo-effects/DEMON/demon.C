@@ -165,7 +165,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   if (argc > 1) {
-    printf("Retro Dots - W.P. van Paassen - 2002\n");
+    printf("Retro Quake2 Model - W.P. van Paassen - 2002\n");
     return -1;
   }
   
@@ -177,12 +177,13 @@ int main( int argc, char* argv[] )
   SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
   
-  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /* |SDL_FULLSCREEN*/))
+  if (!TDEC_set_video_GL(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE  
+			 /*| SDL_FULLSCREEN*/))
     quit(1);
   
   TDEC_init_timer();
   
-  SDL_WM_SetCaption("Retro Dots effect ", "");
+  SDL_WM_SetCaption("Retro Quake2 Model effect ", "");
   
   init();
 

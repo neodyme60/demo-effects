@@ -48,7 +48,11 @@ public:
    * @param p a WP_Point3D object which holds the vertex its coordinates
    * @param n a WP_Vector3D object representing the normal of this vertex. This is used for shading operations like for example gouraud shading
    */
-  WP_Vertex(const WP_Point3D& p, const WP_Vector3D& n):point(p), normal(n){};
+  WP_Vertex(const WP_Point3D& p, const WP_Vector3D& n):point(p), normal(n)
+    {
+      texCoords[0] = texCoords[1] = 0.0;
+    };
+
   virtual ~WP_Vertex(){};
 
   /**
@@ -70,7 +74,7 @@ public:
    * @param v a pointer to a WP_Vertex object representing the second vertex used for interpolating between
    * @param t the amount of interpolation between the two vertices. 0.0 will result in this vertex. 1.0 will result in vertex <i>v</i>. 0.5 in between the two vertices etc.
    */
-  void lerp3D(WP_Vertex* v, float t)
+  void lerp3D(const WP_Vertex* v, float t)
     {
       WP_Point3D p = v->point;
       WP_Vector3D c = p - point;
