@@ -14,22 +14,12 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef SCROLLER_H
-#define SCROLLER_H
+#ifndef COPPERBARS_H
+#define COPPERBARS_H
 
 #include "SDL/SDL.h"
 
-extern void TDEC_init_scroller(char *_text, char *font, char *_characters, 
-			       Uint8 character_width, Uint8 character_height);
-
-extern SDL_Rect* TDEC_get_font_char(void);
-extern void TDEC_free_scroller(void);
-extern Uint8 TDEC_scroller_ready(void);
-extern Uint8 TDEC_get_character_width(void);
-extern Uint8 TDEC_get_character_height(void);
-extern void TDEC_draw_font_char(SDL_Rect *font_rect, SDL_Surface *destination, SDL_Rect *dest_rect);
-
-extern char *TDEC_FONT1_CHARACTERS;
-extern char *TDEC_FONT1;
+extern void TDEC_init_copperbars(SDL_Surface *s, Uint16 sine_amplitude);
+extern void TDEC_draw_copperbars(void);
 
 #endif

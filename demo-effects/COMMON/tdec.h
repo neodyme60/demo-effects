@@ -14,6 +14,7 @@ extern "C" {
 #include "layers.h"
 #include "plasma.h"
 #include "fire.h"
+#include "scroller.h"
 #include "jumpingscroller.h"
 #include "3dstarfield.h"
 

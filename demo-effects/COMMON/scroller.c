@@ -23,6 +23,12 @@ static char *text_pointer;
 static Uint8 cwidth;
 static Uint8 cheight;
 static SDL_Rect frect;
+static Uint8 restarted = 0;
+
+char *TDEC_FONT1_CHARACTERS = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+char *TDEC_FONT1 = "../GFX/font.pcx";
+
+static Uint16 TDEC_compute_font_pos(char scroll_char);
 
 void TDEC_init_scroller(char *_text, char *font, char *_characters,
 			Uint8 character_width, Uint8 character_height)
@@ -49,6 +55,7 @@ Uint16 TDEC_compute_font_pos(char scroll_char)
     {
       text_pointer = text;
       scroll_char = *text_pointer++;
+      restarted = 1;
     }
 
   while (*p++ != scroll_char)
@@ -78,7 +85,12 @@ void TDEC_free_scroller(void)
 
 Uint8 TDEC_scroller_ready(void)
 {
-  return *text_pointer == '\0';
+  if(restarted)
+    {
+      restarted = 0;
+      return 1;
+    }
+  return 0;
 }
 
 inline Uint8 TDEC_get_character_width(void)

@@ -14,8 +14,6 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/*note that the code has not been fully optimized*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -25,6 +23,12 @@
 
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
+
+#define PLASMA     0
+#define STARFIELD  1
+#define COPPERBARS 2
+
+static Uint8 background = PLASMA;
 
 void quit( int code )
 {
@@ -37,7 +41,10 @@ void quit( int code )
   SDL_Quit( );
 
   TDEC_free_fire();
-  /*  TDEC_free_3dstarfield();*/
+  if (background == STARFIELD)
+    {
+      TDEC_free_3dstarfield();
+    }
   TDEC_free_jumping_scroller();
   TDEC_reset_layering();
   
@@ -81,16 +88,15 @@ void process_events( void )
 void init()
 {
   Uint32 i;
-  SDL_Surface *firelayer, *scrollerlayer;
-  char *text = " TDEC Multilayering ";
-  char *characters = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+  SDL_Surface *scrollerlayer, *firelayer;
+  char *text = " tDeC TdEc ";
 
   TDEC_init_layering();
   TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 4);
-  /*TDEC_init_3dstarfield(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 1020);*/
 
   scrollerlayer = TDEC_add_layer(SCREEN_WIDTH, 132, 0, SCREEN_HEIGHT - 132, 0xFF);
-  TDEC_init_jumping_scroller(scrollerlayer, text, "../GFX/font.pcx", characters, 16, 32, SCREEN_WIDTH, 100);
+  TDEC_init_jumping_scroller(scrollerlayer, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100);
+
   firelayer = TDEC_add_layer(SCREEN_WIDTH, 60, 0, 300, 0xFF);
   TDEC_init_fire(firelayer, SCREEN_WIDTH, 60, 0, 0);
 
@@ -115,7 +121,8 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
- if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* | SDL_FULLSCREEN*/))
+ if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* | 
+SDL_FULLSCREEN*/))
    quit(1);
 
  TDEC_init_timer();
@@ -131,8 +138,39 @@ int main( int argc, char* argv[] )
 
      process_events();
 
-     TDEC_draw_plasma();
-     /*TDEC_draw_3dstarfield();*/
+     if (TDEC_scroller_ready())
+       {
+	 background++;
+	 background %= 3;
+
+	 TDEC_clear_layer(TDEC_get_layer(TDEC_BACKGROUND_LAYER));
+	 if (background == PLASMA)
+	   {
+	     TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 4);
+	   }
+	 else if (background == STARFIELD)
+	   {
+	     TDEC_init_3dstarfield(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 1020);
+	   }
+	 else
+	   {
+	     TDEC_init_copperbars(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 100);
+	   }
+       }
+
+     if (background == PLASMA)
+       {
+	 TDEC_draw_plasma();
+       }
+     else if (background == STARFIELD)
+       {
+	 TDEC_draw_3dstarfield();
+       }
+     else
+       {
+	 TDEC_draw_copperbars();
+       }
+
      TDEC_draw_fire();
      TDEC_draw_jumping_scroller();
      
@@ -141,7 +179,6 @@ int main( int argc, char* argv[] )
      if (TDEC_fps_ok())
        {
 	 TDEC_draw_layers();
-	 ;
        }
     }
   
