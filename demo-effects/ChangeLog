@@ -1,3 +1,10 @@
+0.6 TDEC's plugin system has been extended with functions to pass effect's parameters to plugins by using a parameter 
+list. This makes it possible to add effects defined in a database or from a script. 
+Bugs were fixed and overall functionality was improved. 
+Some simple effect and filter plugins were added to the PLUGINS directory to demonstrate 
+how easy it is to implement these. 
+Check out the improved MULTILAYER demo to see it all in action.
+
 0.5 TDEC has been extended with a run-time pluggable multi-layered demo effects plugin system, which is able to show 
 a lot of effects, filters and transition plugins concurrently and can be used to create demo's. This is now part of 
 libTDEC. Plugins can be found in the PLUGINS directory. 

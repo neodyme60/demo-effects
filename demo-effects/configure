@@ -1497,7 +1497,7 @@ program_transform_name=`echo $program_transform_name | sed -f conftest.sed`
 rm conftest.sed
 
 PACKAGE=The_Demo_Effects_Collection
-THE_DEMO_EFFECTS_COLLECTION_VERSION=0.5
+THE_DEMO_EFFECTS_COLLECTION_VERSION=0.6
 
 
 
@@ -1717,7 +1717,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=The_Demo_Effects_Collection
- VERSION=0.5
+ VERSION=0.6
 
 
 cat >>confdefs.h <<_ACEOF
