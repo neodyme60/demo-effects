@@ -162,8 +162,8 @@ DIST_SOURCES = $(libOPCODE_a_SOURCES)
 HEADERS = $(libOPCODEinclude_HEADERS)
 
 DIST_COMMON = README $(libOPCODEinclude_HEADERS) AUTHORS COPYING \
-	ChangeLog INSTALL Makefile.am Makefile.in NEWS configure \
-	configure.in depcomp install-sh missing mkinstalldirs
+	ChangeLog INSTALL Makefile.am Makefile.in NEWS configure.in \
+	depcomp install-sh missing mkinstalldirs
 SOURCES = $(libOPCODE_a_SOURCES)
 
 all: all-am

@@ -20,6 +20,8 @@
 #ifndef WP_2D_H
 #define WP_2D_H
 
+#include <string>
+#include "WPCG.h"
 #include "WP_Def.h"
 
 namespace WPCG

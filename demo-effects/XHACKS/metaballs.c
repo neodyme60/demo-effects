@@ -189,7 +189,7 @@ static unsigned long * SetPalette(Display *pDisplay, Window Win, char *sColor, s
 			XFreeColors( pDisplay, XWinAttribs.colormap, aiColorVals, iColor, 0 );
 			free( aColors );
 			free( aiColorVals );
-			*piColorCount--;
+			(*piColorCount)--;
 			aColors     = calloc( *piColorCount, sizeof(XColor) );
 			aiColorVals = calloc( *piColorCount, sizeof(unsigned long) );
 			iColor = -1;
