@@ -14,7 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <math.h>
+#include <cmath>
 #include "WP_Point3D.h"
 #include "WP_Matrix3D.h"
 #include "WP_Ray3D.h"

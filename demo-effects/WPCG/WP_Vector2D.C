@@ -14,7 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <math.h>
+#include <cmath>
 #include "WP_Vector2D.h"
 #include "WP_Math.h"
 #include "WP_Matrix2D.h"

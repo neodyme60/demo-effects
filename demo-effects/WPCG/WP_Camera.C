@@ -17,7 +17,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include <math.h>
+#include <cmath>
 #include "WP_ObjectManager.h"
 #include "WP_Camera.h"
 

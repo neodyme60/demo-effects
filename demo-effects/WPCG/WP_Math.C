@@ -15,7 +15,7 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 
-#include <math.h>
+#include <cmath>
 #include "WP_Math.h"
 
 WP_Math* WP_Math::_instance = 0;

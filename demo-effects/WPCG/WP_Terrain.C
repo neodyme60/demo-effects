@@ -14,10 +14,9 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <math.h>
+#include <cmath>
 #include <list>
-#include <iostream.h>
-#include <stdlib.h>
+#include <iostream>
 #include "WP_Math.h"
 #include "WP_Vertex.h"
 #include "WP_Quad.h"

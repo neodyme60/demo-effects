@@ -14,7 +14,6 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-//#include <stdio.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <iostream>
@@ -171,18 +170,14 @@ bool WP_Image::loadBMP(const string &file)
 	  throw("WP_Image::loadBMP: Error while allocating memory");
 	}
 
-      input.close();
-      input.open(file.c_str(), ios::binary | ios::in);
-      if(input.fail())
-	{ 
-	  throw("");
-	}
+      input.clear();//!!!
+      input.seekg(ios_base::beg);
 
       byte* p = buffer;
 
       while(input.get(c))
 	{
-	  *p = c;
+	  *p = (unsigned char)c;
 	  p++;
 	}
 
@@ -433,18 +428,14 @@ bool WP_Image::loadPCX(const string &file)
 	  throw("WP_Image::loadPCX: Error while allocating memory");
 	}
 
-      input.close();
-      input.open(file.c_str(), ios::binary | ios::in);
-      if(input.fail())
-	{ 
-	  throw("");
-	}
+      input.clear(); //!!!
+      input.seekg(ios_base::beg);
 
       byte* p = buffer;
 
       while(input.get(c))
 	{
-	  *p = c;
+	  *p = (byte)c;
 	  p++;
 	}
 
@@ -686,8 +677,8 @@ void WP_Image::chromaKey(const WP_RGBA& key, byte alpha)
     }
 }
 
-void WP_Image::setTextureGL(GLuint* texture_id, GLint wrap_s=GL_REPEAT, GLint wrap_t=GL_REPEAT, 
-			    GLint mag_filter=GL_NEAREST, GLint min_filter=GL_NEAREST, bool mipmapping=false)
+void WP_Image::setTextureGL(GLuint* texture_id, GLint wrap_s, GLint wrap_t, 
+			    GLint mag_filter, GLint min_filter, bool mipmapping)
 {
   glGenTextures(1, texture_id);
   glBindTexture(GL_TEXTURE_2D, *texture_id);

@@ -1,6 +1,10 @@
 #ifndef WPCG_H
 #define WPCG_H
 
+#include "../OPCODE-1.2/Opcode.h"
+using namespace Opcode;
+using namespace std;
+
 #include "WP_Def.h"
 #include "WP_Color.h"
 #include "WP_GLState.h"

@@ -18,6 +18,7 @@
 #define WP_DEF_H
 
 #include "GL/gl.h"
+using namespace std;
 
 #define byte unsigned char
 #define scalar GLfloat

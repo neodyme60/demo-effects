@@ -28,14 +28,15 @@
 
 class WP_Model
  {
+   friend class WP_Frame;
  public:
-  WP_Model(){};
+  WP_Model();
   
   /**
    * @param the name of the to be loaded model
    * @param scaling a WP_Vector3D object holding values by which the model is scaled
    */
-  WP_Model(const string& name, const WP_Vector3D& scaling): model_name(name)
+  WP_Model(const string& name, const WP_Vector3D& scaling): model_name(name) ,numberTriangles(0), triangles(0), numberVertices(0) 
     {
       scaling_matrix = new WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]);
     };
@@ -84,6 +85,15 @@ class WP_Model
    */
   string model_name;
   
+  int numberTriangles;
+      
+  unsigned int *triangles; 
+
+  /**
+   * the number of vertices in the model
+   */
+  int numberVertices;
+
   /**
    * the number of objects using this model, this is used by the WP_ObjectManager object. The model is only discarted by the object manager if this value is zero. This is a so called reference count
    */
@@ -99,33 +109,7 @@ class WP_Model
   /**
    * this function finalizes all after the model was read and everything was initialized. The textures are sorted and the model bounding sphere is created
    */
-  bool finalizeAll();  
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * this abstract class represents an animated model
- */
- 
-class WP_AnimatedModel: public WP_Model
- {
- public:
-  WP_AnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling),
-    numberFrames(0), currentFrame(0), interpolate(0.0){}; 
-
-  //COPY CONSTRUCTOR
-  WP_AnimatedModel(const WP_AnimatedModel& amodel);
-
-  virtual ~WP_AnimatedModel();
-
-  //ASSIGNMENT OPERATOR
-  WP_AnimatedModel& operator=(const WP_AnimatedModel &amodel);
-
-  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
-  virtual bool initModel() = 0;
-
-protected:
+  virtual bool finalizeAll() = 0;  
 
  /**
    * this nested class represents a frame. 
@@ -133,7 +117,8 @@ protected:
   class WP_Frame
     {
     public:
-      WP_Frame():numberVertices(0), vertices(0){};
+      WP_Frame():vertices(0){};
+      WP_Frame(WP_Model* m):model(m), vertices(0){};
 
       //copy constructor
       WP_Frame(const WP_Frame &frame);
@@ -146,10 +131,9 @@ protected:
       //assignment operator
       WP_Frame& operator=(const WP_Frame &frame);
 
-      /**
-       * the number of vertices in the frame
-       */
-      int numberVertices;
+      OPCODE_Model collision_model;
+
+      WP_Model *model;
 
       /**
        * an array of <i>numberVertices</i> WP_Vertex objects representing the vertices of the frame
@@ -194,11 +178,88 @@ protected:
        */
       void computeBoundingSphere(WP_Matrix3D* scaling_matrix);
     };
+};
 
-  scalar interpolate;
-  WP_Frame *frames;
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * this abstract class represents a non_animated model
+ */
+ 
+class WP_NonAnimatedModel: public WP_Model
+ {
+ public:
+   WP_NonAnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling)
+{
+  frame = new WP_Frame(this);
+};
+
+  virtual ~WP_NonAnimatedModel()
+{
+  delete frame;
+};
+
+//COPY CONSTRUCTOR
+WP_NonAnimatedModel(const WP_NonAnimatedModel& namodel):WP_Model(namodel)
+{
+  frame = new WP_Frame(*namodel.frame);
+}
+
+  //ASSIGNMENT OPERATOR
+  WP_NonAnimatedModel& operator=(const WP_NonAnimatedModel &namodel)
+{
+  if (this == &namodel)
+    return *this;
+
+  WP_Model::operator=(namodel);
+  
+  delete frame;
+  frame = new WP_Frame(*namodel.frame);
+
+  return *this;
+}
+
+  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  virtual bool initModel() = 0;
+
+ protected:
+  WP_Frame* frame;
+
+  bool finalizeAll();
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * this abstract class represents an animated model
+ */
+ 
+class WP_AnimatedModel: public WP_Model
+ {
+ public:
+  WP_AnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling),
+    frames(0), numberFrames(0), currentFrame(0), interpolate(0.0){}; 
+
+  //COPY CONSTRUCTOR
+  WP_AnimatedModel(const WP_AnimatedModel& amodel);
+
+  virtual ~WP_AnimatedModel();
+
+  //ASSIGNMENT OPERATOR
+  WP_AnimatedModel& operator=(const WP_AnimatedModel &amodel);
+
+  virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
+  virtual bool initModel() = 0;
+
+protected:
+
+  WP_Frame* frames;
   unsigned int numberFrames;
   unsigned int currentFrame;
+  scalar interpolate;
+
+  bool finalizeAll();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +329,7 @@ class WP_Model_MD2: public WP_AnimatedModel
 
 //////////////////////////////// WP_MetaBall /////////////////////////////////////////////////////
 
-class WP_MetaBall: public WP_Model
+class WP_MetaBall: public WP_NonAnimatedModel
 {
  public:
   WP_MetaBall(const string& name, const WP_Vector3D& scaling);

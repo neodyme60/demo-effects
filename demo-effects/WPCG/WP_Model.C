@@ -14,12 +14,10 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <stdlib.h>
-#include <values.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <list>
-#include <math.h>
+#include <cmath>
 #include <GL/gl.h>
 #include "WP_TextureManager.h"
 #include "WP_GLState.h"
@@ -27,6 +25,8 @@
 #include "WP_Model.h"
 
 /////////////////////////////WP_Model//////////////////////////////////
+
+WP_Model::WP_Model(){}
 
 WP_Model::~WP_Model()
 {
@@ -70,77 +70,37 @@ bool WP_Model::init()
   return finalizeAll();
 }
 
-bool WP_Model::finalizeAll()
-{
-  //FIXME computation of bounding sphere is broke! Create a bounding sphere for each animation frame
-
-  try
-    {
-      /*      //set center and compute radius of sphere
-      
-      WP_Point3D _max = getMaxPoint();
-      WP_Point3D _min = getMinPoint();
-      
-      scalar x_size = _max.data[0] - _min.data[0];
-      scalar y_size = _max.data[1] - _min.data[1];
-      scalar z_size = _max.data[2] - _min.data[2];
-      
-      if (x_size >= y_size && x_size >= z_size)
-	{
-	  radius = (x_size / 2.0) * 1.35;
-	}
-      else if (y_size >= x_size && y_size >= z_size)
-	{
-	  radius = (y_size / 2.0) * 1.35;
-	}
-      else
-	{
-	  radius =  (z_size / 2.0) * 1.35;
-	}
-      
-      center.data[0] = _min.data[0] + ((_max.data[0] - _min.data[0]) / 2.0);
-      center.data[1] = _min.data[1] + ((_max.data[1] - _min.data[1]) / 2.0);
-      center.data[2] = _min.data[2] + ((_max.data[2] - _min.data[2]) / 2.0);
-      */
-      return true;
-      
-    }
-  catch(...)
-    {
-      return false;
-    }
-}
-
-
 ////////////////////////////////// WP_FRAME ////////////////////////////////////////////
 
-WP_AnimatedModel::WP_Frame::WP_Frame(const WP_AnimatedModel::WP_Frame &frame)
+WP_Model::WP_Frame::WP_Frame(const WP_Model::WP_Frame &frame)
 {
-  numberVertices = frame.numberVertices;
-  
+  model = frame.model;
   int i = 0;
-  for (; i < numberVertices; ++i)
+  vertices = new WP_Vertex[model->numberVertices];
+  for (; i < model->numberVertices; ++i)
       vertices[i] = frame.vertices[i];
   
   material = frame.material;
+  collision_model = frame.collision_model;
   name = frame.name;
   center = frame.center;
   radius = frame.radius;
 }
 
-WP_AnimatedModel::WP_Frame& WP_AnimatedModel::WP_Frame::operator=(const WP_AnimatedModel::WP_Frame &frame)
+WP_Model::WP_Frame& WP_Model::WP_Frame::operator=(const WP_Model::WP_Frame &frame)
 {
   if (this == &frame)
     return *this;
 
   delete[] vertices;
-  numberVertices = frame.numberVertices;
-  vertices = new WP_Vertex[numberVertices];
+  vertices = new WP_Vertex[model->numberVertices];
   
+  model = frame.model;
   int i = 0;
-  for (; i < numberVertices; ++i)
+  for (; i < model->numberVertices; ++i)
       vertices[i] = frame.vertices[i];
   
+  collision_model = frame.collision_model;
   material = frame.material;
   name =  frame.name;
   center = frame.center;
@@ -148,155 +108,16 @@ WP_AnimatedModel::WP_Frame& WP_AnimatedModel::WP_Frame::operator=(const WP_Anima
   return *this;
 }
 
-////////////////////////////////// WP_AnimatedModel ////////////////////////////////////
-
-//COPY CONSTRUCTOR
-WP_AnimatedModel::WP_AnimatedModel(const WP_AnimatedModel& amodel):WP_Model(amodel)
+WP_Point3D 
+WP_Model::WP_Frame::getMaxPoint() const
 {
-  interpolate = amodel.interpolate;
-  numberFrames = amodel.numberFrames;
-  frames = new WP_Frame[numberFrames];
-
-  int i = 0;
-  for (; i < numberFrames; ++i)
-    frames[i] = amodel.frames[i];
-
-  currentFrame = amodel.currentFrame;
-}
-
-WP_AnimatedModel::~WP_AnimatedModel()
-{
-  delete frames;
-}
-
-WP_AnimatedModel& WP_AnimatedModel::operator=(const WP_AnimatedModel &amodel)
-{
-  if (this == &amodel)
-    return *this;
-
-  WP_Model::operator=(amodel);
-
-  interpolate = amodel.interpolate;
-  delete[] frames;
-  numberFrames = amodel.numberFrames;
-  frames = new WP_Frame[numberFrames];
-
-  int i = 0;
-  for (; i < numberFrames; ++i)
-    frames[i] = amodel.frames[i];
-
-  currentFrame = amodel.currentFrame;
-
-  return *this;
 }
 
 WP_Point3D 
-WP_AnimatedModel::WP_Frame::getMaxPoint() const
+WP_Model::WP_Frame::getMinPoint() const
 {
-  WP_Point3D _max(MINFLOAT, MINFLOAT, MINFLOAT);
-  /*  WP_Point3D p;
-
-  int j = 0;
-  
-  for (; j < number_blended_meshes; j++)
-    {
-      p = blendedMeshes[j].getMaxPoint(scaling_matrix);
-
-      if (p.data[0] > _max.data[0])
-	{
-	  _max.data[0] = p.data[0];
-	}
-			      
-      if (p.data[1] > _max.data[1])
-	{
-	  _max.data[1] = p.data[1];
-	} 
-      
-      if (p.data[2] > _max.data[2])
-	{
-	  _max.data[2] = p.data[2];
-	}
-    }
-
-  j = 0;
-  
-  for(; j < number_meshes; j++)
-    {
-      p = meshes[j].getMaxPoint(scaling_matrix);
-
-      if (p.data[0] > _max.data[0])
-	{
-	  _max.data[0] = p.data[0];
-	}
-			      
-      if (p.data[1] > _max.data[1])
-	{
-	  _max.data[1] = p.data[1];
-	} 
-			      
-      if (p.data[2] > _max.data[2])
-	{
-	  _max.data[2] = p.data[2];
-	}
-    }
-  */
-  return _max;
 }
-
-WP_Point3D 
-WP_AnimatedModel::WP_Frame::getMinPoint() const
-{
-  WP_Point3D _min(MAXFLOAT, MAXFLOAT, MAXFLOAT);
-  WP_Point3D p;
-
-  /*  int j = 0;
-  
-  for (; j < number_blended_meshes; j++)
-    {
-      p = blendedMeshes[j].getMinPoint(scaling_matrix);
-
-      if (p.data[0] < _min.data[0])
-	{
-	  _min.data[0] = p.data[0];
-	}
-      
-      if (p.data[1] < _min.data[1])
-	{
-	  _min.data[1] = p.data[1];
-	} 
-			      
-      if (p.data[2] < _min.data[2])
-	{
-	  _min.data[2] = p.data[2];
-	}
-    }
-
-  j = 0;
-  
-  for(; j < number_meshes; j++)
-    {
-      p = meshes[j].getMinPoint(scaling_matrix);
-
-      if (p.data[0] < _min.data[0])
-	{
-	  _min.data[0] = p.data[0];
-	}
-			      
-      if (p.data[1] < _min.data[1])
-	{
-	  _min.data[1] = p.data[1];
-	} 
-
-      if (p.data[2] < _min.data[2])
-	{
-	  _min.data[2] = p.data[2];
-	}
-    }
-  */  
-  return _min;
-}
-
-void WP_AnimatedModel::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
+void WP_Model::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matrix)
 {
   /* //set center and determine sphere radius
   
@@ -324,6 +145,75 @@ void WP_AnimatedModel::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matr
       radius = (z_size / 2.0) * 1.35;
     }
   */
+}
+
+////////////////////////////////// WP_AnimatedModel ////////////////////////////////////
+
+//COPY CONSTRUCTOR
+WP_AnimatedModel::WP_AnimatedModel(const WP_AnimatedModel& amodel):WP_Model(amodel)
+{
+  interpolate = amodel.interpolate;
+  numberFrames = amodel.numberFrames;
+  frames = new WP_Frame[numberFrames];
+
+  int i = 0;
+  for (; i < numberFrames; ++i)
+    frames[i] = amodel.frames[i];
+
+  currentFrame = amodel.currentFrame;
+}
+
+WP_AnimatedModel::~WP_AnimatedModel()
+{
+  delete[] frames;
+}
+
+WP_AnimatedModel& WP_AnimatedModel::operator=(const WP_AnimatedModel &amodel)
+{
+  if (this == &amodel)
+    return *this;
+
+  WP_Model::operator=(amodel);
+
+  interpolate = amodel.interpolate;
+  delete[] frames;
+  numberFrames = amodel.numberFrames;
+  frames = new WP_Frame[numberFrames];
+
+  int i = 0;
+  for (; i < numberFrames; ++i)
+    frames[i] = amodel.frames[i];
+
+  currentFrame = amodel.currentFrame;
+
+  return *this;
+}
+
+bool 
+WP_AnimatedModel::finalizeAll()
+{
+
+ //init OPCODE_Model for every frame
+
+  OPCODECREATE OPCC;
+
+
+
+  
+  return true;
+}
+
+
+/////////////////////////// WP_NonAnimatedModel //////////////////////////////////
+
+bool 
+WP_NonAnimatedModel::finalizeAll()
+{
+
+ //init OPCODE_Model for only frame
+
+  OPCODECREATE OPCC;
+  return true;
 }
 
 /////////////////////////// WP_Model_MD2 //////////////////////////////////////////
@@ -553,10 +443,9 @@ bool WP_Model_MD2::initModel()
   try
     {
       ifstream input(model_name.c_str(), ios::in | ios::binary);
-
       if (!input)
 	{
-	  throw("");
+	  throw("Error opening model");
 	}
 
       //read file to memory
@@ -567,7 +456,7 @@ bool WP_Model_MD2::initModel()
 	{
 	  size++;
 	}
-      
+
       byte* buffer = new byte[size];
       if (!buffer)
 	{
@@ -575,12 +464,8 @@ bool WP_Model_MD2::initModel()
 	  throw("WP_Model_MD2::initModel: Error while allocating memory");
 	}
 
-      input.close();
-      input.open(model_name.c_str(), ios::binary | ios::in);
-      if(input.fail())
-	{ 
-	  throw("");
-	}
+      input.clear(); //!!!
+      input.seekg(ios_base::beg);
 
       byte* p = buffer;
 
@@ -626,20 +511,14 @@ bool WP_Model_MD2::initModel()
 
       string sname(name);
   
-      for (i = 0; i < 64; i++)
-	{
-	  name[i] = *p;
-	  p++;
-	}
-  
       int last = sname.find_last_of('/');
       if (last != -1)
 	{
 	  sname = sname.substr(last + 1, sname.length());
 	}
-      
+
       WP_TextureManager* tex_manager = WP_TextureManager::getInstance();
-      tex_id = tex_manager->getTexture(sname.c_str(), this);
+      tex_id = tex_manager->getTexture(sname, this);
 
       numberFrames = header.numFrames;
       frames = new WP_Frame[numberFrames];
@@ -652,6 +531,7 @@ bool WP_Model_MD2::initModel()
 
       for (k = 0; k < header.numFrames; ++k)
 	{
+	  (frames + k)->model = this;
 	  (frames + k)->vertices = new WP_Vertex[header.numVertices];
       
 	  float x,y,z;
@@ -668,7 +548,7 @@ bool WP_Model_MD2::initModel()
 	  WP_Matrix3D translate(TRANSLATION_MATRIX, x, y, z);
       
 	  for (i = 0; i < 16; i++)
-	      (frames + k)->name[i] = *p++;
+	      (frames + k)->name += *p++;
 
 	  for (j = 0; j < header.numVertices; j++)
 	    {
@@ -802,9 +682,9 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix)
 
 ////////////////////////// WP_MetaBall ////////////////////
 
-WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling){}
+WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_NonAnimatedModel(name, scaling){}
 
-WP_MetaBall::WP_MetaBall(const WP_MetaBall &ball):WP_Model(ball)
+WP_MetaBall::WP_MetaBall(const WP_MetaBall &ball):WP_NonAnimatedModel(ball)
 {
   center = ball.center;
 }
