@@ -15,6 +15,7 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 /* This effect was inspired by an article by Sqrt(-1) */
+/* 08-22-02 Optimized by WP */
 /* note that the code has not been fully optimized */
 
 #include <stdio.h>
@@ -26,8 +27,14 @@
 
 #define SCREEN_WIDTH 340
 
+typedef struct
+{
+  short x, y;
+} BUMP;
+
 static short aSin[512];
 static float reflectionmap[256][256];
+static BUMP bumpmap[SCREEN_WIDTH][SCREEN_HEIGHT];
 static Uint16 sin_index = 0;
 static Uint16 sin_index2 = 80;
 static SDL_Surface* image = 0;
@@ -125,6 +132,19 @@ void init()
 	  reflectionmap[x][y] = Z;
 	}
     }
+
+  /* create bump map */
+
+  for (x = 1; x < SCREEN_WIDTH - 1; ++x)
+    {
+      for (y = 1; y < SCREEN_HEIGHT - 1; ++y)
+	{
+	  bumpmap[x][y].x = *((Uint8*)heightmap->pixels + y * heightmap->pitch + x + 1) 
+	    - *((Uint8*)heightmap->pixels + y * heightmap->pitch + x);
+	  bumpmap[x][y].y = *((Uint8*)heightmap->pixels + y * heightmap->pitch + x) 
+	    - *((Uint8*)heightmap->pixels + ((y - 1) * heightmap->pitch) + x);
+	}
+    }
   
   /*disable events */
   for (i = 0; i < SDL_NUMEVENTS; ++i) {
@@ -140,7 +160,7 @@ int main( int argc, char* argv[] )
 {
   Uint16 lightx, lighty, temp;
   short normalx, normaly, x, y;
-  Uint8 *h1, *s1;
+  Uint8 *s1;
 
   if (argc > 1) {
     printf("Retro 2D Bumpmapping - W.P. van Paassen - 2002\n");
@@ -171,7 +191,6 @@ int main( int argc, char* argv[] )
       lightx = aSin[sin_index];
       lighty = aSin[sin_index2];
 
-      h1 = (Uint8*)heightmap->pixels + heightmap->pitch + 1;
       s1 = (Uint8*)screen->pixels + screen->pitch + 1;
 
       for (y = 1; y < SCREEN_HEIGHT - 1; ++y)
@@ -179,12 +198,9 @@ int main( int argc, char* argv[] )
 	  temp = lighty - y;
 	  for (x = 1; x < SCREEN_WIDTH - 1; ++x)
 	    {
-	      normalx = *(h1 + 1) - *h1;
-	      normaly = *h1 - *(h1 - heightmap->pitch);
+	      normalx = bumpmap[x][y].x + lightx - x;
+	      normaly = bumpmap[x][y].y + temp;
 	  
-	      normalx += lightx - x;
-	      normaly += temp;
-
 	      if (normalx < 0)
 		normalx = 0;
 	      else if (normalx > 255)
@@ -195,10 +211,8 @@ int main( int argc, char* argv[] )
 		normaly = 0;	  
 	      
 	      *s1++ = (Uint8)reflectionmap[normalx][normaly];
-	      h1++;
 	    }
 	  s1+= 2;
-	  h1+= 2;;
 	}
       
       sin_index += 3;
