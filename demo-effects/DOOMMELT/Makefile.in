@@ -66,7 +66,7 @@ VERSION = @VERSION@
 
 noinst_PROGRAMS = doom_melt
 doom_melt_SOURCES = doom_melt.c 
-doom_melt_LDADD = ../COMMON/libcommon.a
+doom_melt_LDADD = ../COMMON/libTDEC.a
 INCLUDES = -I../COMMON
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -78,7 +78,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 doom_melt_OBJECTS =  doom_melt.o
-doom_melt_DEPENDENCIES =  ../COMMON/libcommon.a
+doom_melt_DEPENDENCIES =  ../COMMON/libTDEC.a
 doom_melt_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include "tdec.h"
 
 static SDL_Surface* eye_surface;
@@ -96,7 +95,6 @@ void process_events( void )
 
 void init()
 {
-  SDL_Surface* s;
   int i, hw, hh;
   
   hw = (SCREEN_WIDTH - 60) >> 1;
@@ -116,6 +114,12 @@ void init()
       ypath[i + 1536] = cos(rad * 2.0) * hh + hh;
     }
   
+    /* load eye bob */
+  
+  eye_surface = (SDL_Surface*)IMG_Load("../GFX/eye.png");
+
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, eye_surface->format->palette->colors, 0, eye_surface->format->palette->ncolors);
+
   /* create screen buffers */
 
   screen1 = TDEC_copy_surface(screen);
@@ -125,12 +129,6 @@ void init()
   screen5 = TDEC_copy_surface(screen);
   screen6 = TDEC_copy_surface(screen);
 
-    /* load eye bob */
-  
-  s = (SDL_Surface*)IMG_Load("../GFX/eye.png");
-  eye_surface = SDL_DisplayFormat(s);
-  SDL_FreeSurface(s);
-  
   /*disable events */
   for (i = 0; i < SDL_NUMEVENTS; ++i) {
     if (i != SDL_KEYDOWN && i != SDL_QUIT) {
@@ -148,7 +146,7 @@ int main( int argc, char* argv[] )
   SDL_Rect rect;
 
   if (argc > 1) {
-    printf("RetroUunlimited Bobs Effect - W.P. van Paassen - 2002\n");
+    printf("Retro Uunlimited Bobs Effect - W.P. van Paassen - 2002\n");
     return -1;
   }
   
@@ -226,4 +224,3 @@ int main( int argc, char* argv[] )
   
   return 0; /* never reached */
 }
-

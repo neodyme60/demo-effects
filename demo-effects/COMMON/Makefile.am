@@ -1,4 +1,4 @@
-noinst_LIBRARIES = libcommon.a
+noinst_LIBRARIES = libTDEC.a
 
-libcommon_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c
+libTDEC_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c
 EXTRA_DIST = tdec.h

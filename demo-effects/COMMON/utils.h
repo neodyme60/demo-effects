@@ -19,27 +19,44 @@
 
 #include <SDL/SDL.h>
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-static const Uint32    rmask = 0xff000000;
-static const Uint32    gmask = 0x00ff0000;
-static const Uint32    bmask = 0x0000ff00;
-static const Uint32    amask = 0x000000ff;
-#else
-static const Uint32    rmask = 0x000000ff;
-static const Uint32    gmask = 0x0000ff00;
-static const Uint32    bmask = 0x00ff0000;
-static const Uint32    amask = 0xff000000;
-#endif
-
+/* copying */
 SDL_Surface* TDEC_copy_surface(SDL_Surface* surface);
-SDL_Surface* TDEC_copy_image(SDL_Surface* surface);
-Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate);
+
+/* palette fading */
 Uint8 TDEC_fadeout( SDL_Surface* s, Uint8 rate);
-Uint8 TDEC_fadein_palette(SDL_Palette* source, SDL_Palette* dest, Uint8 rate);
 Uint8 TDEC_fadein( SDL_Surface* s, SDL_Palette* d, Uint8 rate );
 void TDEC_blacken_palette(SDL_Surface* s);
-void TDEC_scaley_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
-void TDEC_flipx_copy_image(SDL_Surface* original, SDL_Surface* copy);
+
+/* image scaling */
+void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
+void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
+void TDEC_scale_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage);
+void TDEC_scalex_image(SDL_Surface* surface, Uint8 percentage);
+void TDEC_scaley_image(SDL_Surface* surface, Uint8 percentage);
+void TDEC_scale_image(SDL_Surface* surface, Uint8 percentage);
+
+/* image flipping */
 void TDEC_flipx_image(SDL_Surface* surface);
+void TDEC_flipy_image(SDL_Surface* surface);
+void TDEC_flipx_copy_image(SDL_Surface* original, SDL_Surface* copy);
+void TDEC_flipy_copy_image(SDL_Surface* original, SDL_Surface* copy);
+
+/* local functions */
+static Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate);
+static Uint8 TDEC_fadein_palette(SDL_Palette* source, SDL_Palette* dest, Uint8 rate);
+
+/* variables */
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+static const Uint32 r_mask = 0xFF000000; 
+static const Uint32 g_mask = 0x00FF0000;
+static const Uint32 b_mask = 0x0000FF00;
+static const Uint32 a_mask = 0x000000FF;
+#else
+static const Uint32 r_mask = 0x000000FF; 
+static const Uint32 g_mask = 0x0000FF00;
+static const Uint32 b_mask = 0x00FF0000;
+static const Uint32 a_mask = 0xFF000000;
+#endif
 
 #endif

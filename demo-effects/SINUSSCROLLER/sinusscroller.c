@@ -21,8 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include "tdec.h"
 
 #define CHARACTER_WIDTH 16
@@ -147,7 +145,7 @@ void init()
   
   /* create scroll surface, this surface must be wider than the screenwidth to print the characters outside the screen */
   
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH + CHARACTER_WIDTH * 2, CHARACTER_HEIGHT, 8, rmask, gmask, bmask, amask); 
+  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH + CHARACTER_WIDTH * 2, CHARACTER_HEIGHT, 8, r_mask, g_mask, b_mask, a_mask); 
   
   scroll_surface = SDL_DisplayFormat(s);
   
@@ -155,12 +153,10 @@ void init()
   
   /* load font */
   
-  s = IMG_Load("../GFX/font.pcx");
-  font_surface = SDL_DisplayFormat(s);
-  SDL_FreeSurface(s);
-  
+  font_surface = IMG_Load("../GFX/font.pcx");
+
   /*create copper surface*/
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8,  rmask, gmask, bmask, amask); 
+  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8,  r_mask, g_mask, b_mask, a_mask); 
   
   copper_surface = SDL_DisplayFormat(s);
   
@@ -190,7 +186,7 @@ void init()
   
   /* create copy surface */
   
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128 , 8, rmask, gmask, bmask, amask); 
+  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128 , 8, r_mask, g_mask, b_mask, a_mask); 
   
   copy_surface = SDL_DisplayFormat(s);
   

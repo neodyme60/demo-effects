@@ -2,6 +2,8 @@
 Equalizer effect won't compile if mikmod is disabled. 
 make install does nothing from now on.
 Added Water (rain) effect, added Doom Melt effect submitted by Ed Sinjiashvili
+libCommon is now called libTDEC
+Added more scaling functions to libTDEC and improved speed of it
 
 0.0.6 Added 3 new effects (circlescroller, sinewave and flipimage). A bug in the image setup was fixed in the lens effect. Image 
 functions added to the util library

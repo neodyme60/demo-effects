@@ -64,9 +64,9 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-noinst_LIBRARIES = libcommon.a
+noinst_LIBRARIES = libTDEC.a
 
-libcommon_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c
+libTDEC_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c
 EXTRA_DIST = tdec.h
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -77,8 +77,8 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libcommon_a_LIBADD = 
-libcommon_a_OBJECTS =  fps.o video.o utils.o
+libTDEC_a_LIBADD = 
+libTDEC_a_OBJECTS =  fps.o video.o utils.o
 AR = ar
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -92,8 +92,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DEP_FILES =  .deps/fps.P .deps/utils.P .deps/video.P
-SOURCES = $(libcommon_a_SOURCES)
-OBJECTS = $(libcommon_a_OBJECTS)
+SOURCES = $(libTDEC_a_SOURCES)
+OBJECTS = $(libTDEC_a_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -131,10 +131,10 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libcommon.a: $(libcommon_a_OBJECTS) $(libcommon_a_DEPENDENCIES)
-	-rm -f libcommon.a
-	$(AR) cru libcommon.a $(libcommon_a_OBJECTS) $(libcommon_a_LIBADD)
-	$(RANLIB) libcommon.a
+libTDEC.a: $(libTDEC_a_OBJECTS) $(libTDEC_a_DEPENDENCIES)
+	-rm -f libTDEC.a
+	$(AR) cru libTDEC.a $(libTDEC_a_OBJECTS) $(libTDEC_a_LIBADD)
+	$(RANLIB) libTDEC.a
 
 tags: TAGS
 

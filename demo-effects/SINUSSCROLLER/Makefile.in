@@ -66,7 +66,7 @@ VERSION = @VERSION@
 
 noinst_PROGRAMS = sinusscroller
 sinusscroller_SOURCES = sinusscroller.c 
-sinusscroller_LDADD = ../COMMON/libcommon.a
+sinusscroller_LDADD = ../COMMON/libTDEC.a
 INCLUDES = -I../COMMON
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -78,7 +78,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 sinusscroller_OBJECTS =  sinusscroller.o
-sinusscroller_DEPENDENCIES =  ../COMMON/libcommon.a
+sinusscroller_DEPENDENCIES =  ../COMMON/libTDEC.a
 sinusscroller_LDFLAGS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

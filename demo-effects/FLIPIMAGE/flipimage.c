@@ -100,10 +100,10 @@ void init()
         quit(3);
     }
 
-    copy = TDEC_copy_image(image);
-    
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, image->format->palette->colors, 0, image->format->palette->ncolors);
 
+    copy = TDEC_copy_surface(image);
+    
     /*disable events */
     for (i = 0; i < SDL_NUMEVENTS; ++i) {
 	if (i != SDL_KEYDOWN && i != SDL_QUIT) {
@@ -146,15 +146,13 @@ int main( int argc, char* argv[] )
     
       process_events();
 
-      if (starting) /*setting up the image */
+      if (starting)
 	{
 	  if (i < 0)
 	    starting = 0;
 	  else
 	    {
 	      short j;
-	      
-	      /* blit image scanlines */
 	      
 	      s.y = d.y = i--;
 	      
@@ -165,19 +163,21 @@ int main( int argc, char* argv[] )
 		}
 	    }
 	}
-      else /* flipping */
-	{
+      else 
+	{ /* flipping */
 	  if (!up)
 	    {
 	      if (scaling > SCALING)
 		{
-		  TDEC_scaley_image(image, copy, scaling);
+		    TDEC_scaley_copy_image(image, copy, scaling);
+
 		  scaling -= SCALING;
 		}
 	      else
 		{
 		  backside = !backside;
-		  TDEC_flipx_image(image);
+		    TDEC_flipx_image(image);
+
 		  if (backside)
 		    TDEC_fadeout(image, 60);		   
 		  else
@@ -189,16 +189,17 @@ int main( int argc, char* argv[] )
 	    {
 	      if (scaling < 99 - SCALING)
 		{
-		  TDEC_scaley_image(image, copy, scaling);
+		    TDEC_scaley_copy_image(image, copy, scaling);
+
 		  scaling += SCALING;
 		}
 	      else
-		up = 0;
+		  up = 0;
 	    }
 	  
 	  SDL_BlitSurface(copy, 0, screen, 0);
 	}
-      
+
       if (TDEC_fps_ok()) 
 	{
 	  SDL_Flip(screen);

@@ -1,4 +1,4 @@
 noinst_PROGRAMS=sinusscroller
 sinusscroller_SOURCES = sinusscroller.c 
-sinusscroller_LDADD = ../COMMON/libcommon.a
+sinusscroller_LDADD = ../COMMON/libTDEC.a
 INCLUDES= -I../COMMON

@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include "tdec.h"
 
 static SDL_Surface* copper_surface;
@@ -110,7 +109,7 @@ void init()
 
   SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8, rmask, gmask, bmask, amask); 
+  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8, r_mask, g_mask, b_mask, a_mask); 
   
   copper_surface = SDL_DisplayFormat(s);
   

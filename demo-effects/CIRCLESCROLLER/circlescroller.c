@@ -134,7 +134,6 @@ Uint16 init_character(void)
 
 void init()
 {
-  SDL_Surface* s;
   float rad;
   Uint16 i;
   short centerx = SCREEN_WIDTH >> 1;
@@ -157,9 +156,7 @@ void init()
 
   /* load font */
   
-  s = IMG_Load("../GFX/font.pcx");
-  font_surface = SDL_DisplayFormat(s);
-  SDL_FreeSurface(s);
+  font_surface = IMG_Load("../GFX/font.pcx");
 
   SDL_SetColorKey(font_surface, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 0x00, 0x00, 0x00));
 

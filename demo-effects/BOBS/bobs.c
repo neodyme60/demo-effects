@@ -83,8 +83,6 @@ void process_events( void )
 
 void init()
 {
-  SDL_Surface* s;
-  
   int i, hw, hh;
   
   hw = (SCREEN_WIDTH - 60) >> 1;
@@ -100,10 +98,10 @@ void init()
   
     /* load eye bob */
   
-  s = (SDL_Surface*)IMG_Load("../GFX/eye.png");
-  eye_surface = SDL_DisplayFormat(s);
-  SDL_FreeSurface(s);
-  
+  eye_surface = (SDL_Surface*)IMG_Load("../GFX/eye.png");
+
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, eye_surface->format->palette->colors, 0, eye_surface->format->palette->ncolors);
+
   /*disable events */
   for (i = 0; i < SDL_NUMEVENTS; ++i) {
     if (i != SDL_KEYDOWN && i != SDL_QUIT) {
@@ -125,7 +123,7 @@ int main( int argc, char* argv[] )
     return -1;
   }
   
-  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_HWSURFACE | SDL_HWPALETTE/* | SDL_FULLSCREEN*/))
+  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE/* | SDL_FULLSCREEN*/))
     quit(1);
   
   TDEC_init_timer();

@@ -130,7 +130,6 @@ Uint16 init_character(void)
 
 void init()
 {
-  SDL_Surface* s;
   float rad;
   Uint16 i, j;
   short centery = SCREEN_HEIGHT - 76;
@@ -166,9 +165,7 @@ void init()
   
   /* load font */
   
-  s = IMG_Load("../GFX/font.pcx");
-  font_surface = SDL_DisplayFormat(s);
-  SDL_FreeSurface(s);
+  font_surface = IMG_Load("../GFX/font.pcx");
 
   /* reset letters */
   for (i = 0; i < NLETTERS; ++i)
@@ -202,7 +199,7 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
-  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_HWSURFACE | SDL_HWPALETTE /*| SDL_FULLSCREEN*/))
+  if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /*| SDL_FULLSCREEN*/))
    quit(1);
   
   TDEC_init_timer();
@@ -280,7 +277,7 @@ int main( int argc, char* argv[] )
       
       if (TDEC_fps_ok())
 	{
-	SDL_UpdateRect(screen, crect.x, crect.y, crect.w, crect.h);
+	  SDL_UpdateRect(screen, crect.x, crect.y, crect.w, crect.h);
 	}
     }
   
