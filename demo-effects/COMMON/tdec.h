@@ -12,7 +12,6 @@ extern "C" {
 #include "video.h"
 #include "utils.h"
 #include "layers.h"
-#include "fire.h"
 #include "scroller.h"
 #include "3dstarfield.h"
 
