@@ -92,47 +92,93 @@ public:
 	 * @param m the matrix containing the to be copied values
 	 * @return a reference to this matrix containing the copied values
 	 */
-	WP_Matrix3D& operator=(const WP_Matrix3D& m);
+	inline WP_Matrix3D& operator=(const WP_Matrix3D& m)
+	  {
+	    if (this == &m)
+	      return *this;
+	    
+	    for (int i = 0; i < 16; i++)
+	      {
+		data[i] = m.data[i];
+	      }
+	    return *this;
+	  }
 
 	/**
 	 * this operator postmultiplies the current matrix by matrix m
 	 * @param m the matrix which will be multiplied by the current matrix
 	 * @return a new matrix containing the multiplication of the current matrix and m
 	 */
-	WP_Matrix3D operator*(const WP_Matrix3D & m) const;
+	inline WP_Matrix3D operator*(const WP_Matrix3D & m) const
+	  {
+	    WP_Matrix3D temp = *this;
+	    temp *= m;
+	    return temp;
+	  }
 
 	/**
 	 * this operator adds m to the current matrix
 	 * @param m the matrix which will be added to the current matrix
 	 * @return a new matrix containing the addition of the current matrix and m
 	 */
-	WP_Matrix3D operator+(const WP_Matrix3D & m) const;
+	inline WP_Matrix3D operator+(const WP_Matrix3D & m) const
+	  {
+	    WP_Matrix3D temp = *this;
+	    for (int i = 0; i < 16; i++)
+	      temp.data[i] += m.data[i];
+	    return temp;
+	  }
 
 	/**
 	 * this operator subtracts m from the current matrix
 	 * @param m the matrix which will be subtracted from the current matrix
 	 * @return a new matrix containing the subtraction of the current matrix and m
 	 */
-	WP_Matrix3D operator-(const WP_Matrix3D & m) const;
+	inline WP_Matrix3D operator-(const WP_Matrix3D & m) const
+	  {
+	    WP_Matrix3D temp = *this;
+	    for (int i = 0; i < 16; i++)
+	      temp.data[i] -= m.data[i];
+	    return temp;
+	  }
 
 	/**
 	 * this operator multiplies every matrix cell by a scalar
 	 * @param s the scalar by which every matrix cell is multiplied
 	 * @return a new matrix containing the multiplied cells
 	 */
-	WP_Matrix3D operator*(scalar s) const;
+	inline WP_Matrix3D operator*(scalar s) const
+	  {
+	    WP_Matrix3D temp = *this;
+	    for (int i = 0; i < 16; i++)
+	      temp.data[i] *= s;
+	    return temp;
+	  }
 
 	/**
 	 * this operator divides every matrix cell by a scalar
 	 * @param s the scalar by which every matrix cell is divided
 	 * @return a new matrix containing the divided cells
 	 */
-	WP_Matrix3D operator/(scalar s) const;
+	inline WP_Matrix3D operator/(scalar s) const
+	  {
+	    WP_Matrix3D temp = *this;
+	    for (int i = 0; i < 16; i++)
+	      temp.data[i] /= s;
+	    return temp;
+	  }
 
 	/**
 	 * this operator inverts every matrix cell
 	 */
-	WP_Matrix3D& operator-();
+	inline WP_Matrix3D& operator-()
+	  {
+	    for (int i = 0; i < 16; i++)
+	      data[i] = -data[i];
+  
+	    return *this;
+	  }
+
 
 	/**
 	 * this operator postmultiplies the current matrix by m and stores the result in this object
@@ -146,28 +192,52 @@ public:
 	 * @param m the matrix which will be added to this matrix
 	 * @return a reference to this object
 	 */
-	WP_Matrix3D& operator+=(const WP_Matrix3D & m);
+	inline WP_Matrix3D& operator+=(const WP_Matrix3D & m)
+	  {
+	    for (int i = 0; i < 16; i++)
+	      data[i] += m.data[i];
+	    
+	    return *this;
+	  }
 
 	/**
 	 * this operator subtracts m from this matrix and stores the result in this object
 	 * @param m the matrix which will be subtracted from this matrix
 	 * @return a reference to this object
 	 */
-	WP_Matrix3D& operator-=(const WP_Matrix3D & m);
+	inline WP_Matrix3D& operator-=(const WP_Matrix3D & m)
+	  {
+	    for (int i = 0; i < 16; i++)
+	      data[i] -= m.data[i];
+  
+	    return *this;
+	  }
 
 	/**
 	 * this operator multiplies each matrix cell by a scalar and stores the result in this object
 	 * @param s the scalar by which every matrix cell is multiplied
 	 * @return a reference to this object
 	 */
-	WP_Matrix3D& operator*=(scalar s);
+	inline WP_Matrix3D& operator*=(scalar s)
+	  {
+	    for (int i = 0; i < 16; i++)
+	      data[i] *= s;
+	    
+	    return *this;
+	  }
 
 	/**
 	 * this operator divides each matrix cell by a scalar and stores the result in this object
 	 * @param s the scalar by which every matrix cell is divided
 	 * @return a reference to this object
 	 */
-	WP_Matrix3D& operator/=(scalar s);
+	WP_Matrix3D& operator/=(scalar s)
+	  {
+	    for (int i = 0; i < 16; i++)
+	      data[i] /= s;
+	    
+	    return *this;
+	  }
 
 	/**
 	 * this function creates the identity matrix
@@ -194,7 +264,20 @@ public:
 	 * this function computes the determinant of this matrix. Currently only inversion of homogenous matrices is supported
 	 * @return the determinant. 0.0f in case of non-homogenous matrix
 	 */
-	scalar determinant();
+	inline scalar determinant()
+	  {
+	    if (isHomogenous())
+	      {
+		return (data[0] * (data[5] * data[10] + (-data[6] * data[9]))) +
+		  (-data[1] * (data[4] * data[10] + (-data[6] * data[8]))) +
+		  (data[2] * (data[4] * data[9] + (-data[5] * data[8])));
+	      }
+	    else
+	      {
+		return 0.0; //FIXME implement determinant for non-homogenous matrices
+	      }
+	  }
+
 
 	/**
 	 * this function computes the inverse of this matrix. Currently only inversion of homogenous matrices is supported
@@ -210,7 +293,7 @@ public:
 	  { 
 	    scalar d = determinant(); 
 	    return d <= -0.00001 || d >= 0.00001;
-	  };
+	  }
 
 	/**
 	 * this function determines if this matrix is the identity matrix
@@ -222,7 +305,19 @@ public:
 	 * this function determines if this matrix is homogenous (lower row is 0 0 0 1)
 	 * @return a boolean indicating if this matrix is homogenous
 	 */
-	bool isHomogenous();
+	inline bool isHomogenous()
+	  {
+	    if (data[3] != 0.0)
+	      return false;
+	    
+	    if (data[7] != 0.0)
+	      return false;
+	    
+	    if (data[11] != 0.0)
+	      return false;
+	    
+	    return data[15] == 1.0;
+	  }
 
 	/**
 	 * an array of 16 floats representing the matrix's cells. The cells are orientated from top to bottom and from left to right, so for example the cell in the fourth column of the first row is located at index 12. This orientation is the same as the matrices in OpenGL

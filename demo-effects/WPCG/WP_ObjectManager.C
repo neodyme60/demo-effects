@@ -400,20 +400,11 @@ WP_ObjectManager::checkCollisions()
   list<WP_CollisionPair*>::const_iterator i = collision_pairs.begin();
   while (i != collision_pairs.end())
     {	
-      Matrix4x4 worldmatrixd((*i)->object1->matrix.data[0],(*i)->object1->matrix.data[1], (*i)->object1->matrix.data[2], (*i)->object1->matrix.data[3], 
-			     (*i)->object1->matrix.data[4],(*i)->object1->matrix.data[5], (*i)->object1->matrix.data[6], (*i)->object1->matrix.data[7],
-			     (*i)->object1->matrix.data[8],(*i)->object1->matrix.data[9], (*i)->object1->matrix.data[10], (*i)->object1->matrix.data[11],
-			     (*i)->object1->matrix.data[12],(*i)->object1->matrix.data[13], (*i)->object1->matrix.data[14], (*i)->object1->matrix.data[15]);
-
-      TC.SetCallback0(&ColCallback1, udword((*i)->object1->model));
-      TC.SetCallback1(&ColCallback2, udword((*i)->object2->model));
-
-      Matrix4x4 worldmatrixs((*i)->object2->matrix.data[0],(*i)->object2->matrix.data[1], (*i)->object2->matrix.data[2], (*i)->object2->matrix.data[3], 
-			     (*i)->object2->matrix.data[4],(*i)->object2->matrix.data[5], (*i)->object2->matrix.data[6], (*i)->object2->matrix.data[7],
-			     (*i)->object2->matrix.data[8],(*i)->object2->matrix.data[9], (*i)->object2->matrix.data[10], (*i)->object2->matrix.data[11],
-			     (*i)->object2->matrix.data[12],(*i)->object2->matrix.data[13], (*i)->object2->matrix.data[14], (*i)->object2->matrix.data[15]);
-      
-      if (TC.Collide((*i)->cache, &worldmatrixd, &worldmatrixs))
+      TC.SetCallback0(&ColCallback, udword((*i)->object1->model));
+      TC.SetCallback1(&ColCallback, udword((*i)->object2->model));
+   
+      if (TC.Collide((*i)->cache, reinterpret_cast<Matrix4x4*>(&(*i)->object1->matrix), 
+		     reinterpret_cast<Matrix4x4*>(&(*i)->object2->matrix)))
 	{
 	  if (TC.GetContactStatus())
 	    {
@@ -439,14 +430,10 @@ void WP_ObjectManager::drawObjects()
     {	
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback1, udword((*i)->model));
-
-      Matrix4x4 worldmatrix((*i)->matrix.data[0],(*i)->matrix.data[1], (*i)->matrix.data[2], (*i)->matrix.data[3], 
-			    (*i)->matrix.data[4],(*i)->matrix.data[5], (*i)->matrix.data[6], (*i)->matrix.data[7],
-			    (*i)->matrix.data[8],(*i)->matrix.data[9], (*i)->matrix.data[10], (*i)->matrix.data[11],
-			    (*i)->matrix.data[12],(*i)->matrix.data[13], (*i)->matrix.data[14], (*i)->matrix.data[15]);
-      
-      if (PC.Collide((*i)->planesCache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), &worldmatrix))
+      PC.SetCallback(&ColCallback, udword((*i)->model));
+    
+      if (PC.Collide((*i)->planesCache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), 
+		     reinterpret_cast<Matrix4x4*>(&(*i)->matrix)))
 	{
 	  if (PC.GetContactStatus())
 	    {
@@ -471,14 +458,10 @@ void WP_ObjectManager::drawObjects()
     {	
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback1, udword((*j)->model));
-
-      Matrix4x4 worldmatrix((*j)->matrix.data[0],(*j)->matrix.data[1], (*j)->matrix.data[2], (*j)->matrix.data[3], 
-			    (*j)->matrix.data[4],(*j)->matrix.data[5], (*j)->matrix.data[6], (*j)->matrix.data[7],
-			    (*j)->matrix.data[8],(*j)->matrix.data[9], (*j)->matrix.data[10], (*j)->matrix.data[11],
-			    (*j)->matrix.data[12],(*j)->matrix.data[13], (*j)->matrix.data[14], (*j)->matrix.data[15]);
-      
-      if (PC.Collide((*j)->planesCache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(),&worldmatrix ))
+      PC.SetCallback(&ColCallback, udword((*j)->model));
+ 
+      if (PC.Collide((*j)->planesCache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(), 
+		     reinterpret_cast<Matrix4x4*>(&(*j)->matrix)))
 	{
 	  if (PC.GetContactStatus())
 	    {
@@ -1155,41 +1138,16 @@ void WP_DynamicObject::print() const
   cout << "Velocity vector: x:" << velocity.data[0] << " y:" << velocity.data[1] << " z:" << velocity.data[2] << endl;
 }
 
-//OPCODE CALLBACKS
+//OPCODE CALLBACK
 void 
-WP_ObjectManager::ColCallback1(udword triangleindex, VertexPointers &triangle, udword user_data)
+WP_ObjectManager::ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data)
 {
-  static Point p,q,r;
-
-  WP_Model* model = (WP_Model*)user_data;
+  WP_Model* model = reinterpret_cast<WP_Model*>(user_data);
   unsigned int* indices = model->triangles + triangleindex * 3;
-  WP_Vertex* v = model->getVertex(indices[0]);
-  p.Set(v->point.data);
-  triangle.Vertex[0] = &p;
-  v = model->getVertex(indices[1]);
-  q.Set(v->point.data);
-  triangle.Vertex[1] = &q;
-  v = model->getVertex(indices[2]);
-  r.Set(v->point.data);
-  triangle.Vertex[2] = &r;
-}
 
-void 
-WP_ObjectManager::ColCallback2(udword triangleindex, VertexPointers &triangle, udword user_data)
-{
-  static Point p,q,r;
-
-  WP_Model* model = (WP_Model*)user_data;
-  unsigned int* indices = model->triangles + triangleindex * 3;
-  WP_Vertex* v = model->getVertex(indices[0]);
-  p.Set(v->point.data);
-  triangle.Vertex[0] = &p;
-  v = model->getVertex(indices[1]);
-  q.Set(v->point.data);
-  triangle.Vertex[1] = &q;
-  v = model->getVertex(indices[2]);
-  r.Set(v->point.data);
-  triangle.Vertex[2] = &r;
+  triangle.Vertex[0] = reinterpret_cast<Point*>(&model->getVertex(indices[0])->point);
+  triangle.Vertex[1] = reinterpret_cast<Point*>(&model->getVertex(indices[1])->point);
+  triangle.Vertex[2] = reinterpret_cast<Point*>(&model->getVertex(indices[2])->point);
 }
 
 void 

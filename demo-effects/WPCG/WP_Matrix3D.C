@@ -166,65 +166,6 @@ WP_Matrix3D::WP_Matrix3D(scalar* f)
   data[15] = f[15];
 }
 
-WP_Matrix3D& WP_Matrix3D::operator=(const WP_Matrix3D& m)
-{
-  if (this == &m)
-    return *this;
-
-  for (int i = 0; i < 16; i++)
-    {
-      data[i] = m.data[i];
-    }
-  return *this;
-}
-
-WP_Matrix3D WP_Matrix3D::operator*(const WP_Matrix3D& m) const
-{
-  WP_Matrix3D temp = *this;
-  temp *= m;
-  return temp;
-}
-
-WP_Matrix3D WP_Matrix3D::operator*(scalar s) const
-{
-  WP_Matrix3D temp = *this;
-  for (int i = 0; i < 16; i++)
-    temp.data[i] *= s;
-  return temp;
-}
-
-WP_Matrix3D WP_Matrix3D::operator/(scalar s) const
-{
-  WP_Matrix3D temp = *this;
-  for (int i = 0; i < 16; i++)
-    temp.data[i] /= s;
-  return temp;
-}
-
-WP_Matrix3D WP_Matrix3D::operator-(const WP_Matrix3D& m) const
-{
-  WP_Matrix3D temp = *this;
-  for (int i = 0; i < 16; i++)
-    temp.data[i] -= m.data[i];
-  return temp;
-}
-
-WP_Matrix3D WP_Matrix3D::operator+(const WP_Matrix3D& m) const
-{
-  WP_Matrix3D temp = *this;
-  for (int i = 0; i < 16; i++)
-    temp.data[i] += m.data[i];
-  return temp;
-}
-
-WP_Matrix3D& WP_Matrix3D::operator-()
-{
-  for (int i = 0; i < 16; i++)
-    data[i] = -data[i];
-  
-  return *this;
-}
-
 WP_Matrix3D& WP_Matrix3D::operator*=(const WP_Matrix3D& m)
 {
   //postmultiply
@@ -262,38 +203,6 @@ WP_Matrix3D& WP_Matrix3D::operator*=(const WP_Matrix3D& m)
     matrix.data[11] * m.data[10] + matrix.data[15] * m.data[11];
   data[15] = matrix.data[3] * m.data[12] + matrix.data[7] * m.data[13] + 
     matrix.data[11] * m.data[14] + matrix.data[15] * m.data[15];
-  return *this;
-}
-
-WP_Matrix3D& WP_Matrix3D::operator*=(scalar s)
-{
-  for (int i = 0; i < 16; i++)
-    data[i] *= s;
-  
-  return *this;
-}
-
-WP_Matrix3D& WP_Matrix3D::operator/=(scalar s)
-{
-  for (int i = 0; i < 16; i++)
-    data[i] /= s;
-  
-  return *this;
-}
-
-WP_Matrix3D& WP_Matrix3D::operator+=(const WP_Matrix3D& m)
-{
-  for (int i = 0; i < 16; i++)
-    data[i] += m.data[i];
-  
-  return *this;
-}
-
-WP_Matrix3D& WP_Matrix3D::operator-=(const WP_Matrix3D& m)
-{
-  for (int i = 0; i < 16; i++)
-    data[i] -= m.data[i];
-  
   return *this;
 }
 
@@ -353,20 +262,6 @@ void WP_Matrix3D::transpose()
   data[14] = m.data[11];
 }
 
-scalar WP_Matrix3D::determinant()
-{
-  if (isHomogenous())
-    {
-      return (data[0] * (data[5] * data[10] + (-data[6] * data[9]))) +
-	(-data[1] * (data[4] * data[10] + (-data[6] * data[8]))) +
-	(data[2] * (data[4] * data[9] + (-data[5] * data[8])));
-    }
-  else
-    {
-      return 0.0; //FIXME implement determinant for non-homogenous matrices
-    }
-}
-
 bool WP_Matrix3D::inverse()
 {
   //using Cramer's law, Hill, Computer Graphics using OpenGL page 825
@@ -421,20 +316,6 @@ bool WP_Matrix3D::inverse()
       //return false; //FIXME implement inverse for non homogenous matrices
       //}
   return true;
-}
-
-bool WP_Matrix3D::isHomogenous()
-{
-  if (data[3] != 0.0)
-    return false;
-
-  if (data[7] != 0.0)
-    return false;
-
-  if (data[11] != 0.0)
-    return false;
-
-  return data[15] == 1.0;
 }
 
 bool WP_Matrix3D::isIdentity()

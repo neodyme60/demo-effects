@@ -53,7 +53,16 @@ public:
 	 * @param deltaV the amount of movement along <b>v</b>
 	 * @param deltaN the amount of movement along <b>n</b>
 	 */
-	void slide(scalar deltaU, scalar deltaV, scalar deltaN);
+	inline void slide(scalar deltaU, scalar deltaV, scalar deltaN)
+	  {
+	    WP_Vector3D translateU(u * deltaU);
+	    WP_Vector3D translateV(v * deltaV);
+	    WP_Vector3D translateN(n * deltaN);
+	    
+	    WP_Vector3D translate = translateU + translateV + translateN;
+	    eye += translate;
+	    setModelViewMatrixGL();
+	  }
 
 	/**
 	 * this function rotates the camera first around <b>u</b>, then around <b>v</b> and finally around <b>n</b>
@@ -67,19 +76,28 @@ public:
 	 * this function <i>pitches</i> the object. Pitch is an aviation term and the pitch of an airplane is the angle that its longitudinal axis (running from tail to nose and having direction <b>-n</b> makes with the horizontal plane
 	 * @param the angle in degrees
 	 */
-	void pitch(int angle);
+	inline void pitch(int angle)
+	  {
+	    rotate(angle, 0, 0);
+	  }
 
 	/**
 	 * this function <i>rolls</i> the object. Roll is an aviation term and an airplane rolls by rotating about its longitudinal axis (<b>n</b>. The roll is the amount of rotation relative to the horizontal plane.
 	 * @param the angle in degrees
 	 */
-	void roll(int angle);
+	inline void roll(int angle)
+	  {
+	    rotate(0, 0, angle);
+	  }
 
 	/**
 	 * this function <i>yaws</i> the object. Yaw is an aviation term and it means changing the heading of the plane by rotating about <b>v</b>
 	 * @param the angle in degrees
 	 */
-	void yaw(int angle);
+	inline void yaw(int angle)
+	  {
+	    rotate(0, angle, 0);
+	  }
 
 	/**
 	 * this function is used to obtain a pointer to the only instance of this class (singleton)
@@ -125,14 +143,34 @@ public:
 	/**
 	 * this function sets the framebuffer render volume but it only has to be called when object picking is needed and you want to switch back from the selection buffer viewing volume to the normal framebuffer rendering view volume. This call has therefor only effect when currently the picking view volume is defined.
 	 */
-	void setRenderVolume();
+	inline void setRenderVolume()
+	  {
+	    if (!normal_viewing_volume)
+	      {
+		state->projection();
+		glPopMatrix();
+		state->modelview();
+		normal_viewing_volume = true;
+	      }
+	  }
+
 	/**
 	 * this function creates a WP_Ray3D object which represents a 3D ray starting at the eye of the camera's and passing through pixel x y on the nearplane N. See F.S. Hill, Computer Graphics using OpenGL, page 743/735
 	 * @param x the x position of the pixel on the nearplane through which the ray passes
 	 * @param y the y position of the pixel on the nearplane through which the ray passes
 	 * @return a WP_Ray3D object representing the ray which starts at the eye of the camera and passes through pixels x y on the nearplane N
 	 */
-	WP_Ray3D createRayForTracing(int x, int y) const; 
+	inline WP_Ray3D createRayForTracing(int x, int y) const
+	  {
+	    WP_Ray3D ray;
+	    ray.start = eye;
+	    
+	    float H = nearPlane * tan(math->degreeToRad((int)(viewAngle / 2.0f)));
+	    float W = H * aspectRatio;
+	    
+	    ray.direction = n * -nearPlane + u * (-W + (W * ((x * 2.0f) / (float)screen_width))) + v * (-H + (H * ((y * 2.0f) / (float)screen_height)));
+	    return ray;
+	  }
 
 	/**
 	 * a WP_Point3D object representing the eye (position) of the camera
@@ -255,7 +293,12 @@ private:
 	/**
 	 * this function loads the camera's modelview matrix into OpenGL
 	 */
-	void setModelViewMatrixGL();	
+	inline void setModelViewMatrixGL()
+	  {
+	    matrix = WP_Matrix3D(eye.toVector(), u, v, n);
+	    glLoadMatrixf(matrix.data);
+	    computeFrustum(); //FIXME don't compute the frustum planes everytime, just translate, rotate etc them
+	  }
 
 	/**
 	 * this function computes the six frustum planes after each change in orientation of the camera's view volume (frustum)

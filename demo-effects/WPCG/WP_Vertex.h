@@ -62,7 +62,7 @@ public:
    * @param v the WP_Vertex object which is copied to this object
    * @return a reference to this object containing the copied vertex values
    */
-  WP_Vertex& operator=(const WP_Vertex& v)
+  inline WP_Vertex& operator=(const WP_Vertex& v)
     {
       if (this == &v)
 	return *this;
@@ -79,7 +79,7 @@ public:
    * @param v a pointer to a WP_Vertex object representing the second vertex used for interpolating between
    * @param t the amount of interpolation between the two vertices. 0.0 will result in this vertex. 1.0 will result in vertex <i>v</i>. 0.5 in between the two vertices etc.
    */
-  void lerp3D(const WP_Vertex* v, float t)
+  inline void lerp3D(const WP_Vertex* v, float t)
     {
       WP_Point3D p = v->point;
       WP_Vector3D c = p - point;

@@ -64,13 +64,6 @@ void WP_Camera::setFrustumAndCamera(scalar _viewAngle, unsigned int width, unsig
   setModelViewMatrixGL();
 }
 
-void WP_Camera::setModelViewMatrixGL() 
-{
-  matrix = WP_Matrix3D(eye.toVector(), u, v, n);
-  glLoadMatrixf(matrix.data);
-  computeFrustum(); //FIXME don't compute the frustum planes everytime, just translate, rotate etc them
-}
-
 void WP_Camera::setPickingVolume(int width, int height, int x, int y) 
 {
   if (normal_viewing_volume)
@@ -90,17 +83,6 @@ void WP_Camera::setPickingVolume(int width, int height, int x, int y)
     }
 }
 
-void WP_Camera::setRenderVolume() 
-{
-  if (!normal_viewing_volume)
-    {
-      state->projection();
-      glPopMatrix();
-      state->modelview();
-      normal_viewing_volume = true;
-    }
-}
- 
 //frustum code by Mark Morley (www.markmorley.com)
 void WP_Camera::computeFrustum()
 {
@@ -230,17 +212,6 @@ void WP_Camera::computeFrustum()
   frustum[5].Set(-coords[0], -coords[1], -coords[2], -coords[3]);
 }
 
-void WP_Camera::slide(scalar deltaU, scalar deltaV, scalar deltaN)
-{
-  WP_Vector3D translateU(u * deltaU);
-  WP_Vector3D translateV(v * deltaV);
-  WP_Vector3D translateN(n * deltaN);
-  
-  WP_Vector3D translate = translateU + translateV + translateN;
-  eye += translate;
-  setModelViewMatrixGL();
-}
-
 //first rotated around X(U), then Y(V) and finally Z(N)
 void WP_Camera::rotate(int angleU, int angleV, int angleN)
 {
@@ -277,33 +248,6 @@ void WP_Camera::rotate(int angleU, int angleV, int angleN)
     }
   
   setModelViewMatrixGL();
-}
-
-void WP_Camera::pitch(int angle)
-{
-  rotate(angle, 0, 0);
-}
-
-void WP_Camera::roll(int angle)
-{
-  rotate(0, 0, angle);
-}
-
-void WP_Camera::yaw(int angle)
-{
-  rotate(0, angle, 0);
-}
-
-WP_Ray3D WP_Camera::createRayForTracing(int x, int y) const
-{
-  WP_Ray3D ray;
-  ray.start = eye;
-
-  float H = nearPlane * tan(math->degreeToRad((int)(viewAngle / 2.0f)));
-  float W = H * aspectRatio;
-
-  ray.direction = n * -nearPlane + u * (-W + (W * ((x * 2.0f) / (float)screen_width))) + v * (-H + (H * ((y * 2.0f) / (float)screen_height)));
-  return ray;
 }
 
 void WP_Camera::followObject()

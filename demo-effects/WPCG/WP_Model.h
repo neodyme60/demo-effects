@@ -285,9 +285,11 @@ class WP_Model_MD2: public WP_AnimatedModel
 
  private:
 
+  static WP_Vector3D quake2_normals[];
+
   // nested class WP_MD2_HEADER 
   class WP_MD2_HEADER
-  {
+    {
   public:
     int magic; 
     int version; 

@@ -621,10 +621,9 @@ private:
   PlanesCollider PC;
   AABBTreeCollider TC;
 
-//OPCODE CALLBACKS
+//OPCODE CALLBACK
 
-  static void ColCallback1(udword triangleindex, VertexPointers &triangle, udword user_data);
-  static void ColCallback2(udword triangleindex, VertexPointers &triangle, udword user_data);
+  static void ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data);
 };
 }
 #endif
