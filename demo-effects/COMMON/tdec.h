@@ -11,6 +11,10 @@ extern "C" {
 #include "fps.h"
 #include "video.h"
 #include "utils.h"
+#include "layers.h"
+#include "plasma.h"
+#include "fire.h"
+#include "jumpingscroller.h"
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2002-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -15,6 +15,25 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 #include "utils.h"
+
+/* local functions */
+static Uint8 TDEC_fadeout_palette(SDL_Palette *palette, Uint8 rate);
+static Uint8 TDEC_fadein_palette(SDL_Palette *source, SDL_Palette *dest, Uint8 rate);
+static void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width, Uint16 height, Uint16 size);
+
+/* variables */
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+static const Uint32 r_mask = 0xFF000000; 
+static const Uint32 g_mask = 0x00FF0000;
+static const Uint32 b_mask = 0x0000FF00;
+static const Uint32 a_mask = 0x000000FF;
+#else
+static const Uint32 r_mask = 0x000000FF; 
+static const Uint32 g_mask = 0x0000FF00;
+static const Uint32 b_mask = 0x00FF0000;
+static const Uint32 a_mask = 0xFF000000;
+#endif
 
 SDL_Surface* TDEC_copy_surface(SDL_Surface *surface)
 {
@@ -871,5 +890,76 @@ void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width
       TDEC_rquaddivide(s, startx + width, starty, width, height, size);
       TDEC_rquaddivide(s, startx, starty + height, width, height, size);
       TDEC_rquaddivide(s, startx + width, starty + height, width, height, size);
+    }
+}
+
+
+/*
+ * Return the pixel value at (x, y)
+ * NOTE: The surface must be locked before calling this!
+ */
+Uint32 TDEC_get_pixel(SDL_Surface *surface, int x, int y)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) 
+      {
+    case 1:
+        return *p;
+
+    case 2:
+        return *(Uint16 *)p;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
+            return p[0] | p[1] << 8 | p[2] << 16;
+
+    case 4:
+        return *(Uint32 *)p;
+
+    default:
+        return 0;       /* shouldn't happen, but avoids warnings */
+    }
+}
+
+/*
+ * Set the pixel at (x, y) to the given value
+ * NOTE: The surface must be locked before calling this!
+ */
+void TDEC_put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to set */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) 
+      {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
     }
 }

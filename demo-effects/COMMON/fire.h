@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -14,16 +14,13 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef FPS_H
-#define FPS_H
+#ifndef FIRE_H
+#define FIRE_H
 
 #include "SDL/SDL.h"
 
-extern void TDEC_set_fps(unsigned char _fps);
-extern void TDEC_print_fps();
-extern void TDEC_new_time();
-extern int TDEC_fps_ok();
-extern void TDEC_init_timer();
-extern int TDEC_get_fps();
+extern void TDEC_init_fire(SDL_Surface *s, unsigned short _width, unsigned short _height, unsigned short _xpos, unsigned short _ypos);
+extern void TDEC_free_fire();
+extern void TDEC_draw_fire();
 
 #endif

@@ -16,6 +16,11 @@
 
 #include "fps.h"
 
+static Uint32 Ticks = 0, Drawn_Frames = 0, next, now;
+static unsigned char fps = 40;
+static Uint16 Tick_Interval = 20 ;
+static Uint16 Min_Tick = 20;
+
 void TDEC_set_fps(unsigned char _fps)
 {
 	fps = _fps;

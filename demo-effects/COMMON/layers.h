@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -14,16 +14,20 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef FPS_H
-#define FPS_H
+#ifndef LAYERS_H
+#define LAYERS_H
 
 #include "SDL/SDL.h"
 
-extern void TDEC_set_fps(unsigned char _fps);
-extern void TDEC_print_fps();
-extern void TDEC_new_time();
-extern int TDEC_fps_ok();
-extern void TDEC_init_timer();
-extern int TDEC_get_fps();
+#define NLAYERS 10
+#define TDEC_BACKGROUND_LAYER 0
+
+extern unsigned int TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha);
+extern void TDEC_draw_layers();
+extern void TDEC_init_layering();
+extern void TDEC_reset_layering();
+extern SDL_Surface* TDEC_get_layer(Uint32 index);
+extern void TDEC_flatten_layers();
+extern void TDEC_clear_layer(Uint32 index);
 
 #endif

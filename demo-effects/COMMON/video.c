@@ -16,6 +16,9 @@
 
 #include "video.h"
 
+/* Information about the current video settings. */
+static const SDL_VideoInfo* info = 0;
+
 int TDEC_init_video()
 {
   /* First, initialize SDL's video. */

@@ -76,21 +76,20 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-noinst_LIBRARIES = libTDEC.a
-
-libTDEC_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c layers.c layers.h plasma.h plasma.c fire.h fire.c scroller.h scroller.c jumpingscroller.h jumpingscroller.c
-EXTRA_DIST = tdec.h
-subdir = COMMON
+noinst_PROGRAMS = multilayer
+multilayer_SOURCES = multilayer.c 
+multilayer_LDADD = ../COMMON/libTDEC.a
+INCLUDES = -I../COMMON
+subdir = MULTILAYER
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+noinst_PROGRAMS = multilayer$(EXEEXT)
+PROGRAMS = $(noinst_PROGRAMS)
 
-libTDEC_a_AR = $(AR) cru
-libTDEC_a_LIBADD =
-am_libTDEC_a_OBJECTS = fps.$(OBJEXT) video.$(OBJEXT) utils.$(OBJEXT) \
-	layers.$(OBJEXT) plasma.$(OBJEXT) fire.$(OBJEXT) \
-	scroller.$(OBJEXT) jumpingscroller.$(OBJEXT)
-libTDEC_a_OBJECTS = $(am_libTDEC_a_OBJECTS)
+am_multilayer_OBJECTS = multilayer.$(OBJEXT)
+multilayer_OBJECTS = $(am_multilayer_OBJECTS)
+multilayer_DEPENDENCIES = ../COMMON/libTDEC.a
+multilayer_LDFLAGS =
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir)
@@ -99,19 +98,15 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/fire.Po ./$(DEPDIR)/fps.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/jumpingscroller.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/layers.Po ./$(DEPDIR)/plasma.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/scroller.Po ./$(DEPDIR)/utils.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/video.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/multilayer.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CFLAGS = @CFLAGS@
-DIST_SOURCES = $(libTDEC_a_SOURCES)
+DIST_SOURCES = $(multilayer_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(libTDEC_a_SOURCES)
+SOURCES = $(multilayer_SOURCES)
 
 all: all-am
 
@@ -119,18 +114,15 @@ all: all-am
 .SUFFIXES: .c .o .obj
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  COMMON/Makefile
+	  $(AUTOMAKE) --gnu  MULTILAYER/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
-AR = ar
-
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libTDEC.a: $(libTDEC_a_OBJECTS) $(libTDEC_a_DEPENDENCIES) 
-	-rm -f libTDEC.a
-	$(libTDEC_a_AR) libTDEC.a $(libTDEC_a_OBJECTS) $(libTDEC_a_LIBADD)
-	$(RANLIB) libTDEC.a
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+multilayer$(EXEEXT): $(multilayer_OBJECTS) $(multilayer_DEPENDENCIES) 
+	@rm -f multilayer$(EXEEXT)
+	$(LINK) $(multilayer_LDFLAGS) $(multilayer_OBJECTS) $(multilayer_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -138,14 +130,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fire.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jumpingscroller.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layers.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plasma.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scroller.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/video.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multilayer.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
@@ -227,7 +212,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(PROGRAMS)
 
 installdirs:
 
@@ -257,7 +242,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 
@@ -293,7 +278,7 @@ mostlyclean-am: mostlyclean-compile mostlyclean-generic
 uninstall-am: uninstall-info-am
 
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES distclean distclean-compile \
+	clean-noinstPROGRAMS distclean distclean-compile \
 	distclean-depend distclean-generic distclean-tags distdir dvi \
 	dvi-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am install-info \
