@@ -5,6 +5,11 @@ The Demo Effects Collection uses the great mikmod library for playing musical mo
 run configure --enable-mikmod=no if you don't want to use it. The Equalizer effect won't build in that case. 
 The use of mikmod is enabled by default
 
+For 3D collision detection and frustum culling, The Demo Effects Collection makes use of the excellent OPCODE 
+collision detection library of Pierre Terdiman
+
+If you don't want the 3D demonstrations, run configure --enable-opengl=no
+
 The Demo Effects Collection is available under the GNU General Public License,
 see the file "COPYING" for details.
 
@@ -18,6 +23,7 @@ Dan G. Lunde		- danglund@online.no
 Buddy Smith		- nullset@dookie.net
 Ed Sinjiashvili		- edsin@swes.saren.ru
 Nupur Saurabh		- saunup@hotmail.com
+Pierre Terdiman		- p.terdiman@wanadoo.fr
 Jason Liszkiewicz	- involution@mail.lokmail.net - of the Creative Invasion Workshop -
 Radford Spaeth		- scooby11@sonic.net
 Aamir Syed		- amir_syed11@hotmail.com
@@ -29,3 +35,8 @@ Jonathan Corriveau	- jonathan.corriveau@sympathico.ca
 Saumya Sarpal		- saumyasarpal@yahoo.com
 
 Feel free to send me your favourite effect || become a developer!
+
+Cheers
+WP
+
+ *- 2002 -* 

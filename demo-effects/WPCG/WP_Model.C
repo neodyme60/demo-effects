@@ -747,7 +747,7 @@ WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object)
 
   for (; i < numberTriangles; ++i)
     {
-      glBegin(GL_POLYGON);
+      glBegin(GL_TRIANGLES);
       glVertex3fv(frame->vertices[triangles[i * 3]].point.data);
       glVertex3fv(frame->vertices[triangles[i * 3 + 1]].point.data);
       glVertex3fv(frame->vertices[triangles[i * 3 + 2]].point.data);

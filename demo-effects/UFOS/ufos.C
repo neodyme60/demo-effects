@@ -33,6 +33,7 @@ WP_ObjectManager *manager;
 WP_Terrain *terrain;
 WP_DynamicObject *ufo;
 WP_Draw_2D draw;
+WP_Image *logo;
 
 void quit( int code )
 {      
@@ -123,6 +124,8 @@ void draw_screen( void )
   sprintf(fps, "Collisions: %i", manager->number_collisions);
   draw.vDrawString(GLUT_BITMAP_HELVETICA_18, string(fps), 10,  SCREEN_HEIGHT - 60);
 
+  logo->drawToFrameBuffer();
+
   glPopMatrix();
   state->projection(); 
   glPopMatrix();
@@ -185,6 +188,10 @@ void init()
       SDL_EventState(i, SDL_IGNORE);
     }
   }
+
+  logo = new WP_Image("../GFX/tdec-small.pcx");
+  logo->rasterpos_x = SCREEN_WIDTH - logo->columns;
+  logo->rasterpos_y = SCREEN_HEIGHT;
   
   SDL_ShowCursor(SDL_DISABLE);
 }

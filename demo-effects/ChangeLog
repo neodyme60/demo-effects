@@ -1,3 +1,9 @@
+0.1 Pierre Terdiman's fantastic OPCODE 3D Collision Detection Library is now part of TDEC and is used by the WPCG 
+library for 3D frustum culling and collision detection. A demo called ufos was added to demonstrate these features.
+The WPCG library was improved and enchanced. Many bugs were fixed and a proper lighting system and collision 
+detection support and handling was among others added to WPCG. The demon and terrain examples were therefore adjusted.
+TDEC now compiles with gcc 3.2 which has better C++ support and generates better and tighter code.
+
 0.0.9 Optimized BUMP2D effect. Added weapon to CyberDemon 2000 quake2 model. Added new Terrain effect demo. Added and improved upon 
 WPCG classes (fixed bugs in WP_Terrain class. Removed WP_SkyDome class and added WP_SkyBox class, improved object handling of 
 WP_ObjectManager etc.)

@@ -122,7 +122,7 @@ void init()
 	
   manager = WP_ObjectManager::getInstance();
 
-  manager->addLight(WP_Point3D(0.0, 3.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
+  manager->addLight(WP_Point3D(1.0, 1.0, 0.0), WP_Color((float)0.0, (float)0.0, (float)0.0), 
 		    WP_Color((float)0.75, (float)0.75, (float)0.75), WP_Color((float)0.0, (float)0.0, (float)0.0),
 		    WP_Color((float)0.0, (float)0.0, (float)0.0));
 

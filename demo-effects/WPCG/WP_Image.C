@@ -23,6 +23,12 @@
 
 WP_Image::WP_Image(): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0){}
 
+WP_Image::WP_Image(const string &filename): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0)
+{
+  loadImage(filename);
+  glPixelZoom(1, -1); //reverse y
+}
+
 //COPY CONSTRUCTOR
 WP_Image::WP_Image(const WP_Image &image)
 {
@@ -88,6 +94,7 @@ void WP_Image::drawToFrameBuffer() const
     return;
   
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glRasterPos2i(rasterpos_x, rasterpos_y);
   glDrawPixels(columns, rows, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 

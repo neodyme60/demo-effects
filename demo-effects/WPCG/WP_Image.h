@@ -44,6 +44,8 @@ class WP_Image
  public:
   WP_Image();
 
+  WP_Image(const string &filename);
+
   //copy constructor
   WP_Image(const WP_Image &image);
 
@@ -133,8 +135,6 @@ class WP_Image
    */
   int rasterpos_y;
 
- private:
-  
   /**
    * the number of pixel rows in the image
    */
@@ -145,6 +145,7 @@ class WP_Image
    */
   int columns;
 
+ protected:
   /**
    * the array of pixels
    */
