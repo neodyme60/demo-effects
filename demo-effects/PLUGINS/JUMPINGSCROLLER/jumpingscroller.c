@@ -42,14 +42,17 @@ static Uint16 _jump_height;
 static SDL_Rect _jump_frect;
 static SDL_Rect _jump_srect;
 static char _jump_scroll_id;
+static void (*_jump_restart)(void);
 
-void jumpingscroller_LTX_init_effect(SDL_Surface *s, va_list parameters)
+void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   float rad;
   Uint16 i, j;
   char *_text, *font, *_characters;
   Uint8 character_width, character_height;
   short centery;
+
+  _jump_restart = restart;
 
   _text = va_arg(parameters, char*);
   font = va_arg(parameters, char*);
@@ -142,6 +145,15 @@ void jumpingscroller_LTX_draw_effect(void)
 	}
       
       _jump_displacement = 0;
+    }
+
+  if (TDEC_scroller_ready(_jump_scroll_id))
+    {
+      if (_jump_restart)
+	{
+	  (*_jump_restart)(); /*call scroller restart callback */
+	  return;
+	}
     }
   
   _jump_displacement += 2;

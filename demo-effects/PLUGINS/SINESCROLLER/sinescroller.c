@@ -33,8 +33,9 @@ static SDL_Rect _sine_frect;
 static Uint16 _sine_sine_index = 0;
 static Uint8 _sine_pixels;
 static char _sine_scroll_id;
+static void (*_sine_restart)(void);
 
-void sinescroller_LTX_init_effect(SDL_Surface *s, va_list parameters)
+void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   float rad;
   Uint16 i, centery;
@@ -42,6 +43,8 @@ void sinescroller_LTX_init_effect(SDL_Surface *s, va_list parameters)
   char *_text, *font, *_characters;
   Uint8 character_width, character_height;
   Uint16 amplitude;
+
+  _sine_restart = restart;
 
   _text = va_arg(parameters, char*);
   font = va_arg(parameters, char*);
@@ -99,6 +102,15 @@ void sinescroller_LTX_draw_effect(void)
     {
       TDEC_draw_font_char(_sine_scroll_id, TDEC_get_font_char(_sine_scroll_id), _sine_scroll_surface, &_sine_frect);
       _sine_displacement = 0;
+    }
+
+  if (TDEC_scroller_ready(_sine_scroll_id))
+    {
+      if (_sine_restart)
+	{
+	  (*_sine_restart)(); /*call scroller restart callback */
+	  return;
+	}
     }
     
   /* clean sinus area */

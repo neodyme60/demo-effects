@@ -31,7 +31,7 @@ static int _plasma_aSin[512];
 static SDL_Color _plasma_colors[256];
 static Uint8 _plasma_pixelspcolor;
 
-void plasma_LTX_init_effect(SDL_Surface *s, va_list parameters)
+void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   int i;
   float rad;

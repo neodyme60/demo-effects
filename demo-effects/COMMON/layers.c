@@ -24,7 +24,7 @@
 
 typedef struct
 {
-  void (*init)(SDL_Surface *s, va_list parameters);
+  void (*init)(SDL_Surface *s, void (*restart)(void), va_list parameters);
   void (*draw)(void);
   void (*free)(void);
   lt_dlhandle effect_module;
@@ -55,7 +55,7 @@ void TDEC_free_layers(void)
   lt_dlexit();
 }
 
-SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, const char *module, ...)
+SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, const char *module, void (*restart_callback)(void), ...)
 {
   SDL_Surface *res = (SDL_Surface*)0;
   va_list parameters;
@@ -114,7 +114,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 	  res = (SDL_Surface*)0;
 	}
 
-      effect->init = (void(*)(SDL_Surface*, va_list))lt_dlsym(effect->effect_module, "init_effect");
+      effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
       if (!effect->init)  
 	{
 	  fprintf (stderr, "%s\n", lt_dlerror());
@@ -135,12 +135,15 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 	  res = (SDL_Surface*)0;
 	}
       
-      va_start(parameters, module);
+      if (res)
+	{
+	  va_start(parameters, restart_callback);
 
-      /*init effects plugin */
-      (*effect->init)(res, parameters);
+	  /*init effects plugin */
+	  (*effect->init)(res, restart_callback, parameters);
 
-      va_end(parameters);
+	  va_end(parameters);
+	}
     }
   else if (nlayers == 0)
     {
@@ -182,7 +185,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 
       printf("Opened effects plugin %s\n",module);
 
-      effect->init = (void(*)(SDL_Surface*, va_list))lt_dlsym(effect->effect_module, "init_effect");
+      effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
       if (!effect->init)  
 	{
 	  fprintf (stderr, "%s\n", lt_dlerror());
@@ -205,10 +208,10 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 
       if (res)
 	{
-	  va_start(parameters, module);
+	  va_start(parameters, restart_callback);
 
 	  /*init effects plugin */
-	  (*effect->init)(res, parameters);
+	  (*effect->init)(res, restart_callback, parameters);
 
 	  va_end(parameters);
 

@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include "SDL/SDL.h"
 
-extern void fire_LTX_init_effect(SDL_Surface *s, va_list parameters);
+extern void fire_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
 extern void fire_LTX_draw_effect(void);
 extern void fire_LTX_free_effect(void);
 

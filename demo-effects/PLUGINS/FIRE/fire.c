@@ -29,7 +29,7 @@ static Uint16 _fire_xpos;
 static Uint16 _fire_ypos;
 static Uint8 *_fire_fire;
 
-void fire_LTX_init_effect(SDL_Surface* s, va_list parameters)
+void fire_LTX_init_effect(SDL_Surface* s, void (*restart)(void), va_list parameters)
 {
   unsigned int i;
 

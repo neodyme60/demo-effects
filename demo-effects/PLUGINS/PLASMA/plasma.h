@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include "SDL/SDL.h"
 
-extern void plasma_LTX_init_effect(SDL_Surface *s, va_list parameters);
+extern void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
 extern void plasma_LTX_draw_effect(void);
 extern void plasma_LTX_free_effect(void);
 

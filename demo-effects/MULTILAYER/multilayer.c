@@ -73,25 +73,35 @@ void process_events( void )
     }
 }
 
+void restart_sine(void)
+{
+  printf("Restarting Sine Scroller\n");
+}
+
+void restart_jump(void)
+{
+  printf("Restarting Jumping Scroller\n");
+}
+
 void init()
 {
   Uint32 i;
   char *text = " tDeC TdEc ";
   char *text2 = "The Demo Effects Collection ";
 
-  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 4))
+  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 0, 4))
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",  text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
+  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",  &restart_jump, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
     {
       exit(1);
       }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", SCREEN_WIDTH, 60, 0, 0))
+  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", 0, SCREEN_WIDTH, 60, 0, 0))
     {
       exit(1);
       }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",  text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
+  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",  &restart_sine, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
     {
       exit(1);
       }

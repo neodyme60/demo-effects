@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include "SDL/SDL.h"
 
-extern void sinescroller_LTX_init_effect(SDL_Surface *s, va_list parameters);
+extern void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
 extern void sinescroller_LTX_draw_effect(void);
 extern void sinescroller_LTX_free_effect(void);
 
