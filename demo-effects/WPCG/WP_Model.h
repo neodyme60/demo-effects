@@ -241,7 +241,7 @@ class WP_Model_MD2: public WP_AnimatedModel
 class WP_MetaBall: public WP_Model
 {
  public:
-  WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling) {};
+  WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling);
   virtual WP_MetaBall::~WP_MetaBall(){};
 
   void drawOpenGL(const WP_Matrix3D& matrix);
@@ -250,6 +250,8 @@ class WP_MetaBall: public WP_Model
    * this function is used for reading the model file and initializing the model by filling the variables of the base class with the appropriate read values. This function is automaticly called by the base class WP_Model by a call to its <i>init</i> function
    */
   bool initModel();
+
+  WP_Point3D center;
 };
 
 #endif

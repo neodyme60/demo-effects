@@ -422,14 +422,14 @@ public:
    * @param last a pointer to a WP_StaticObject to indicate the position of the object preceeding the wanted object. If this pointer is 0, the first object in the static object list is returned. If last is the last object in the list, the first object is returned
    * @return a pointer to a Object representing the next object (or first if <i>last>/i> is 0 or <i>last</i> is the last object in the list, 0 in case of no available objects
    */
-  WP_Object* getNextStaticObject(const WP_StaticObject* last) const;
+  WP_StaticObject* getNextStaticObject(const WP_StaticObject* last) const;
 
   /**
    * this function returns the next dynamic object following <i>last</i> in the object manager's internal dynamic object list
    * @param last a pointer to a WP_DynamicObject to indicate the position of the object preceeding the wanted object. If this pointer is 0, the first object in the dynamic object list is returned. If <i>last</i> is the last object in the list, the first object is returned
    * @return a pointer to a WP_Object representing the next object (or first if <i>last>/i> is 0 or <i>last</i> is the last object in the list, 0 in case of no available objects
    */
-  WP_Object* getNextDynamicObject(const WP_DynamicObject* last) const;
+  WP_DynamicObject* getNextDynamicObject(const WP_DynamicObject* last) const;
 
   /**
    * this function returns the first static object in the object manager's internal static object list
@@ -571,12 +571,12 @@ protected:
    */
   unsigned int unique;
 
-  static const unsigned char num_internal_objects;
+  static const unsigned char num_internal_models;
 
   /**
-   * static array of const strings representing internal objects like for example WP_MetaBall
+   * static array of const strings representing internal models like for example WP_MetaBall
    */
-  static const string internal_objects[];
+  static const string internal_models[];
 };
 #endif
 

@@ -1,4 +1,4 @@
-0.0.9 Optimized BUMP2D effect.
+0.0.9 Optimized BUMP2D effect. Added weapon to CyberDemon 2000 quake2 model.
 
 0.0.8 Added vertical scanline effect to SPIRALTWIST effect. Optimized SINEWAVE effect. Added C++ library libWPCG which adds many 
 classes for handling 2D/3D computer graphics. Added first completely 3D C++ effect called DEMON which displays a key frame animated 

@@ -50,11 +50,11 @@ void WP_Object::print() const
 
 //********************************************* WP_ObjectManager *******************************************************
 
-const unsigned char WP_ObjectManager::num_internal_objects = 1;
+const unsigned char WP_ObjectManager::num_internal_models = 1;
 
 WP_ObjectManager* WP_ObjectManager::om_instance = 0;
 
-const string WP_ObjectManager::internal_objects[] = {"WP_METABALL"};
+const string WP_ObjectManager::internal_models[] = {"WP_METABALL"};
 
 WP_ObjectManager::WP_ObjectManager():cam(WP_Camera::getInstance()), unique(0){}
 
@@ -113,16 +113,14 @@ try
 
     int i;
     bool internal = false;
-    string m_name;
 
-    for (i = 0; i < num_internal_objects; ++i)
+    for (i = 0; i < num_internal_models; ++i)
       {
-	if (object_name == internal_objects[i])
+	if (object_name == internal_models[i])
 	  {
 	    internal = true;
-	    m_name = object_name;
 	    sobject->name_id = unique++;
-	    model = findInstance(m_name);
+	    model = findInstance(model_name);
 	    if (model)
 	      {
 		model->count++;
@@ -131,7 +129,7 @@ try
 	      }
 	    else
 	      {
-		model = new WP_MetaBall(m_name, scaling);
+		model = new WP_MetaBall(model_name, scaling);
 		if (!model->init())
 		  {
 		    throw("");
@@ -145,7 +143,7 @@ try
       
     if (!internal)
       {
-	m_name = "../MODELS/" + model_name;
+	string m_name = "../MODELS/" + model_name;
 	sobject->name_id = unique++;
 	model = findInstance(m_name);
 	if (model)
@@ -208,16 +206,14 @@ try
 
     int i;
     bool internal = false;
-    string m_name;
 
-    for (i = 0; i < num_internal_objects; ++i)
+    for (i = 0; i < num_internal_models; ++i)
       {
-	if (object_name == internal_objects[i])
+	if (model_name == internal_models[i])
 	  {
 	    internal = true;
-	    m_name = object_name;
 	    dobject->name_id = unique++;
-	    model = new WP_MetaBall(m_name, scaling);
+	    model = new WP_MetaBall(model_name, scaling);
 	    if (!model->init())
 	      {
 		throw("");
@@ -230,12 +226,12 @@ try
 
     if (!internal)
       {
-	m_name = "../MODELS/" + model_name;
+	string m_name = "../MODELS/" + model_name;
 	dobject->name_id = unique++;
 
 	/*model = findInstance(m_name);
   
-	if (model) //FIXME add pssibility to share animated models (current frame, interpolation etc) disabled for now 
+	if (model) //FIXME add possibility to share animated models (current frame, interpolation etc) disabled for now 
 	{
 	model->count++;
 	dobject->model = model;
@@ -285,7 +281,7 @@ WP_Object* WP_ObjectManager::getObject(const string& name) const
 
 //if last == 0 then the first element of the list is given
 //0 is returned when list is empty
-WP_Object* WP_ObjectManager::getNextStaticObject(const WP_StaticObject* last) const
+WP_StaticObject* WP_ObjectManager::getNextStaticObject(const WP_StaticObject* last) const
 {
   list<WP_StaticObject*>::const_iterator j;
   if (last)
@@ -314,7 +310,7 @@ WP_Object* WP_ObjectManager::getNextStaticObject(const WP_StaticObject* last) co
 
 //if last == 0 then the first element of the list is given
 //0 is returned when list is empty
-WP_Object* WP_ObjectManager::getNextDynamicObject(const WP_DynamicObject* last) const
+WP_DynamicObject* WP_ObjectManager::getNextDynamicObject(const WP_DynamicObject* last) const
 {
   list<WP_DynamicObject*>::const_iterator j;
   if (last)

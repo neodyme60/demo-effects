@@ -21,6 +21,7 @@
 #include <iostream.h>
 #include <fstream.h>
 #include <list>
+#include <math.h>
 #include <GL/gl.h>
 #include "WP_TextureManager.h"
 #include "WP_GLState.h"
@@ -664,10 +665,21 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix)
 
 ////////////////////////// WP_MetaBall ////////////////////
 
+WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling)
+{
+  
+}
+
 void 
 WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix)
 {
+  glPushMatrix();
+  glMultMatrixf(matrix.data); 
+
+  //fixme t be done
   
+  glEnd();
+  glPopMatrix();
 }
 
 /**
