@@ -34,8 +34,10 @@ void TDEC_scale_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perce
 void TDEC_scalex_image(SDL_Surface* surface, Uint8 percentage);
 void TDEC_scaley_image(SDL_Surface* surface, Uint8 percentage);
 void TDEC_scale_image(SDL_Surface* surface, Uint8 percentage);
-void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage);
-void TDEC_scale_scanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage);
+void TDEC_scale_copy_hscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage);
+void TDEC_scale_copy_vscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage);
+void TDEC_scale_hscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage);
+void TDEC_scale_vscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage);
 
 /* image flipping */
 void TDEC_flipx_image(SDL_Surface* surface);

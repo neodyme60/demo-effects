@@ -160,8 +160,7 @@ void TDEC_blacken_palette(SDL_Surface* s)
 void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage)
 {
   float skip_columns, rest;
-  Uint16 j;
-  int i;
+  Uint16 i,j;
   SDL_Rect o = {0, 0, 1, original->h};
   SDL_Rect c = {0, 0, 1, original->h};
 
@@ -186,12 +185,12 @@ void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
 
   /* copy scanlines left of middle column */
 
-  j = original->w >> 1;
+  j = (original->w >> 1) - 1;
   rest = skip_columns;
   o.x = j;
   c.x = j;
 
-  for (i = j; i >= 0; --i)
+  for (i = j + 1; i > 0; --i)
     {
       if (rest >= 1.0)
 	{
@@ -227,8 +226,7 @@ void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
 void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage)
 {
   float skip_scanlines, rest;
-  Uint16 j;
-  int i;
+  Uint16 i, j;
   SDL_Rect o = {0, 0, original->w, 1};
   SDL_Rect c = {0, 0, copy->w, 1};
 
@@ -253,12 +251,12 @@ void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
 
   /* copy scanlines above middle scanline */
 
-  j = original->h >> 1;
+  j = (original->h >> 1) - 1;
   rest = skip_scanlines;
   o.y = j;
   c.y = j;
 
-  for (i = j; i >= 0; --i)
+  for (i = j + 1; i > 0; --i)
     {
       if (rest >= 1.0)
 	{
@@ -329,11 +327,11 @@ void TDEC_scale_image(SDL_Surface* surface, Uint8 percentage)
   TDEC_scaley_image(surface, percentage);
 }
 
-void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage)
+void TDEC_scale_copy_hscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage)
 {
   float skip_pixels, rest;
-  Uint16 j, l;
-  short i, k;
+  Uint16 i, j, l;
+  short k;
   Uint32 index = scanline_index * original->pitch;
   Uint8* original_pixel = (Uint8*)original->pixels + index;
   Uint8* copy_pixel = (Uint8*)copy->pixels + index;
@@ -342,7 +340,12 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
 
   if (original->w != copy->w)
     {
-      printf("TDEC_scaley_image: original and copy image are not of the same height \n");
+      printf("TDEC_scale_copy_hscanline: original and copy image are not of the same width \n");
+      return;
+    }
+  else if (scanline_index >= original->h)
+    {
+      printf("TDEC_scaley_copy_hscanline: invalid scanline_index \n");
       return;
     }
   
@@ -367,7 +370,7 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
 
   skip_pixels = percentage / 100.0;
 
-  j = original->w >> 1;
+  j = (original->w >> 1) - 1;
   
   index = j * original->format->BytesPerPixel;
   original_pixel += index;
@@ -377,7 +380,7 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
 
   /* copy pixels left from middle pixel */
 
-  for (i = j; i >= 0; --i)
+  for (i = (original->w >> 1); i > 0; --i)
     {
       if (rest >= 1.0)
 	{
@@ -394,14 +397,13 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
   
   /* copy pixels right from middle pixel */
 
-  j = original->w >> 1;
   index = j * original->format->BytesPerPixel;
   original_pixel = o + index;
   copy_pixel = c + index;
   
   rest = skip_pixels;
 
-  for (i = j; i < original->w; ++i)
+  for (i = original->w >> 1; i < original->w; ++i)
     {
       if (rest >= 1.0)
 	{
@@ -419,13 +421,117 @@ void TDEC_scale_copy_scanline(SDL_Surface* original, SDL_Surface* copy, Uint16 s
   SDL_UnlockSurface(copy);
 }
 
-void TDEC_scale_scanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage)
+void TDEC_scale_hscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage)
 {
   SDL_Surface* s;
   SDL_Rect o = {0, scanline_index, surface->w, 1};
 
   s = TDEC_copy_surface(surface);
-  TDEC_scale_copy_scanline(surface, s, scanline_index, percentage);
+  TDEC_scale_copy_hscanline(surface, s, scanline_index, percentage);
+
+  SDL_BlitSurface(s, &o, surface, &o);
+
+  SDL_FreeSurface(s);
+}
+
+void TDEC_scale_copy_vscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage)
+{
+  float skip_pixels, rest;
+  Uint16 i, j, l;
+  short k;
+  Uint32 index;
+  Uint8* original_pixel = (Uint8*)original->pixels + (scanline_index * original->format->BytesPerPixel);
+  Uint8* copy_pixel = (Uint8*)copy->pixels + (scanline_index * copy->format->BytesPerPixel);
+  Uint8* o = original_pixel;
+  Uint8* c = copy_pixel;
+
+  if (original->h != copy->h)
+    {
+      printf("TDEC_scale_copy_vscanline: original and copy image are not of the same height \n");
+      return;
+    }
+  else if (scanline_index >= original->w)
+    {
+      printf("TDEC_scaley_copy_vscanline: invalid scanline_index: %i \n", scanline_index);
+      return;
+    }
+  
+  if (percentage == 0)
+    {
+      SDL_Rect c = {scanline_index, 0, 1, copy->h};
+      SDL_FillRect(copy, &c, SDL_MapRGB(copy->format, 0,0,0));
+      return;
+    }
+
+  if (percentage >= 100)
+    {
+      SDL_Rect o = {scanline_index, 0, 1, original->h};
+      SDL_Rect c = {scanline_index, 0, 1, copy->h};
+      
+      SDL_BlitSurface(original, &o, copy, &c);
+      
+      return;
+    }
+
+  SDL_LockSurface(copy);
+
+  skip_pixels = percentage / 100.0;
+
+  j = ((original->h >> 1) - 1) * original->pitch;
+  
+  original_pixel += j;
+  copy_pixel += j;
+  rest = skip_pixels;
+
+  /* copy pixels above the middle pixel */
+
+  for (i = original->h >> 1; i > 0; --i)
+    {
+      if (rest >= 1.0)
+	{
+	  for (k = original->format->BytesPerPixel - 1; k >= 0; --k)
+	      *(copy_pixel + k) = *(original_pixel + k);
+	  
+	  copy_pixel -= copy->pitch;
+	  rest -= 1.0;
+	}
+      
+      original_pixel -= original->pitch;
+      rest += skip_pixels;
+    }
+  
+  /* copy pixels below of the middle pixel */
+
+  j += original->format->BytesPerPixel;
+  original_pixel = o + j;
+  copy_pixel = c + j;
+  rest = skip_pixels;
+
+  for (i = original->h >> 1; i < original->h; ++i)
+    {
+      if (rest >= 1.0)
+	{
+	  for (l = 0; l < original->format->BytesPerPixel; ++l)
+	    *(copy_pixel + l) = *(original_pixel + l);
+
+	  copy_pixel += copy->pitch;	  
+	  rest -= 1.0;	  
+	}
+
+      original_pixel += original->pitch;
+      rest += skip_pixels;
+    }
+
+  SDL_UnlockSurface(copy);
+}
+
+void TDEC_scale_vscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage)
+{
+  SDL_Surface* s;
+  SDL_Rect o = {scanline_index, 0, 1, surface->h};
+
+  s = TDEC_copy_surface(surface);
+  TDEC_scale_copy_vscanline(surface, s, scanline_index, percentage);
 
   SDL_BlitSurface(s, &o, surface, &o);
 

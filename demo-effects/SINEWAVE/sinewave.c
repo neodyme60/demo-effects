@@ -14,6 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+/* 080802 done some optimization WP */
 /*note that the code has not been optimized*/
 
 #include <stdio.h>
@@ -182,7 +183,7 @@ void init()
 void sinewave( void )
 {
   Uint16 i, sin_backup = sin_index;
-  SINE_EFFECT* e = EFFECTS.sine_effects + EFFECTS.current_effect;
+  static SINE_EFFECT* e = EFFECTS.sine_effects;
   SDL_Rect r = {e->sine_table[sin_backup], 0,SCREEN_WIDTH, 1};
   SDL_Rect d = {0, 0, SCREEN_WIDTH, 1};
  
@@ -223,6 +224,7 @@ void sinewave( void )
       sin_index = 0;
       EFFECTS.current_effect++;
       EFFECTS.current_effect %= MAX_EFFECTS;
+      e = EFFECTS.sine_effects + EFFECTS.current_effect;    
     }
 }
 
@@ -233,7 +235,8 @@ int main( int argc, char* argv[] )
 	return -1;
     }
 
-    if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /*| SDL_FULLSCREEN*/))
+    if (!TDEC_init_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE 
+/*| SDL_FULLSCREEN*/))
 	quit(1);
 
     TDEC_init_timer();

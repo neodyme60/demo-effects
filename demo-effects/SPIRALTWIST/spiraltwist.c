@@ -14,6 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+/* 080802 Added vertical scanline effect. WP */
 /*note that the code has not been optimized*/
 
 #include <stdio.h>
@@ -30,8 +31,24 @@
 static short aSin[512];
 static Uint16 sin_index = 0;
 static Uint16 sin_global_index = 0;
-static SDL_Surface *image = 0;
-static SDL_Surface *flipped_image = 0;
+static SDL_Surface* image = 0;
+static SDL_Surface* flippedx_image = 0;
+static SDL_Surface* flippedy_image = 0;
+
+typedef struct
+{
+  Uint8 index_add;
+  Uint8 effect;
+} SINE_EFFECT;
+
+#define MAX_EFFECTS 4
+
+struct 
+{
+  SINE_EFFECT sine_effects[MAX_EFFECTS];
+  Uint8 current_effect;
+} EFFECTS;
+
 
 void quit( int code )
 {      
@@ -43,8 +60,10 @@ void quit( int code )
   
   if (image) 
     SDL_FreeSurface(image);
-  if (flipped_image) 
-    SDL_FreeSurface(flipped_image);
+  if (flippedx_image) 
+    SDL_FreeSurface(flippedx_image);
+  if (flippedx_image)
+    SDL_FreeSurface(flippedy_image);
 
   SDL_Quit( );
 
@@ -100,8 +119,11 @@ void init()
 
     SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, image->format->palette->colors, 0, image->format->palette->ncolors);
 
-    flipped_image = TDEC_copy_surface(image);
-    TDEC_flipy_image(flipped_image);
+    flippedx_image = TDEC_copy_surface(image);
+    TDEC_flipx_image(flippedx_image);
+
+    flippedy_image = TDEC_copy_surface(image);
+    TDEC_flipy_image(flippedy_image);
 
     /*create sin lookup table */
     for (i = 0; i < 512; i++)
@@ -109,6 +131,22 @@ void init()
 	rad =  (float)i * 0.0174532 * 0.703125; 
 	aSin[i] = (short)((sin(rad) * 100.0));
       }
+
+    /* create effects */
+
+    EFFECTS.current_effect = 0;
+
+    EFFECTS.sine_effects[0].index_add = 2;
+    EFFECTS.sine_effects[0].effect = 0;
+
+    EFFECTS.sine_effects[1].index_add = 1;
+    EFFECTS.sine_effects[1].effect = 1;
+
+    EFFECTS.sine_effects[2].index_add = 1;
+    EFFECTS.sine_effects[2].effect = 0;
+
+    EFFECTS.sine_effects[3].index_add = 2;
+    EFFECTS.sine_effects[3].effect = 1;
 
     /*disable events */
     for (i = 0; i < SDL_NUMEVENTS; ++i) {
@@ -123,6 +161,7 @@ void init()
 int main( int argc, char* argv[] )
 {
   Uint16 i;
+  SINE_EFFECT* e = EFFECTS.sine_effects + EFFECTS.current_effect;
 
   if (argc > 1) {
     printf("Retro Spiraltwist - W.P. van Paassen - 2002\n");
@@ -140,9 +179,11 @@ int main( int argc, char* argv[] )
   
   TDEC_set_fps(25);
 
+
   /* time based demo loop */
   while( 1 ) 
     {
+      
       TDEC_new_time();
     
       process_events();
@@ -151,18 +192,41 @@ int main( int argc, char* argv[] )
       
       SDL_FillRect(screen, 0, 0);
 
-      for (i = 0; i < image->h; ++i)
+      if (e->effect)
 	{
-	  if (aSin[sin_index] < 0)
-	    TDEC_scale_copy_scanline(flipped_image, screen, i, -aSin[sin_index++]);
-	  else
-	    TDEC_scale_copy_scanline(image, screen, i, aSin[sin_index++]);
+	  for (i = 0; i < image->w; ++i)
+	    {
+	      if (aSin[sin_index] < 0)
+		TDEC_scale_copy_vscanline(flippedx_image, screen, i, -aSin[sin_index]);
+	      else
+		TDEC_scale_copy_vscanline(image, screen, i, aSin[sin_index]);
 
-	  sin_index &= 511;
+	      sin_index += e->index_add;
+	      sin_index &= 511;
+	    }
 	}
-     
+      else
+	{
+	  for (i = 0; i < image->h; ++i)
+	    {
+	      if (aSin[sin_index] < 0) 
+		TDEC_scale_copy_hscanline(flippedy_image, screen, i, -aSin[sin_index]);
+	      else
+		TDEC_scale_copy_hscanline(image, screen, i, aSin[sin_index]);
+
+	      sin_index += e->index_add;
+	      sin_index &= 511;
+	    }
+	}
+
       sin_global_index += 4;
-      sin_global_index &= 511;
+      if (sin_global_index > 511)
+	{
+	  sin_global_index = 0;
+	  EFFECTS.current_effect++;
+	  EFFECTS.current_effect %= MAX_EFFECTS;
+	  e = EFFECTS.sine_effects + EFFECTS.current_effect;
+	}
       
       if (TDEC_fps_ok()) 
 	{
