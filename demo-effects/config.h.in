@@ -1,0 +1,38 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you have the <SDL/SDL.h> header file.  */
+#undef HAVE_SDL_SDL_H
+
+/* Define if you have the <SDL/SDL_image.h> header file.  */
+#undef HAVE_SDL_SDL_IMAGE_H
+
+/* Define if you have the <mikmod.h> header file.  */
+#undef HAVE_MIKMOD_H
+
+/* Define if you have the SDL library (-lSDL).  */
+#undef HAVE_LIBSDL
+
+/* Define if you have the SDL_image library (-lSDL_image).  */
+#undef HAVE_LIBSDL_IMAGE
+
+/* Define if you have the m library (-lm).  */
+#undef HAVE_LIBM
+
+/* Define if you have the mikmod library (-lmikmod).  */
+#undef HAVE_LIBMIKMOD
+
+/* Define if you have the pthread library (-lpthread).  */
+#undef HAVE_LIBPTHREAD
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
