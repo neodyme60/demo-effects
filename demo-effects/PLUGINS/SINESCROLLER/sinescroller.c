@@ -31,7 +31,7 @@ static SDL_Rect _sine_srect2;
 static SDL_Rect _sine_drect;
 static SDL_Rect _sine_srect;
 static SDL_Rect _sine_frect;
-static Uint16 _sine_sine_index = 0;
+static Uint16 _sine_sine_index;
 static Uint8 _sine_pixels;
 static char _sine_scroll_id;
 static void (*_sine_restart)(void);
@@ -47,7 +47,9 @@ void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list
 
   _sine_restart = restart;
 
-  _text = va_arg(parameters, char*);
+  _sine_sine_index = 0;
+
+ _text = va_arg(parameters, char*);
   font = va_arg(parameters, char*);
   _characters = va_arg(parameters, char*);
   character_width = (Uint8)va_arg(parameters, int);

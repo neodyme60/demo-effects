@@ -45,7 +45,7 @@ static Uint16 _circle_bottomborder;
 static SDL_Rect _circle_frect;
 static SDL_Rect _circle_srect;
 static char _circle_scroll_id;
-static Uint16 _circle_x_move_circle_y_move;
+static Uint16 _circle_x_move, _circle_y_move;
 static void (*_circle_restart)(void);
 
 void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)

@@ -25,10 +25,10 @@
 static SDL_Color _copper_copper[46];
 static Uint16 _copper_aSin[360];
 static SDL_Surface *_copper_surface;
-static Uint16 _copper_red = 96, _copper_red2 = 0, _copper_red3 = 88, _copper_red4 = 0, _copper_red5 = 80, _copper_red6 = 0, 
-  _copper_red7 = 72, _copper_red8 = 0, _copper_white = 64, _copper_white2 = 0, _copper_white3 = 56, _copper_white4 = 0, 
-  _copper_white5 = 48, _copper_white6 = 0, _copper_white7 = 40, _copper_white8 = 0, _copper_blue = 32, _copper_blue2 = 0, 
-  _copper_blue3 = 24, _copper_blue4 = 0, _copper_blue5 = 16, _copper_blue6 = 0, _copper_blue7 = 8, _copper_blue8 = 0;
+static Uint16 _copper_red, _copper_red2, _copper_red3, _copper_red4, _copper_red5, _copper_red6, 
+  _copper_red7, _copper_red8, _copper_white, _copper_white2, _copper_white3, _copper_white4, 
+  _copper_white5, _copper_white6, _copper_white7, _copper_white8, _copper_blue, _copper_blue2, 
+  _copper_blue3, _copper_blue4, _copper_blue5, _copper_blue6, _copper_blue7, _copper_blue8;
 
 void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
@@ -37,6 +37,31 @@ void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list p
   Uint16 sine_amplitude;
 
   _copper_surface = s;
+
+  _copper_red = 96; 
+  _copper_red2 = 0;
+  _copper_red3 = 88;
+  _copper_red4 = 0;
+  _copper_red5 = 80;
+  _copper_red6 = 0;
+  _copper_red7 = 72;
+  _copper_red8 = 0;
+  _copper_white = 64;
+  _copper_white2 = 0;
+  _copper_white3 = 56;
+  _copper_white4 = 0;
+  _copper_white5 = 48;
+  _copper_white6 = 0;
+  _copper_white7 = 40;
+  _copper_white8 = 0;
+  _copper_blue = 32;
+  _copper_blue2 = 0;
+  _copper_blue3 = 24;
+  _copper_blue4 = 0;
+  _copper_blue5 = 16;
+  _copper_blue6 = 0;
+  _copper_blue7 = 8;
+  _copper_blue8 = 0;
 
   sine_amplitude = (Uint16)va_arg(parameters, int);
 
