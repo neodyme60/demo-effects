@@ -9823,7 +9823,7 @@ includedir="$includedir"
 
 
 
-ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile TWINSCROLLER/Makefile SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile PLUGINS/SINESCROLLER/Makefile PLUGINS/JUMPINGSCROLLER/Makefile"
+ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile TWINSCROLLER/Makefile SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile PLUGINS/SINESCROLLER/Makefile PLUGINS/JUMPINGSCROLLER/Makefile PLUGINS/STARFIELD/Makefile PLUGINS/COPPERBARS/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -10375,6 +10375,8 @@ do
   "PLUGINS/FIRE/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLUGINS/FIRE/Makefile" ;;
   "PLUGINS/SINESCROLLER/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLUGINS/SINESCROLLER/Makefile" ;;
   "PLUGINS/JUMPINGSCROLLER/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLUGINS/JUMPINGSCROLLER/Makefile" ;;
+  "PLUGINS/STARFIELD/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLUGINS/STARFIELD/Makefile" ;;
+  "PLUGINS/COPPERBARS/Makefile" ) CONFIG_FILES="$CONFIG_FILES PLUGINS/COPPERBARS/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

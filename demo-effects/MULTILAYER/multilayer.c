@@ -89,24 +89,37 @@ void init()
   char *text = " tDeC TdEc ";
   char *text2 = "The Demo Effects Collection ";
 
-  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 0, 4))
+  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 
+		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 4))
     {
       exit(1);
     }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",  &restart_jump, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
+  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",
+		      &restart_jump, TDEC_NO_FILTER, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
     {
       exit(1);
-      }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", 0, SCREEN_WIDTH, 60, 0, 0))
+    }
+  if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", 
+		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, SCREEN_WIDTH, 60, 0, 0))
     {
       exit(1);
-      }
-  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",  &restart_sine, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
+    }
+  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",
+		      &restart_sine, TDEC_NO_FILTER, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
     {
       exit(1);
-      }
-
-
+    }
+  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/STARFIELD/starfield",
+		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 500))
+    {
+      exit(1);
+    }
+  if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0x80, "../PLUGINS/COPPERBARS/copperbars",
+		      TDEC_NO_RESTART_CALLBACK, TDEC_NO_FILTER, 100))
+    {
+      exit(1);
+    }
+  
  /*disable events */
   
   for (i = 0; i < SDL_NUMEVENTS; ++i)
@@ -128,7 +141,7 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
- if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA /*|SDL_FULLSCREEN*/))
+ if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* |SDL_FULLSCREEN*/))
    quit(1);
 
  TDEC_init_timer();

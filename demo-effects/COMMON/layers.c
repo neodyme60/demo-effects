@@ -44,18 +44,29 @@ static Uint8 nlayers = 0;
 void TDEC_free_layers(void)
 {
   Uint32 i;
+
   for (i = 0; i < nlayers; ++i)
     {
       (*layers[i]->effect->free)();
       lt_dlclose(layers[i]->effect->effect_module);
       free(layers[i]->effect);
+      if (i != TDEC_BACKGROUND_LAYER)
+	{
+	  SDL_FreeSurface(layers[i]->surface);
+	}
       free(layers[i]);
     }
   nlayers = 0;
   lt_dlexit();
 }
 
-SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, const char *module, void (*restart_callback)(void), ...)
+SDL_Surface* TDEC_get_background_layer(void)
+{
+  return layers[TDEC_BACKGROUND_LAYER]->surface;
+}
+
+SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
+			    const char *module, void (*restart_callback)(void), Uint8 is_filter, ...)
 {
   SDL_Surface *res = (SDL_Surface*)0;
   va_list parameters;
@@ -65,28 +76,40 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 
   if (nlayers + 1 <= NLAYERS && nlayers != 0)
     {
-      SDL_Surface *s = SDL_CreateRGBSurface(screen->flags, width, height, screen->format->BitsPerPixel, 
+      LAYER *l = (LAYER*)malloc(sizeof(LAYER));
+
+      if (is_filter == TDEC_NO_FILTER)
+	{
+	  SDL_Surface *s = SDL_CreateRGBSurface(screen->flags, width, height, screen->format->BitsPerPixel, 
 					    screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, 
 					    screen->format->Amask);
  
-      LAYER *l = (LAYER*)malloc(sizeof(LAYER));
-      l->surface = SDL_ConvertSurface(s, screen->format, screen->flags);
+	  l->surface = SDL_ConvertSurface(s, screen->format, screen->flags);
 
-      /* set palette if any */
-      if (l->surface->format->palette)
-	{
-	  SDL_SetPalette(l->surface, SDL_LOGPAL | SDL_PHYSPAL, l->surface->format->palette->colors, 0, 
-			 l->surface->format->palette->ncolors);
+	  /* set palette if any */
+	  if (l->surface->format->palette)
+	    {
+	      SDL_SetPalette(l->surface, SDL_LOGPAL | SDL_PHYSPAL, l->surface->format->palette->colors, 0, 
+			     l->surface->format->palette->ncolors);
+	    }
+	  
+	  /* set transparant pixel which is black */
+	  SDL_SetColorKey(l->surface, SDL_SRCCOLORKEY/* | SDL_RLEACCEL*/, SDL_MapRGBA(l->surface->format, 0, 0, 0, 0xFF)); 
+
+	  /* set surface alpha value if appropriate*/
+	  l->alpha = alpha;
+	  if (alpha != 0xFF)
+	    {
+	      SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
+	    }
+
+	  printf("Added layer %i\n", nlayers);
+	  SDL_FreeSurface(s);
 	}
-
-      /* set transparant pixel which is black */
-      SDL_SetColorKey(l->surface, SDL_SRCCOLORKEY/* | SDL_RLEACCEL*/, SDL_MapRGBA(l->surface->format, 0, 0, 0, 0xFF)); 
-
-      /* set surface alpha value if appropriate*/
-      l->alpha = alpha;
-      if (alpha != 0xFF)
+      else
 	{
-	  SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
+	  /* effect is a filter, for instance a blur or a lens, so use background as surface */
+	  l->surface = TDEC_get_background_layer();
 	}
       
       /* set surface dimensions and position */
@@ -96,9 +119,6 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       l->r.h = height;
       layers[nlayers] = l;
 
-      printf("Added layer %i\n", nlayers);
-
-      SDL_FreeSurface(s);
       res = l->surface;
 
       /* dynamically load effects-plugin, attach it to a layer and init it */
@@ -137,7 +157,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       
       if (res)
 	{
-	  va_start(parameters, restart_callback);
+	  va_start(parameters, is_filter);
 
 	  /*init effects plugin */
 	  (*effect->init)(res, restart_callback, parameters);
@@ -149,7 +169,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
     {
       LAYER *background;
 
-      /* first layer so init layering system */
+      /* first layer so init layering system, the first effect can also be a filter but we've got to create a background surface anyway */
 
       /* check if video was set */
       if (!screen)
@@ -208,8 +228,8 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 
       if (res)
 	{
-	  va_start(parameters, restart_callback);
-
+	  va_start(parameters, is_filter);
+	  
 	  /*init effects plugin */
 	  (*effect->init)(res, restart_callback, parameters);
 
@@ -218,6 +238,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 	  nlayers = 1;
 	}
     }
+
   return res;
 }
 
@@ -232,11 +253,6 @@ void TDEC_draw_layers(void)
       SDL_BlitSurface(l->surface, 0, screen, &l->r);
     }
   SDL_Flip(screen);
-}
-
-SDL_Surface* TDEC_get_background_layer(void)
-{
-  return layers[TDEC_BACKGROUND_LAYER]->surface;
 }
 
 SDL_Surface* TDEC_get_layer(Uint8 index)
@@ -273,6 +289,7 @@ void TDEC_remove_layer(void)
       (*layers[nlayers - 1]->effect->free)();
       lt_dlclose(layers[nlayers - 1]->effect->effect_module);
       free(layers[nlayers - 1]->effect);
+      SDL_FreeSurface(layers[nlayers - 1]->surface);
       free(layers[nlayers - 1]);
       nlayers--;
       printf("Removed layer %i\n", nlayers);

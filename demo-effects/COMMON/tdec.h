@@ -13,7 +13,6 @@ extern "C" {
 #include "utils.h"
 #include "layers.h"
 #include "scroller.h"
-#include "3dstarfield.h"
 
 #ifdef __cplusplus
 }
