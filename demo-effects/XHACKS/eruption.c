@@ -10,8 +10,8 @@
  *
  * Module - "eruption.c"
  *
- * [04-2002] - W.P. van Paassen: Creation for the Demo Effects Collection (http://demo-effects.sourceforge.net)
  * [01-2003] - W.P. van Paassen: Port to X for use with XScreenSaver, the shadebob hack by Shane Smit was used as a template
+ * [04-2002] - W.P. van Paassen: Creation for the Demo Effects Collection (http://demo-effects.sourceforge.net)
  */
 
 #include <math.h>
@@ -25,20 +25,24 @@ char *progclass = "Eruption";
 char *defaults [] = {
   ".background: black",
   ".foreground: white",
-  "*count:    20",
-  "*cycles:   75",
+  "*cycles:   80",
   "*ncolors:  256",
   "*delay:    5000",
-  "*particles: 250",
+  "*particles: 300",
+  "*cooloff: 2",
+  "*gravity: 1",
+  "*heat: 256",
   0
 };
 
 XrmOptionDescRec options [] = {
   { "-ncolors", ".ncolors", XrmoptionSepArg, 0 },
-  { "-count",   ".count",   XrmoptionSepArg, 0 },
   { "-delay",   ".delay",   XrmoptionSepArg, 0 },
   { "-cycles",  ".cycles",  XrmoptionSepArg, 0 },
   { "-particles",  ".particles",  XrmoptionSepArg, 0 },
+  { "-cooloff",  ".cooloff",  XrmoptionSepArg, 0 },
+  { "-gravity",  ".gravity",  XrmoptionSepArg, 0 },
+  { "-heat",  ".heat",  XrmoptionSepArg, 0 },
   { 0, 0, 0, 0 }
 };
 
@@ -54,15 +58,18 @@ static PARTICLE *particles;
 static unsigned short iWinWidth, iWinHeight;
 static unsigned char **fire;
 static unsigned short nParticleCount;
+static unsigned char xdelta, ydelta, decay;
+static signed char gravity;
+static signed short heat;
 
-void init_particle(PARTICLE* particle)
+void init_particle(PARTICLE* particle, signed short iColorCount)
 {
   /* randomly init particles, generate them in the center of the screen */
   particle->xpos = (iWinWidth >> 1) - 15 + (int)(14.0 * (random()/(RAND_MAX+1.0)));
   particle->ypos = (iWinHeight >> 1) - 15 + (int)(16.0 * (random()/(RAND_MAX+1.0)));
-  particle->xdir =   -10 + (int)(10.0 * (random()/(RAND_MAX+1.0)));
-  particle->ydir =   -20 + (int)(8.0 * (random()/(RAND_MAX+1.0)));
-  particle->colorindex = 255;
+  particle->xdir =   -xdelta + (int)(xdelta * (random()/(RAND_MAX+1.0)));
+  particle->ydir =   -ydelta + (int)((ydelta / 2) * (random()/(RAND_MAX+1.0)));
+  particle->colorindex = iColorCount;
   particle->dead = 0;
 }
 
@@ -71,109 +78,125 @@ static void Execute( Display *pDisplay,
                      GC *pGC, XImage *pImage,
                      signed short iColorCount, unsigned long *aiColorVals )
 {
-	unsigned int i, j, temp;
+  int i, j;
+  unsigned int temp;
 
-	/* move and draw particles into fire array */
-
-	for (i = 0; i < nParticleCount; i++)
-	  {
-	    if (!particles[i].dead)
-	      {
-		particles[i].xpos += particles[i].xdir;
-		particles[i].ypos += particles[i].ydir;
-	  
-		/* is particle dead? */
-
-		if (particles[i].colorindex <= 0)
-		{
-		  particles[i].dead = 1;
-		  continue;
-		}
-
-		if (particles[i].xpos < 2)
-		  {
-		    particles[i].xpos = 2;
-		    particles[i].xdir = -particles[i].xdir - 4;
-		    particles[i].colorindex = 255;
-		  }
-		else if (particles[i].xpos > iWinWidth - 3)
-		  {
-		    particles[i].xpos = iWinWidth - 3;
-		    particles[i].xdir = -particles[i].xdir + 4;
-		    particles[i].colorindex = 255;
-		  }
-	       
-		if (particles[i].ypos < 2)
-		  {
-		    particles[i].ypos = 2;
-		    particles[i].ydir = -particles[i].ydir;
-		    particles[i].colorindex = 255;
-		  }
-		else if (particles[i].ypos > iWinHeight - 3)
-		  {
-		    particles[i].ypos = iWinHeight - 3;
-		    particles[i].ydir = -particles[i].ydir >> 2;
-		    particles[i].colorindex = 255;
-		  }
-		
-		/* gravity kicks in */
-		particles[i].ydir++;
-	  
-	      /* particle cools off */
-		particles[i].colorindex--;
-	  
-	      /* draw particle */
-	      fire[particles[i].ypos][particles[i].xpos] = particles[i].colorindex;
-	      fire[particles[i].ypos][particles[i].xpos - 1] = particles[i].colorindex;
-	      fire[particles[i].ypos + 1][particles[i].xpos] = particles[i].colorindex;
-	      fire[particles[i].ypos - 1][particles[i].xpos] = particles[i].colorindex;
-	      fire[particles[i].ypos][particles[i].xpos + 1] = particles[i].colorindex;
-	    }
-	}
+  /* move and draw particles into fire array */
   
-	/* create fire effect */ 
-	for (i = 1; i < iWinHeight - 1; i++)
+  for (i = 0; i < nParticleCount; i++)
+    {
+      if (!particles[i].dead)
 	{
-	  for (j = 1; j < iWinWidth - 1; j++)
+	  particles[i].xpos += particles[i].xdir;
+	  particles[i].ypos += particles[i].ydir;
+	  
+	  /* is particle dead? */
+	  
+	  if (particles[i].colorindex == 0)
 	    {
-	      temp = fire[i][j + 1];
-	      temp += fire[i][j - 1];
-	      temp += fire[i - 1][j];
-	      temp += fire[i - 1][j - 1];
-	      temp += fire[i - 1][j + 1];
-	      temp += fire[i + 1][j];
-	      temp += fire[i + 1][j + 1];
-	      temp += fire[i + 1][j - 1];
-	  
-	      temp >>= 3;
-	  
-	      if (temp > 4)
-		{
-		  temp -= 4;
-		}
-	      else
-		{
-		  temp = 0;
-		}
-	      
-	      fire[i + 1][j] = temp;
+	      particles[i].dead = 1;
+	      continue;
 	    }
+	  
+	  if (particles[i].xpos < 2)
+	    {
+	      particles[i].xpos = 2;
+	      particles[i].xdir = -particles[i].xdir - 4;
+	      particles[i].colorindex = iColorCount;
+	    }
+	  else if (particles[i].xpos > iWinWidth - 3)
+	    {
+	      particles[i].xpos = iWinWidth - 3;
+	      particles[i].xdir = -particles[i].xdir + 4;
+	      particles[i].colorindex = iColorCount;
+	    }
+	  
+	  if (particles[i].ypos < 2)
+	    {
+	      particles[i].ypos = 2;
+	      particles[i].ydir = -particles[i].ydir;
+	      particles[i].colorindex = iColorCount;
+	    }
+	  else if (particles[i].ypos > iWinHeight - 3)
+	    {
+	      particles[i].ypos = iWinHeight - 3;
+	      particles[i].ydir = (-particles[i].ydir >> 2) - (int)(2.0 * (random()/(RAND_MAX+1.0)));;
+	      particles[i].colorindex = iColorCount;
+	    }
+	  
+	  /* gravity kicks in */
+	  particles[i].ydir += gravity;
+	  
+	  /* particle cools off */
+	  particles[i].colorindex--;
+	  
+	  /* draw particle */
+	  fire[particles[i].ypos][particles[i].xpos] = particles[i].colorindex;
+	  fire[particles[i].ypos][particles[i].xpos - 1] = particles[i].colorindex;
+	  fire[particles[i].ypos + 1][particles[i].xpos] = particles[i].colorindex;
+	  fire[particles[i].ypos - 1][particles[i].xpos] = particles[i].colorindex;
+	  fire[particles[i].ypos][particles[i].xpos + 1] = particles[i].colorindex;
 	}
-	
-	memset( pImage->data, 0, pImage->bytes_per_line * pImage->height );
+    }
+  
+  /* create fire effect */ 
+  for (i = 0; i < iWinHeight; i++)
+    {
+      for (j = 0; j < iWinWidth; j++)
+	{
+	  if (j + 1 >= iWinWidth)
+	    temp = 0;
+	  else
+	    temp = fire[i][j + 1];
 
-	/* draw fire array to screen */
-	for (i = 1; i < iWinHeight - 3; ++i)
-	  {
-	    for (j = 2; j < iWinWidth - 2; ++j)
-	      {
-		if (fire[i][j] > 0)
-		  XPutPixel( pImage, j, i, aiColorVals[ fire[i][j] ] );
-	      }
-	  }
-	XPutImage( pDisplay, MainWindow, *pGC, pImage,
-		   2,1,2,1, iWinWidth, iWinHeight );
-	XSync( pDisplay, False );
+	  if (j - 1 >= 0)  
+	    temp += fire[i][j - 1];
+
+	  if (i - 1 >= 0)
+	    {
+	      temp += fire[i - 1][j];
+	      if (j - 1 >= 0)
+		temp += fire[i - 1][j - 1];
+	      if (j + 1 < iWinWidth)
+		temp += fire[i - 1][j + 1];
+	    }
+	  
+	  if (i + 1 < iWinHeight)
+	    {
+	      temp += fire[i + 1][j];
+	      if (j + 1 < iWinWidth)
+		temp += fire[i + 1][j + 1];
+	      if (j - 1 >= 0)
+		temp += fire[i + 1][j - 1];
+	    }
+	  
+	  temp >>= 3;
+	  
+	  if (temp > decay)
+	    {
+	      temp -= decay;
+	    }
+	  else
+	    temp = 0;
+	  
+	  fire[i][j] = temp;
+	}
+    }
+  
+  memset( pImage->data, 0, pImage->bytes_per_line * pImage->height );
+  
+  /* draw fire array to screen */
+  for (i = 0; i < iWinHeight; ++i)
+    {
+      for (j = 0; j < iWinWidth; ++j)
+	{
+	  if (fire[i][j] > 0)
+	    XPutPixel( pImage, j, i, aiColorVals[ fire[i][j] ] );
+	}
+    }
+  XPutImage( pDisplay, MainWindow, *pGC, pImage,
+	     0,0,0,0, iWinWidth, iWinHeight );
+  XSync( pDisplay, False );
 }
 
 static unsigned long * SetPalette(Display *pDisplay, Window Win, signed short *piColorCount )
@@ -186,7 +209,7 @@ static unsigned long * SetPalette(Display *pDisplay, Window Win, signed short *p
 	XGetWindowAttributes( pDisplay, Win, &XWinAttribs );
 	
 	*piColorCount = get_integer_resource( "ncolors", "Integer" );
-	if( *piColorCount <   2 )	*piColorCount = 2;
+	if( *piColorCount <   16 )	*piColorCount = 16;
 	if( *piColorCount > 255 )	*piColorCount = 256;
 
 	aColors    = calloc( *piColorCount, sizeof(XColor) );
@@ -229,8 +252,10 @@ static unsigned long * SetPalette(Display *pDisplay, Window Win, signed short *p
 	      aColors[iColor].blue = Color.blue * temp;
 	    }
 	  else
-	    /* white */
-	    aColors[iColor].red = aColors[iColor].green = aColors[iColor].blue = 65535;
+	    {
+	      /* white */
+	      aColors[iColor].red = aColors[iColor].green = aColors[iColor].blue = 65535;
+	    }
 
 	  if( !XAllocColor( pDisplay, XWinAttribs.colormap, &aColors[ iColor ] ) )
 	    {
@@ -238,7 +263,7 @@ static unsigned long * SetPalette(Display *pDisplay, Window Win, signed short *p
 	      XFreeColors( pDisplay, XWinAttribs.colormap, aiColorVals, iColor, 0 );
 	      free( aColors );
 	      free( aiColorVals );
-	      piColorCount--;
+	      *piColorCount--;
 	      aColors     = calloc( *piColorCount, sizeof(XColor) );
 	      aiColorVals = calloc( *piColorCount, sizeof(unsigned long) );
 	      iColor = -1;
@@ -247,6 +272,9 @@ static unsigned long * SetPalette(Display *pDisplay, Window Win, signed short *p
 	    aiColorVals[ iColor ] = aColors[ iColor ].pixel;
 	}
 
+	if (heat < *piColorCount)
+	  *piColorCount = heat;
+	
 	free( aColors );
 
 	XSetWindowBackground( pDisplay, Win, aiColorVals[ 0 ] );
@@ -295,8 +323,6 @@ static void Initialize( Display *pDisplay, Window Win, GC *pGC, XImage **ppImage
 
 	/*create particles */
 	particles = malloc (nParticleCount * sizeof(PARTICLE));
-	for (i = 0; i < nParticleCount; i++)
-	  init_particle(particles + i);
 }
 
 void screenhack(Display *pDisplay, Window Win )
@@ -304,6 +330,7 @@ void screenhack(Display *pDisplay, Window Win )
 	GC gc;
 	signed short iColorCount = 0;
 	unsigned long *aiColorVals = NULL;
+	unsigned short sum = 0;
 	XImage *pImage = NULL;
 #ifdef VERBOSE
 	time_t nTime = time( NULL );
@@ -312,10 +339,28 @@ void screenhack(Display *pDisplay, Window Win )
 	int delay, cycles, i;
 
 	nParticleCount = get_integer_resource( "particles", "Integer" );
-	if (nParticleCount < 2)
-	  nParticleCount = 2;
-	if (nParticleCount > 1000)
-	  nParticleCount = 1000;
+	if (nParticleCount < 100)
+	  nParticleCount = 100;
+	if (nParticleCount > 2000)
+	  nParticleCount = 2000;
+
+	decay = get_integer_resource( "cooloff", "Integer" );
+	if (decay <= 0)
+	  decay = 0;
+	if (decay > 10)
+	  decay = 10;
+
+	gravity = get_integer_resource( "gravity", "Integer" );
+	if (gravity < -5)
+	  gravity = -5;
+	if (gravity > 5)
+	  gravity = 5;
+
+	heat = get_integer_resource( "heat", "Integer" );
+	if (heat < 64)
+	  heat = 64;
+	if (heat > 256)
+	  heat = 256;
 
 #ifdef VERBOSE 
 	printf( "%s: Allocated %d particles\n", progclass, nParticleCount );
@@ -323,9 +368,30 @@ void screenhack(Display *pDisplay, Window Win )
 
 	Initialize( pDisplay, Win, &gc, &pImage );
 
+	ydelta = 0;
+	while (sum < (iWinHeight >> 1) - 15)
+	  {
+	    ydelta++;
+	    sum += ydelta;
+	  }
+
+	sum = 0;
+	while (sum < (iWinWidth >> 3))
+	  {
+	    xdelta++;
+	    sum += xdelta;
+	  }
+
 	delay = get_integer_resource( "delay", "Integer" );
 	cycles = get_integer_resource( "cycles", "Integer" );
 	i = cycles;
+
+	XWindowAttributes XWinAttribs;
+	XGetWindowAttributes( pDisplay, Win, &XWinAttribs );
+	XFreeColors( pDisplay, XWinAttribs.colormap, aiColorVals, iColorCount, 0 );
+	free( aiColorVals );
+	aiColorVals = SetPalette( pDisplay, Win, &iColorCount );
+	XClearWindow( pDisplay, Win );
 
 	while( 1 )
 	{
@@ -333,19 +399,12 @@ void screenhack(Display *pDisplay, Window Win )
 
 		if( i++ >= cycles )
 		{
-                        XWindowAttributes XWinAttribs;
-                        XGetWindowAttributes( pDisplay, Win, &XWinAttribs );
-			memset( pImage->data, 0, pImage->bytes_per_line * pImage->height );
-                        XFreeColors( pDisplay, XWinAttribs.colormap, aiColorVals, iColorCount, 0 );
-			free( aiColorVals );
-			aiColorVals = SetPalette( pDisplay, Win, &iColorCount );
-			XClearWindow( pDisplay, Win );
 			for (i = 0; i < nParticleCount; i++)
-			  init_particle(particles + i);
+			  init_particle(particles + i, iColorCount - 1);
 			i = 0;
 		}
 
-		Execute( pDisplay, Win, &gc, pImage, iColorCount, aiColorVals );
+		Execute( pDisplay, Win, &gc, pImage, iColorCount - 1, aiColorVals );
 
 		if( delay && !(i % 4) )
 			usleep(delay);
@@ -372,5 +431,3 @@ void screenhack(Display *pDisplay, Window Win )
 
 /* End of Module - "eruption.c" */
 
-/* vim: ts=4
- */
