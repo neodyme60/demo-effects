@@ -119,7 +119,7 @@ void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_l
 
   _jump_frect.h = TDEC_get_character_height(_jump_scroll_id);
   _jump_srect.w = TDEC_get_character_width(_jump_scroll_id);
-  _jump_srect.h = TDEC_get_character_height(_jump_scroll_id);
+  _jump_srect.h = _jump_frect.h;
 }
 
 void jumpingscroller_LTX_draw_effect(void)

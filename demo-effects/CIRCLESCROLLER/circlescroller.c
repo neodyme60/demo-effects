@@ -236,7 +236,7 @@ SDL_FULLSCREEN*/))
   
       /* update letter positions */
 
-      for (i = NLETTERS; i >= 0; --i)
+      for (i = NLETTERS - 1; i >= 0; --i)
 	{
 	  if (letters[i].sin_index > 0)
 	      {

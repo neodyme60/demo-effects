@@ -30,6 +30,7 @@ static char fire;
 static char copper;
 static char stars;
 static char lens;
+static char circle;
 static char fade;
 
 static short alpha = 0xFF;
@@ -152,8 +153,14 @@ void init()
       exit(1);
     }
 
+  if ((circle = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/CIRCLESCROLLER/circlescroller",
+				TDEC_NO_RESTART_CALLBACK, text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 100)) == -1)
+    {
+      exit(1);
+    }
+  
   if ((fade = TDEC_add_effect(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, alpha, "../PLUGINS/FADE/fade",
-		      TDEC_NO_RESTART_CALLBACK)) == -1)
+			      TDEC_NO_RESTART_CALLBACK)) == -1)
     {
       exit(1);
     }
@@ -181,7 +188,7 @@ int main( int argc, char* argv[] )
       printf("Run-Time Pluggable Multi Effects and Filter system - W.P. van Paassen - 2003\n");
       return -1;
     }
-
+ 
  if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* |SDL_FULLSCREEN*/))
    quit(1);
 

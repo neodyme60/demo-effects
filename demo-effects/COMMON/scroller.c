@@ -89,7 +89,7 @@ char TDEC_add_scroller(char *_text, char *font, char *_characters,
 		      printf("Sharing font\n");
 #endif
 		      
-		      /* font found, so share it, also copy characters and size information so a user has only too supply the font name in case of a shared font */
+		      /* font found, so share it, also copy characters and size information so a user has only to supply the font name in case of a shared font */
 		      scrollers[scroller_index].font_surface = scrollers[i].font_surface;
 		      scrollers[scroller_index].font_name = scrollers[i].font_name;
 		      scrollers[scroller_index].characters = scrollers[i].characters;
@@ -218,4 +218,10 @@ void TDEC_free_all_scrollers(void)
 	  TDEC_free_scroller(i);
 	}
     }
+}
+
+void TDEC_set_font_colorkey(Uint8 scroll_id, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+  SDL_SetColorKey(scrollers[scroll_id].font_surface, SDL_SRCCOLORKEY/* | SDL_RLEACCEL*/, 
+		  SDL_MapRGBA(scrollers[scroll_id].font_surface->format, r, g, b, a));
 }
