@@ -1,0 +1,6 @@
+07-22-02 Added 3 new effects, fixed a bug in the lens effect, added image functions to the util library
+07-13-02 Added 2 new effects, done some optimizations, separated init timer from init video
+06-23-02 Added 2 new effects, created GFX directory and added utility functions to the common lib
+06-14-02 Added 3 new effects, improved configure script, created static common lib
+05-31-02 Added 2 more effects, cleaned up the code, increased performance
+05-20-02 Released the first 5 effects, created the configure scripts

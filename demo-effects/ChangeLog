@@ -1,0 +1,20 @@
+0.0.7 mikmod library is now optional and can be dis/enabled with configure --enable-mikmod=yes/no, default is yes. This means that the 
+Equalizer effect won't compile if mikmod is disabled. 
+make install does nothing from now on.
+
+0.0.6 Added 3 new effects (circlescroller, sinewave and flipimage). A bug in the image setup was fixed in the lens effect. Image 
+functions added to the util library
+
+0.0.5 Added 2 new effects (rotozoom (by Byron Ellacot) and equalizer which is the first effect with music). Optimized some effects and 
+done some cleaning up. Created a SOUND and SOUND/MODS directory for storing music and mods
+
+0.0.4 Added 2 new effects (bobs and unlimited bobs). Created a GFX directory for sharing graphics. Added utility functions to the 
+common library 
+
+0.0.3 Added 3 new effects (shadebob, lens (both by Byron Ellacott) and jumping scroller). Improved configure script. Created a COMMON 
+dir and library containing the fps and video code. Now effects share this common code
+
+0.0.2 Added 2 new effects (candybar and sinusscroller), dramatically improved the performance of the demo's, added a better timed loop implementation, 
+split the demo's into fps, video and the actual effect .c files, cleaned up the code
+
+0.0.1 Added the first 5 effects (plasma, fire, particle explosion, 3d starfield and copperbars)
