@@ -78,4 +78,4 @@ SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile CO
 ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile 
 SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile 
 PLASMACUBE/Makefile TWINSCROLLER/Makefile SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile 
-BLOB/Makefile)
+BLOB/Makefile TUXTRAIL/Makefile)

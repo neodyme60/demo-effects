@@ -16,9 +16,9 @@
 
 #include "utils.h"
 
-SDL_Surface* TDEC_copy_surface(SDL_Surface* surface)
+SDL_Surface* TDEC_copy_surface(SDL_Surface *surface)
 {
-  SDL_Surface* res;
+  SDL_Surface *res;
 
   res = SDL_ConvertSurface(surface, surface->format, surface->flags);
 
@@ -28,14 +28,14 @@ SDL_Surface* TDEC_copy_surface(SDL_Surface* surface)
   return res;
 }
 
-Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate)
+Uint8 TDEC_fadeout_palette(SDL_Palette *palette, Uint8 rate)
 {
   Uint16 i;
   Uint16 faded = 0;
 
   for (i = 0; i < palette->ncolors; ++i)
     {
-      SDL_Color* c = palette->colors + i;
+      SDL_Color *c = palette->colors + i;
 
       if (c->r > 0)
 	{  
@@ -74,25 +74,25 @@ Uint8 TDEC_fadeout_palette(SDL_Palette* palette, Uint8 rate)
   return faded == 0;
 }
 
-Uint8 TDEC_fadeout( SDL_Surface* s, Uint8 rate )
+Uint8 TDEC_fadeout( SDL_Surface *s, Uint8 rate )
 {
   Uint8 res;
-  SDL_Palette* p = s->format->palette;
+  SDL_Palette *p = s->format->palette;
   
   res = TDEC_fadeout_palette(p, rate);
   SDL_SetPalette(s, SDL_PHYSPAL, p->colors, 0, p->ncolors);
   return res;
 }
 
-Uint8 TDEC_fadein_palette(SDL_Palette* source, SDL_Palette* dest, Uint8 rate)
+Uint8 TDEC_fadein_palette(SDL_Palette *source, SDL_Palette *dest, Uint8 rate)
 {
   Uint16 i;
   Uint16 full = 0;
 
   for (i = 0; i < source->ncolors && i < dest->ncolors; ++i)
     {
-      SDL_Color* cs = source->colors + i;
-      SDL_Color* cd = dest->colors + i;
+      SDL_Color *cs = source->colors + i;
+      SDL_Color *cd = dest->colors + i;
 
       if (cd->r < cs->r)
 	{  
@@ -131,20 +131,20 @@ Uint8 TDEC_fadein_palette(SDL_Palette* source, SDL_Palette* dest, Uint8 rate)
   return full == 0;
 }
 
-Uint8 TDEC_fadein( SDL_Surface* s, SDL_Palette* d, Uint8 rate )
+Uint8 TDEC_fadein( SDL_Surface *s, SDL_Palette *d, Uint8 rate )
 {
   Uint8 res;
-  SDL_Palette* ps = s->format->palette;
+  SDL_Palette *ps = s->format->palette;
   
   res = TDEC_fadein_palette(d,ps,rate);
   SDL_SetPalette(s, SDL_LOGPAL | SDL_PHYSPAL, ps->colors, 0, ps->ncolors);
   return res;
 }
 
-void TDEC_blacken_palette(SDL_Surface* s)
+void TDEC_blacken_palette(SDL_Surface *s)
 {
   Uint16 i;
-  SDL_Palette* p = s->format->palette;
+  SDL_Palette *p = s->format->palette;
 
   for (i = 0; i < p->ncolors; ++i)
     {
@@ -157,7 +157,7 @@ void TDEC_blacken_palette(SDL_Surface* s)
   SDL_SetPalette(s, SDL_PHYSPAL | SDL_LOGPAL, p->colors, 0, p->ncolors);
 }
 
-void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage)
+void TDEC_scalex_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 percentage)
 {
   float skip_columns, rest;
   Uint16 i,j;
@@ -223,7 +223,7 @@ void TDEC_scalex_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
     }
 }
 
-void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage)
+void TDEC_scaley_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 percentage)
 {
   float skip_scanlines, rest;
   Uint16 i, j;
@@ -289,17 +289,17 @@ void TDEC_scaley_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 perc
     }
 }
 
-void TDEC_scale_copy_image(SDL_Surface* original, SDL_Surface* copy, Uint8 percentage)
+void TDEC_scale_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 percentage)
 {
-  SDL_Surface* temp = TDEC_copy_surface(copy);
+  SDL_Surface *temp = TDEC_copy_surface(copy);
   TDEC_scalex_copy_image(original, temp, percentage);
   TDEC_scaley_copy_image(temp, copy, percentage);
   SDL_FreeSurface(temp);
 }
 
-void TDEC_scalex_image(SDL_Surface* surface, Uint8 percentage)
+void TDEC_scalex_image(SDL_Surface *surface, Uint8 percentage)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
 
   s = TDEC_copy_surface(surface);
   TDEC_scalex_copy_image(surface, s, percentage);
@@ -309,9 +309,9 @@ void TDEC_scalex_image(SDL_Surface* surface, Uint8 percentage)
   SDL_FreeSurface(s);
 }
 
-void TDEC_scaley_image(SDL_Surface* surface, Uint8 percentage)
+void TDEC_scaley_image(SDL_Surface *surface, Uint8 percentage)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
 
   s = TDEC_copy_surface(surface);
   TDEC_scaley_copy_image(surface, s, percentage);
@@ -321,22 +321,73 @@ void TDEC_scaley_image(SDL_Surface* surface, Uint8 percentage)
   SDL_FreeSurface(s);
 }
 
-void TDEC_scale_image(SDL_Surface* surface, Uint8 percentage)
+void TDEC_scale_image(SDL_Surface *surface, Uint8 percentage)
 {
   TDEC_scalex_image(surface, percentage);
   TDEC_scaley_image(surface, percentage);
 }
 
-void TDEC_scale_copy_hscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage)
+SDL_Surface* TDEC_scale_image_new(SDL_Surface *source, Uint8 percentage)
+{
+  SDL_Surface *s;
+  SDL_Surface *destination;
+  Uint8 foundx = 0;
+  Uint16 i, j;
+  Uint16 width = (source->w / 100.0) * percentage;
+  Uint16 height = (source->h / 100.0) * percentage;
+  SDL_Rect start = {0,source->h, width, height};
+  
+  /* source should be unchanged */
+
+  s = TDEC_copy_surface(source);
+
+  destination = SDL_CreateRGBSurface(source->flags, width, height, source->format->BitsPerPixel,
+				     source->format->Rmask, source->format->Gmask, source->format->Bmask, 
+				     source->format->Amask); 
+
+  if (destination->format->palette)
+    SDL_SetPalette(destination, SDL_LOGPAL | SDL_PHYSPAL, source->format->palette->colors, 0, source->format->palette->ncolors);
+
+  TDEC_scalex_image(s, percentage);
+  TDEC_scaley_image(s, percentage);
+
+  /* find x and y start */
+
+  for (i= 0; i < s->w; ++i)
+    {
+      for (j = 0; j < s->h; ++j)
+	{
+	  if (*((Uint8*)s->pixels + j * s->pitch + i) != 0)
+	    {
+	      if (!foundx)
+		{
+		  /* found x, now find y */
+		  start.x = i;
+		  foundx = 1;
+		}
+	      if (j < start.y)
+		start.y = j;
+	      break;
+	    }
+	}
+    }
+
+  SDL_BlitSurface(s, &start, destination, 0);
+  SDL_FreeSurface(s);
+
+  return destination;
+}
+
+void TDEC_scale_copy_hscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 scanline_index, Uint8 percentage)
 {
   float skip_pixels, rest;
   Uint16 i, j, l;
   short k;
   Uint32 index = scanline_index * original->pitch;
-  Uint8* original_pixel = (Uint8*)original->pixels + index;
-  Uint8* copy_pixel = (Uint8*)copy->pixels + index;
-  Uint8* o = original_pixel;
-  Uint8* c = copy_pixel;
+  Uint8 *original_pixel = (Uint8*)original->pixels + index;
+  Uint8 *copy_pixel = (Uint8*)copy->pixels + index;
+  Uint8 *o = original_pixel;
+  Uint8 *c = copy_pixel;
 
   if (original->w != copy->w)
     {
@@ -421,9 +472,9 @@ void TDEC_scale_copy_hscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 
   SDL_UnlockSurface(copy);
 }
 
-void TDEC_scale_hscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage)
+void TDEC_scale_hscanline(SDL_Surface *surface, Uint16 scanline_index, Uint8 percentage)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
   SDL_Rect o = {0, scanline_index, surface->w, 1};
 
   s = TDEC_copy_surface(surface);
@@ -434,16 +485,16 @@ void TDEC_scale_hscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 per
   SDL_FreeSurface(s);
 }
 
-void TDEC_scale_copy_vscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 scanline_index, Uint8 percentage)
+void TDEC_scale_copy_vscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 scanline_index, Uint8 percentage)
 {
   float skip_pixels, rest;
   Uint16 i, j, l;
   short k;
   Uint32 index;
-  Uint8* original_pixel = (Uint8*)original->pixels + (scanline_index * original->format->BytesPerPixel);
-  Uint8* copy_pixel = (Uint8*)copy->pixels + (scanline_index * copy->format->BytesPerPixel);
-  Uint8* o = original_pixel;
-  Uint8* c = copy_pixel;
+  Uint8 *original_pixel = (Uint8*)original->pixels + (scanline_index * original->format->BytesPerPixel);
+  Uint8 *copy_pixel = (Uint8*)copy->pixels + (scanline_index * copy->format->BytesPerPixel);
+  Uint8 *o = original_pixel;
+  Uint8 *c = copy_pixel;
 
   if (original->h != copy->h)
     {
@@ -525,9 +576,9 @@ void TDEC_scale_copy_vscanline(SDL_Surface* original, SDL_Surface* copy, Uint16 
   SDL_UnlockSurface(copy);
 }
 
-void TDEC_scale_vscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 percentage)
+void TDEC_scale_vscanline(SDL_Surface *surface, Uint16 scanline_index, Uint8 percentage)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
   SDL_Rect o = {scanline_index, 0, 1, surface->h};
 
   s = TDEC_copy_surface(surface);
@@ -538,7 +589,7 @@ void TDEC_scale_vscanline(SDL_Surface* surface, Uint16 scanline_index, Uint8 per
   SDL_FreeSurface(s);
 }
 
-void TDEC_flipx_copy_image(SDL_Surface* original, SDL_Surface* copy)
+void TDEC_flipx_copy_image(SDL_Surface *original, SDL_Surface *copy)
 {
   Uint16 i;
   SDL_Rect o = {0, 0, original->w, 1};
@@ -558,9 +609,9 @@ void TDEC_flipx_copy_image(SDL_Surface* original, SDL_Surface* copy)
     }
 }
 
-void TDEC_flipx_image(SDL_Surface* surface)
+void TDEC_flipx_image(SDL_Surface *surface)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
 
   s = TDEC_copy_surface(surface);
   TDEC_flipx_copy_image(surface, s);
@@ -570,7 +621,7 @@ void TDEC_flipx_image(SDL_Surface* surface)
   SDL_FreeSurface(s);
 }
 
-void TDEC_flipy_copy_image(SDL_Surface* original, SDL_Surface* copy)
+void TDEC_flipy_copy_image(SDL_Surface *original, SDL_Surface *copy)
 {
   Uint16 i;
   SDL_Rect o = {0, 0, 1, original->h};
@@ -590,9 +641,9 @@ void TDEC_flipy_copy_image(SDL_Surface* original, SDL_Surface* copy)
     }
 }
 
-void TDEC_flipy_image(SDL_Surface* surface)
+void TDEC_flipy_image(SDL_Surface *surface)
 {
-  SDL_Surface* s;
+  SDL_Surface *s;
 
   s = TDEC_copy_surface(surface);
   TDEC_flipy_copy_image(surface, s);
@@ -602,21 +653,18 @@ void TDEC_flipy_image(SDL_Surface* surface)
   SDL_FreeSurface(s);
 }
 
-SDL_Surface* TDEC_create_heightmap(SDL_Surface *source)
+void TDEC_create_heightmap(SDL_Surface *source)
 {
   Uint16 i, j;
   Uint32 x; 
   Uint8 index;
   SDL_Palette *p;
-  SDL_Surface *s;
   Uint8 *image;
 
   if (!source->format->palette) /* not an 8-bit source surface */
-    return (SDL_Surface*)0;
+    return;
 
-  s = TDEC_copy_surface(source);
-
-  p = s->format->palette;
+  p = source->format->palette;
 
   /* sort palette from dark to light colors using selection sort */
 
@@ -667,33 +715,30 @@ SDL_Surface* TDEC_create_heightmap(SDL_Surface *source)
 	    }
 	}
 
-      image = (Uint8*)s->pixels;
+      image = (Uint8*)source->pixels;
       p->colors[index] = p->colors[i];
       p->colors[i].r = p->colors[i].g = p->colors[i].b = i;
       
       /* swap pixels in image */
       
-      for (x = 0; x < s->w * s->h; ++x)
+      for (x = 0; x < source->w * source->h; ++x)
 	{
 	  if (*image == index)
 	    *image = i;
 	  image++;
 	}
     }
-
-  return s;
 }
 
-SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source)
+void TDEC_create_blackandwhite(SDL_Surface *surface)
 {
   SDL_Color colors[256];
   Uint16 i, j; 
   Uint8 index;
-  SDL_Palette *p = source->format->palette;
-  SDL_Surface *s;
+  SDL_Palette *p = surface->format->palette;
 
   if (!p) /* not an 8-bit source surface */
-    return (SDL_Surface*)0;
+    return;
 
   /* copy palette */
 
@@ -757,11 +802,9 @@ SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source)
 	}
     }
 
-  /* copy image and set black to white palette */
+  /* set black to white palette */
 
-  s = TDEC_copy_surface(source);
-
-  p = s->format->palette;
+  p = surface->format->palette;
 
   for (i = 0; i < 256; ++i)
     {
@@ -777,26 +820,32 @@ SDL_Surface* TDEC_create_blackandwhite(SDL_Surface* source)
 	    }
 	}
     }
-
-  return s;
 }
 
-void TDEC_mozaiek_surface( SDL_Surface* s, Uint16 blocksize)
+void TDEC_mozaiek_surface( SDL_Surface *s, Uint16 blocksize)
 {
-  if (blocksize > 1 && !(blocksize % 2)) 
-    TDEC_rquaddivide(s, 0, 0, s->w, s->h, blocksize);
+  if (blocksize > 1) 
+    {
+      SDL_LockSurface(s);
+      TDEC_rquaddivide(s, 0, 0, s->w, s->h, blocksize);
+      SDL_UnlockSurface(s);
+    }
 }
 
 void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width, Uint16 height, Uint16 size)
 {
-  if (width <= size || height <= size)
+  if (width <= size && height <= size)
     {
       Uint16 i, j;
       Uint32 tempx, tempy;
-      Uint32 tempmax = s->h * s->pitch ;
-      Uint8 color = *((Uint8*)s->pixels + starty * s->pitch + startx + (width >> 1) + (width >> 1) * s->pitch);
-      
-      SDL_LockSurface(s);
+      Uint32 tempmax = s->h * s->pitch;
+      Uint8 color = *((Uint8*)s->pixels + starty * s->pitch + startx + (width >> 1) + (height >> 1) * s->pitch);
+
+      if (width == 0)
+	width = 1;
+      if (height == 0)
+	height = 1;
+    
       for (i = 0; i < width; ++i)
 	{
 	  tempx = startx + i;
@@ -809,7 +858,6 @@ void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width
 		break;
 	    }
 	}
-      SDL_UnlockSurface(s);
     }
   else
     {

@@ -1,3 +1,5 @@
+12-26-03 Added 4 new effects, added scaling functions to libTDEC and improved libWPCG's collision detection and 
+overall performance
 12-15-02 Added 3 new effects, fixed a bug in WPCG's lighting system and added a namespace to it. Added logo to 3D 
 effects.
 11-27-02 Added many improvements to the WPCG 2D/3D library, among others 3D collision detection using the 3D OPCODE 

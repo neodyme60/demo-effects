@@ -1,3 +1,7 @@
+0.3 Added 4 new effects. BARSCROLLER, 3D TUNNEL, 2D BLOB and TUXTRAIL with a mozaiek end effect. The TDEC lib was 
+extended with extra functions for scaling a SDL surface. The WPCG lib was optimized and the use of OPCODE in the 
+library was improved.
+
 0.2 Added three new effects. First a 3D PLASMACUBE effect which is lighted by two coloured lights. Second a 2D Spiral 
 Sine scroller effect called SPIRALSINESCROLL and last a 2D Twin sine scroller (butterfly) called TWINSCROLLER.
 Furthermore, fixed a bug in the lighting system of WPCG, added the WPCG namespace to it and changed some defines into 

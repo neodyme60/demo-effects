@@ -38,7 +38,6 @@ static float reflectionmap[256][256];
 static BUMP bumpmap[SCREEN_WIDTH][SCREEN_HEIGHT];
 static Uint16 sin_index = 0;
 static Uint16 sin_index2 = 80;
-static SDL_Surface* image = 0;
 static SDL_Surface* heightmap = 0;
 
 void quit( int code )
@@ -49,8 +48,6 @@ void quit( int code )
    * etc.
    */
   
-  if (image) 
-    SDL_FreeSurface(image);
   if (heightmap) 
     SDL_FreeSurface(heightmap);
 
@@ -101,13 +98,13 @@ void init()
   short x, y;
   float rad, z;
   
-  image = IMG_Load("../GFX/tuxblackbg.png");
-  if (!image) {
+  heightmap = IMG_Load("../GFX/tuxblackbg.png");
+  if (!heightmap) {
     fprintf(stderr, "Cannot open file tuxblackbg.png: %s\n", SDL_GetError());
     quit(3);
   }
   
-  heightmap = TDEC_create_heightmap(image);
+  TDEC_create_heightmap(heightmap);
   
   SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, heightmap->format->palette->colors, 0, heightmap->format->palette->ncolors);
   
