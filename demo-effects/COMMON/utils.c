@@ -21,20 +21,6 @@ static Uint8 TDEC_fadeout_palette(SDL_Palette *palette, Uint8 rate);
 static Uint8 TDEC_fadein_palette(SDL_Palette *source, SDL_Palette *dest, Uint8 rate);
 static void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width, Uint16 height, Uint16 size);
 
-/* variables */
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-static const Uint32 r_mask = 0xFF000000; 
-static const Uint32 g_mask = 0x00FF0000;
-static const Uint32 b_mask = 0x0000FF00;
-static const Uint32 a_mask = 0x000000FF;
-#else
-static const Uint32 r_mask = 0x000000FF; 
-static const Uint32 g_mask = 0x0000FF00;
-static const Uint32 b_mask = 0x00FF0000;
-static const Uint32 a_mask = 0xFF000000;
-#endif
-
 SDL_Surface* TDEC_copy_surface(SDL_Surface *surface)
 {
   SDL_Surface *res;

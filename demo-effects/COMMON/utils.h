@@ -57,4 +57,19 @@ extern void TDEC_create_blackandwhite(SDL_Surface *surface);
 extern Uint32 TDEC_get_pixel(SDL_Surface *surface, int x, int y);
 extern void TDEC_put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 
+/* variables */
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+static const Uint32 r_mask = 0xFF000000; 
+static const Uint32 g_mask = 0x00FF0000;
+static const Uint32 b_mask = 0x0000FF00;
+static const Uint32 a_mask = 0x000000FF;
+#else
+static const Uint32 r_mask = 0x000000FF; 
+static const Uint32 g_mask = 0x0000FF00;
+static const Uint32 b_mask = 0x00FF0000;
+static const Uint32 a_mask = 0xFF000000;
+#endif
+
+
 #endif

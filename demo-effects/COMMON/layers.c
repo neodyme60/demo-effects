@@ -26,9 +26,9 @@ typedef struct
 } LAYER;
 
 static LAYER* layers[NLAYERS];
-static unsigned char nlayers = 0;
+static Uint8 nlayers = 0;
 
-void TDEC_init_layering()
+void TDEC_init_layering(void)
 {
   /* check if video was set */
   if (!screen)
@@ -53,7 +53,7 @@ void TDEC_init_layering()
   printf("Layering-Init succesfull\n");
 }
 
-void TDEC_reset_layering()
+void TDEC_reset_layering(void)
 {
   Uint32 i;
   for (i = 0; i < nlayers; ++i)
@@ -64,8 +64,7 @@ void TDEC_reset_layering()
   printf("Layering-Reset succesfull\n");
 }
 
-/* FIXME return SDL_Surface */
-unsigned int TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha)
+SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha)
 {
   if (nlayers + 1 <= NLAYERS && nlayers != 0)
     {
@@ -103,30 +102,34 @@ unsigned int TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
       printf("Added layer %i\n", nlayers - 1);
 
       SDL_FreeSurface(s);
+      return l->surface;
     }
   else if (nlayers == 0)
     {
       printf("error, layering system not init, call TDEC_init_layering first please\n");
     }
-  return nlayers - 1;
+  return (SDL_Surface*)0;
 }
 
-void TDEC_draw_layers()
+inline void TDEC_draw_layers(void)
 {
   SDL_Flip(screen);
 }
 
-SDL_Surface* TDEC_get_layer(Uint32 index)
+inline SDL_Surface* TDEC_get_background_layer(void)
 {
-  /* 0 is the background, is TDEC_BACKGROUND_LAYER and is screen */
+  return layers[TDEC_BACKGROUND_LAYER]->surface;
+}
 
+inline SDL_Surface* TDEC_get_layer(Uint8 index)
+{
   if (index < nlayers)
     {
-      return (layers[index])->surface;
+	  return (layers[index])->surface;
     }
 }
 
-void TDEC_flatten_layers()
+inline void TDEC_flatten_layers()
 {
   if (nlayers > 1)
     {
@@ -139,10 +142,7 @@ void TDEC_flatten_layers()
     }
 }
 
-void TDEC_clear_layer(Uint32 index)
+inline void TDEC_clear_layer(SDL_Surface* surface)
 {
-  if (index < nlayers)
-    {
-      SDL_FillRect(layers[index]->surface, 0, SDL_MapRGB(layers[index]->surface->format, 0, 0, 0));
-    }
+      SDL_FillRect(surface, 0, SDL_MapRGB(surface->format, 0, 0, 0));
 }

@@ -14,10 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <string.h>
 
 #include "utils.h"
 #include "plasma.h"
@@ -26,13 +23,15 @@ static SDL_Surface *surface;
 static Uint16 pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, tpos1, tpos2, tpos3, tpos4;
 static int aSin[512];
 static SDL_Color colors[256];
+static Uint8 pixelspcolor;
 
-void TDEC_init_plasma(SDL_Surface *s)
+void TDEC_init_plasma(SDL_Surface *s, Uint8 pixels_per_color)
 {
   int i;
   float rad;
  
   surface = s;
+  pixelspcolor = pixels_per_color;
 
   /*create sin lookup table */
   for (i = 0; i < 512; i++)
@@ -62,7 +61,7 @@ void TDEC_init_plasma(SDL_Surface *s)
 void TDEC_draw_plasma()
 {
   Uint16 i,j;
-  Uint8 index;
+  Uint8 index, k, l;
   int x;  
   
   /* Lock the screen for direct access to the pixels */
@@ -74,7 +73,7 @@ void TDEC_draw_plasma()
   tpos4 = pos4;
   tpos3 = pos3;
   
-  for (i = 0; i < surface->h; ++i)
+  for (i = 0; i + pixelspcolor - 1 < surface->h; i += pixelspcolor)
     {
       tpos1 = pos1 + 5;
       tpos2 = pos2 + 3;
@@ -82,7 +81,7 @@ void TDEC_draw_plasma()
       tpos3 &= 511;
       tpos4 &= 511;
       
-      for (j = 0; j < surface->w; ++j)
+      for (j = 0; j  + pixelspcolor - 1 < surface->w;)
 	{
 	  tpos1 &= 511;
 	  tpos2 &= 511;
@@ -91,7 +90,13 @@ void TDEC_draw_plasma()
 	  
 	  index = 128 + (x >> 4); //fixed point multiplication but optimized so basically it says (x * (64 * 1024) / (1024 * 1024)), x is already multiplied by 1024
 	  
-	  TDEC_put_pixel(surface, j, i, SDL_MapRGB(surface->format, colors[index].r, colors[index].g, colors[index].b));
+	  for (k = 0; k < pixelspcolor; ++j, ++k)
+	    {
+	      for (l = 0; l < pixelspcolor; ++l)
+		{
+		  TDEC_put_pixel(surface, j, i + l, SDL_MapRGB(surface->format, colors[index].r, colors[index].g, colors[index].b));
+		}
+	    }
 	  
 	  tpos1 += 5; 
 	  tpos2 += 3; 

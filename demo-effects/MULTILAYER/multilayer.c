@@ -37,9 +37,9 @@ void quit( int code )
   SDL_Quit( );
 
   TDEC_free_fire();
+  /*  TDEC_free_3dstarfield();*/
   TDEC_free_jumping_scroller();
   TDEC_reset_layering();
-  TDEC_print_fps();
   
   /* Exit program. */
   exit( code );
@@ -80,16 +80,19 @@ void process_events( void )
 
 void init()
 {
-  Uint32 i, fire_index, jscroller_index;
-  char *text = " A jumping scroller - pretty retro isn't it? - cheers -   W.P. van Paassen -       starting over again in -      9  8  7  6  5  4  3  2  1  ";
+  Uint32 i;
+  SDL_Surface *firelayer, *scrollerlayer;
+  char *text = " TDEC Multilayering ";
   char *characters = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
   TDEC_init_layering();
-  TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER));
-  jscroller_index = TDEC_add_layer(SCREEN_WIDTH, 132, 0, SCREEN_HEIGHT - 132, 0xFF);
-  TDEC_init_jumping_scroller(TDEC_get_layer(jscroller_index), text, "../GFX/font.pcx", characters, 16, 32, SCREEN_WIDTH, 100);
-  fire_index = TDEC_add_layer(SCREEN_WIDTH, 60, 0, 300, 0xFF);
-  TDEC_init_fire(TDEC_get_layer(fire_index), SCREEN_WIDTH, 60, 0, 0);
+  TDEC_init_plasma(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 4);
+  /*TDEC_init_3dstarfield(TDEC_get_layer(TDEC_BACKGROUND_LAYER), 1020);*/
+
+  scrollerlayer = TDEC_add_layer(SCREEN_WIDTH, 132, 0, SCREEN_HEIGHT - 132, 0xFF);
+  TDEC_init_jumping_scroller(scrollerlayer, text, "../GFX/font.pcx", characters, 16, 32, SCREEN_WIDTH, 100);
+  firelayer = TDEC_add_layer(SCREEN_WIDTH, 60, 0, 300, 0xFF);
+  TDEC_init_fire(firelayer, SCREEN_WIDTH, 60, 0, 0);
 
  /*disable events */
   
@@ -116,7 +119,7 @@ int main( int argc, char* argv[] )
    quit(1);
 
  TDEC_init_timer();
- TDEC_set_fps(5);
+ TDEC_set_fps(60);
 
  SDL_WM_SetCaption("Multi layered effects", "");
   
@@ -129,13 +132,16 @@ int main( int argc, char* argv[] )
      process_events();
 
      TDEC_draw_plasma();
+     /*TDEC_draw_3dstarfield();*/
      TDEC_draw_fire();
      TDEC_draw_jumping_scroller();
+     
+     TDEC_flatten_layers();
 
      if (TDEC_fps_ok())
        {
-	 TDEC_flatten_layers();
 	 TDEC_draw_layers();
+	 ;
        }
     }
   

@@ -78,7 +78,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 noinst_LIBRARIES = libTDEC.a
 
-libTDEC_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c layers.c layers.h plasma.h plasma.c fire.h fire.c scroller.h scroller.c jumpingscroller.h jumpingscroller.c
+libTDEC_a_SOURCES = fps.c fps.h video.c video.h utils.h utils.c layers.c layers.h plasma.h plasma.c fire.h fire.c scroller.h scroller.c jumpingscroller.h jumpingscroller.c 3dstarfield.h 3dstarfield.c
 EXTRA_DIST = tdec.h
 subdir = COMMON
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -89,7 +89,8 @@ libTDEC_a_AR = $(AR) cru
 libTDEC_a_LIBADD =
 am_libTDEC_a_OBJECTS = fps.$(OBJEXT) video.$(OBJEXT) utils.$(OBJEXT) \
 	layers.$(OBJEXT) plasma.$(OBJEXT) fire.$(OBJEXT) \
-	scroller.$(OBJEXT) jumpingscroller.$(OBJEXT)
+	scroller.$(OBJEXT) jumpingscroller.$(OBJEXT) \
+	3dstarfield.$(OBJEXT)
 libTDEC_a_OBJECTS = $(am_libTDEC_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -99,8 +100,8 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/fire.Po ./$(DEPDIR)/fps.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/jumpingscroller.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/3dstarfield.Po ./$(DEPDIR)/fire.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/fps.Po ./$(DEPDIR)/jumpingscroller.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/layers.Po ./$(DEPDIR)/plasma.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/scroller.Po ./$(DEPDIR)/utils.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/video.Po
@@ -138,6 +139,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3dstarfield.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fire.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jumpingscroller.Po@am__quote@

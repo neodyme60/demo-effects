@@ -14,12 +14,13 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef PLASMA_H
-#define PLASMA_H
+#ifndef THREED_STARFIELD_H
+#define THREED_STARFIELD_H
 
 #include "SDL/SDL.h"
 
-extern void TDEC_init_plasma(SDL_Surface *s, Uint8 pixels_per_color);
-extern void TDEC_draw_plasma(void);
+extern void TDEC_init_3dstarfield(SDL_Surface *s, Uint16 number_of_stars);
+extern void TDEC_draw_3dstarfield(void);
+extern void TDEC_free_3dstarfield(void);
 
 #endif

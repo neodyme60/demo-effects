@@ -15,6 +15,7 @@ extern "C" {
 #include "plasma.h"
 #include "fire.h"
 #include "jumpingscroller.h"
+#include "3dstarfield.h"
 
 #ifdef __cplusplus
 }
