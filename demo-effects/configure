@@ -4618,7 +4618,7 @@ fi
 CFLAGS="$CFLAGS `sdl-config --cflags`"
 LIBS="$LIBS `sdl-config --libs`"
 
-ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile"
+ac_config_files="$ac_config_files Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -5169,6 +5169,7 @@ do
   "WATER/Makefile" ) CONFIG_FILES="$CONFIG_FILES WATER/Makefile" ;;
   "DOOMMELT/Makefile" ) CONFIG_FILES="$CONFIG_FILES DOOMMELT/Makefile" ;;
   "SPIRALTWIST/Makefile" ) CONFIG_FILES="$CONFIG_FILES SPIRALTWIST/Makefile" ;;
+  "OPCODE-1.2/Makefile" ) CONFIG_FILES="$CONFIG_FILES OPCODE-1.2/Makefile" ;;
   "WPCG/Makefile" ) CONFIG_FILES="$CONFIG_FILES WPCG/Makefile" ;;
   "DEMON/Makefile" ) CONFIG_FILES="$CONFIG_FILES DEMON/Makefile" ;;
   "BUMP2D/Makefile" ) CONFIG_FILES="$CONFIG_FILES BUMP2D/Makefile" ;;

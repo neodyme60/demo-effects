@@ -36,7 +36,7 @@ oldincludedir = /usr/include
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = .
+top_builddir = ..
 
 ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
@@ -92,8 +92,7 @@ libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_O
 	OPC_BoxBoxOverlap.h   OPC_Matrix4x4.h    OPC_OptimizedTree.cpp  OPC_RayCollider.h        OPC_Triangle.cpp	\
 	Stdafx.h	Stdafx.cpp
 
-subdir = .
-ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+subdir = OPCODE-1.2
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
@@ -155,30 +154,19 @@ CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libOPCODE_a_SOURCES)
 DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-	Makefile.in NEWS aclocal.m4 configure configure.in depcomp \
-	install-sh missing mkinstalldirs
+	Makefile.in NEWS configure configure.in depcomp install-sh \
+	missing mkinstalldirs
 SOURCES = $(libOPCODE_a_SOURCES)
 
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .cpp .o .obj
-
-am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
- configure.lineno
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  Makefile
+	  $(AUTOMAKE) --gnu  OPCODE-1.2/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)
-
-$(top_builddir)/config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-	$(SHELL) ./config.status --recheck
-$(srcdir)/configure:  $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
-	cd $(srcdir) && $(AUTOCONF)
-
-$(ACLOCAL_M4):  configure.in 
-	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
 AR = ar
 
@@ -274,20 +262,10 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-top_distdir = .
-distdir = $(PACKAGE)-$(VERSION)
-
-am__remove_distdir = \
-  { test ! -d $(distdir) \
-    || { find $(distdir) -type d ! -perm -200 -exec chmod u+w {} ';' \
-         && rm -fr $(distdir); }; }
-
-GZIP_ENV = --best
-distcleancheck_listfiles = find . -type f -print
+top_distdir = ..
+distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 
 distdir: $(DISTFILES)
-	$(am__remove_distdir)
-	mkdir $(distdir)
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
@@ -308,58 +286,6 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	-find $(distdir) -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
-	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
-	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
-	  ! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \
-	|| chmod -R a+r $(distdir)
-dist-gzip: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(am__remove_distdir)
-
-dist dist-all: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(am__remove_distdir)
-
-# This target untars the dist file and tries a VPATH configuration.  Then
-# it guarantees that the distribution is self-contained by making another
-# tarfile.
-distcheck: dist
-	$(am__remove_distdir)
-	GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(AMTAR) xf -
-	chmod -R a-w $(distdir); chmod a+w $(distdir)
-	mkdir $(distdir)/=build
-	mkdir $(distdir)/=inst
-	chmod a-w $(distdir)
-	dc_install_base=`$(am__cd) $(distdir)/=inst && pwd` \
-	  && cd $(distdir)/=build \
-	  && ../configure --srcdir=.. --prefix=$$dc_install_base \
-	    $(DISTCHECK_CONFIGURE_FLAGS) \
-	  && $(MAKE) $(AM_MAKEFLAGS) \
-	  && $(MAKE) $(AM_MAKEFLAGS) dvi \
-	  && $(MAKE) $(AM_MAKEFLAGS) check \
-	  && $(MAKE) $(AM_MAKEFLAGS) install \
-	  && $(MAKE) $(AM_MAKEFLAGS) installcheck \
-	  && $(MAKE) $(AM_MAKEFLAGS) uninstall \
-	  && (test `find $$dc_install_base -type f -print | wc -l` -le 1 \
-	      || { echo "ERROR: files left after uninstall:" ; \
-	           find $$dc_install_base -type f -print ; \
-	           exit 1; } >&2 ) \
-	  && $(MAKE) $(AM_MAKEFLAGS) dist-gzip \
-	  && rm -f $(distdir).tar.gz \
-	  && $(MAKE) $(AM_MAKEFLAGS) distcleancheck
-	$(am__remove_distdir)
-	@echo "$(distdir).tar.gz is ready for distribution" | \
-	  sed 'h;s/./=/g;p;x;p;x'
-distcleancheck: distclean
-	if test '$(srcdir)' = . ; then \
-	  echo "ERROR: distcleancheck can only run from a VPATH build" ; \
-	  exit 1 ; \
-	fi
-	test `$(distcleancheck_listfiles) | wc -l` -eq 0 \
-	  || { echo "ERROR: files left after distclean:" ; \
-	       $(distcleancheck_listfiles) ; \
-	       exit 1; } >&2
 check-am: all-am
 check: check-am
 all-am: Makefile $(LIBRARIES)
@@ -395,7 +321,7 @@ clean: clean-am
 clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+
 distclean-am: clean-am distclean-compile distclean-depend \
 	distclean-generic distclean-tags
 
@@ -418,8 +344,7 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf autom4te.cache
+
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
@@ -429,15 +354,15 @@ mostlyclean-am: mostlyclean-compile mostlyclean-generic
 uninstall-am: uninstall-info-am
 
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES dist dist-all dist-gzip distcheck \
-	distclean distclean-compile distclean-depend distclean-generic \
-	distclean-tags distcleancheck distdir dvi dvi-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic tags uninstall \
-	uninstall-am uninstall-info-am
+	clean-noinstLIBRARIES distclean distclean-compile \
+	distclean-depend distclean-generic distclean-tags distdir dvi \
+	dvi-am info info-am install install-am install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic tags uninstall uninstall-am \
+	uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
