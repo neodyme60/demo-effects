@@ -510,6 +510,10 @@ bool WP_Model_MD2::initModel()
       
       p = buffer + header.offsetFrames;
 
+      /* create matrix which will orientate model into internal objectmanager orientation, being facing north and standing straight up*/
+      
+      WP_Matrix3D internal_orientation = WP_Matrix3D(Y_ROTATION_MATRIX, 90.0) * WP_Matrix3D(X_ROTATION_MATRIX, -90.0);
+
       for (k = 0; k < header.numFrames; ++k)
 	{
 	  (frames + k)->vertices = new WP_Vertex[header.numVertices];
@@ -540,6 +544,7 @@ bool WP_Model_MD2::initModel()
 	      WP_Point3D point(x, y, z);
 	      point *= scale;
 	      point *= translate;
+	      point *= internal_orientation;
 	  
 	      endian->getTypedData(&x, p, sizeof(byte));
 	  
@@ -662,7 +667,6 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix)
   glCullFace(GL_BACK);
 }
 
-
 ////////////////////////// WP_MetaBall ////////////////////
 
 WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling)
@@ -676,7 +680,7 @@ WP_MetaBall::drawOpenGL(const WP_Matrix3D& matrix)
   glPushMatrix();
   glMultMatrixf(matrix.data); 
 
-  //fixme t be done
+  //fixme to be done
   
   glEnd();
   glPopMatrix();

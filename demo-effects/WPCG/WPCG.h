@@ -23,7 +23,7 @@
 #include "WP_2D.h"
 #include "WP_RGBA.h"
 #include "WP_Endian.h"
-#include "WP_SkyDome.h"
+#include "WP_SkyBox.h"
 #include "WP_Terrain.h"
 #include "WP_Quad.h"
 #include "WP_Camera.h"

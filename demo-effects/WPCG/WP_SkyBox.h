@@ -14,17 +14,16 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef WP_SKYDOME_H
-#define WP_SKYDOME_H
+#ifndef WP_SKYBOX_H
+#define WP_SKYBOX_H
 
 #include "WP_Def.h"
 
 //forward declaration
-class WP_Vertex;
 class WP_Point3D;
 
 /**
- * this class represents a 3D skydome which can surround a 3D scene\n
+ * this class represents a 3D skybox which can surround a 3D scene\n
  * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
@@ -41,21 +40,24 @@ class WP_Point3D;
  *  along with this program; see the file COPYING.  If not, write to the Free
  *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  
  */
-class WP_SkyDome
+class WP_SkyBox
 {
 public:
-	WP_SkyDome(): displayID(0){};
+	WP_SkyBox(): displayID(0){};
 
-	WP_SkyDome(scalar _rad, int delta_azimuth, int delta_latitude);
+	WP_SkyBox(const char* front_texture,
+		  const char* right_texture,
+		  const char* back_texture,
+		  const char* left_texture,
+		  const char* top_texture,
+		  const char* bottom_texture);
 	
-	virtual ~WP_SkyDome();
+	virtual ~WP_SkyBox();
 
-	void drawSkyDome(const WP_Point3D& p) const;
+	void drawSkyBox(const WP_Point3D& p) const;
 
  protected:
 	GLuint displayID;
-
-	WP_Vertex* vertices;
 };
 #endif
 

@@ -389,6 +389,8 @@ void WP_ObjectManager::drawObjects()
 {
 //  cam->meshes_in_frustum = 0;
 
+  cam->followObject();
+
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	

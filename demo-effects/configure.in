@@ -75,4 +75,4 @@ LIBS="$LIBS `sdl-config --libs`"
 AC_OUTPUT(Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile 
 SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile 
 ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile 
-SPIRALTWIST/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile)
+SPIRALTWIST/Makefile WPCG/Makefile DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile)

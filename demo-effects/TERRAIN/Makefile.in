@@ -64,28 +64,22 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-noinst_LIBRARIES = libWPCG.a
-libWPCG_a_SOURCES = WP_2D.C WP_Camera.C WP_Endian.C WP_GLState.C WP_Image.C WP_Init.C WP_Line2D.C WP_Material.C WP_Math.C WP_Matrix2D.C \
-WP_Matrix3D.C WP_Model.C WP_ObjectManager.C WP_Point2D.C WP_Point3D.C WP_Ray2D.C WP_Ray3D.C WP_SkyBox.C WP_Terrain.C \
-WP_TextureManager.C WP_Triangle.C WP_Vector2D.C WP_Vector3D.C 
-
-EXTRA_DIST = *.h
+noinst_PROGRAMS = terrain
+terrain_SOURCES = terrain.C 
+terrain_LDADD = ../COMMON/libTDEC.a ../WPCG/libWPCG.a
+INCLUDES = -I../COMMON/ -I../WPCG
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-LIBRARIES =  $(noinst_LIBRARIES)
+PROGRAMS =  $(noinst_PROGRAMS)
 
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-libWPCG_a_LIBADD = 
-libWPCG_a_OBJECTS =  WP_2D.o WP_Camera.o WP_Endian.o WP_GLState.o \
-WP_Image.o WP_Init.o WP_Line2D.o WP_Material.o WP_Math.o WP_Matrix2D.o \
-WP_Matrix3D.o WP_Model.o WP_ObjectManager.o WP_Point2D.o WP_Point3D.o \
-WP_Ray2D.o WP_Ray3D.o WP_SkyBox.o WP_Terrain.o WP_TextureManager.o \
-WP_Triangle.o WP_Vector2D.o WP_Vector3D.o
-AR = ar
+terrain_OBJECTS =  terrain.o
+terrain_DEPENDENCIES =  ../COMMON/libTDEC.a ../WPCG/libWPCG.a
+terrain_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -97,35 +91,29 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DEP_FILES =  .deps/WP_2D.P .deps/WP_Camera.P .deps/WP_Endian.P \
-.deps/WP_GLState.P .deps/WP_Image.P .deps/WP_Init.P .deps/WP_Line2D.P \
-.deps/WP_Material.P .deps/WP_Math.P .deps/WP_Matrix2D.P \
-.deps/WP_Matrix3D.P .deps/WP_Model.P .deps/WP_ObjectManager.P \
-.deps/WP_Point2D.P .deps/WP_Point3D.P .deps/WP_Ray2D.P .deps/WP_Ray3D.P \
-.deps/WP_SkyBox.P .deps/WP_Terrain.P .deps/WP_TextureManager.P \
-.deps/WP_Triangle.P .deps/WP_Vector2D.P .deps/WP_Vector3D.P
-SOURCES = $(libWPCG_a_SOURCES)
-OBJECTS = $(libWPCG_a_OBJECTS)
+DEP_FILES =  .deps/terrain.P
+SOURCES = $(terrain_SOURCES)
+OBJECTS = $(terrain_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .C .S .c .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --gnu WPCG/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu TERRAIN/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-mostlyclean-noinstLIBRARIES:
+mostlyclean-noinstPROGRAMS:
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 
-distclean-noinstLIBRARIES:
+distclean-noinstPROGRAMS:
 
-maintainer-clean-noinstLIBRARIES:
+maintainer-clean-noinstPROGRAMS:
 
 .s.o:
 	$(COMPILE) -c $<
@@ -143,10 +131,9 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libWPCG.a: $(libWPCG_a_OBJECTS) $(libWPCG_a_DEPENDENCIES)
-	-rm -f libWPCG.a
-	$(AR) cru libWPCG.a $(libWPCG_a_OBJECTS) $(libWPCG_a_LIBADD)
-	$(RANLIB) libWPCG.a
+terrain: $(terrain_OBJECTS) $(terrain_DEPENDENCIES)
+	@rm -f terrain
+	$(CXXLINK) $(terrain_LDFLAGS) $(terrain_OBJECTS) $(terrain_LDADD) $(LIBS)
 .C.o:
 	$(CXXCOMPILE) -c $<
 
@@ -181,14 +168,14 @@ maintainer-clean-tags:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = WPCG
+subdir = TERRAIN
 
 distdir: $(DISTFILES)
 	here=`cd $(top_builddir) && pwd`; \
 	top_distdir=`cd $(top_distdir) && pwd`; \
 	distdir=`cd $(distdir) && pwd`; \
 	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu WPCG/Makefile
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu TERRAIN/Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
@@ -269,7 +256,7 @@ install-am: all-am
 install: install-am
 uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(PROGRAMS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -285,23 +272,22 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+mostlyclean-am:  mostlyclean-noinstPROGRAMS mostlyclean-compile \
 		mostlyclean-tags mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-depend \
+clean-am:  clean-noinstPROGRAMS clean-compile clean-tags clean-depend \
 		clean-generic mostlyclean-am
 
 clean: clean-am
 
-distclean-am:  distclean-noinstLIBRARIES distclean-compile \
-		distclean-tags distclean-depend distclean-generic \
-		clean-am
+distclean-am:  distclean-noinstPROGRAMS distclean-compile distclean-tags \
+		distclean-depend distclean-generic clean-am
 
 distclean: distclean-am
 
-maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
+maintainer-clean-am:  maintainer-clean-noinstPROGRAMS \
 		maintainer-clean-compile maintainer-clean-tags \
 		maintainer-clean-depend maintainer-clean-generic \
 		distclean-am
@@ -310,8 +296,8 @@ maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
-clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
+.PHONY: mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
+clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
 mostlyclean-compile distclean-compile clean-compile \
 maintainer-clean-compile tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir mostlyclean-depend \

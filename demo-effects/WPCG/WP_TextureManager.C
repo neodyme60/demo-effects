@@ -153,7 +153,7 @@ WP_TextureManager::WP_Texture::WP_Texture(const char* _name):texture_id(0), text
 	    }
 	  else
 	    {
-	      image.setTextureGL(&texture_id, GL_REPEAT, GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	      image.setTextureGL(&texture_id, GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR);
 	    }
 	}
 
