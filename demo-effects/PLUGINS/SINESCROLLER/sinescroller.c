@@ -36,7 +36,7 @@ static Uint8 _sine_pixels;
 static char _sine_scroll_id;
 static void (*_sine_restart)(void);
 
-void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void sinescroller_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   float rad;
   Uint16 i, centery;
@@ -56,6 +56,62 @@ void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list
   character_height = (Uint8)va_arg(parameters, int);
   amplitude = (Uint16)va_arg(parameters, int);
   _sine_pixels = (Uint8)va_arg(parameters, int);
+
+  if ((_sine_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
+    {
+      printf("Error, initiating sine scroller\n");
+      return;
+    }
+
+  _sine_surface = s;
+  centery = _sine_surface->h >> 1;
+
+  _sine_srect2.x = _sine_srect2.y = _sine_drect.x = _sine_drect.y = _sine_srect.y = _sine_frect.y = 0;
+  _sine_srect2.w = _sine_drect.w = _sine_pixels;
+  _sine_srect2.h = _sine_drect.h = _sine_frect.h = _sine_srect.h = character_height;
+  _sine_srect.x = 2;
+  _sine_srect.w = _sine_surface->w + character_width;
+  _sine_frect.x = _sine_surface->w;
+  _sine_frect.w = character_width;
+
+  /*create sin lookup table */
+  for (i = 0; i < 360; i++)
+    {
+      rad =  (float)i * 0.0174532; 
+      _sine_aSin[i] = centery + (short)((sin(rad) * (float)amplitude));
+    }
+  
+  /* create scroll surface, this surface must be wider than the surface width to be able to place the characters */
+  temp = SDL_CreateRGBSurface(_sine_surface->flags, _sine_surface->w + character_width, character_height,
+			      _sine_surface->format->BitsPerPixel, 
+			      _sine_surface->format->Rmask, _sine_surface->format->Gmask, _sine_surface->format->Bmask, 
+			      _sine_surface->format->Amask); 
+  _sine_scroll_surface = SDL_ConvertSurface(temp, _sine_surface->format, _sine_surface->flags);
+  SDL_FreeSurface(temp);
+
+  _sine_displacement = 0;
+}
+
+void sinescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  float rad;
+  Uint16 i, centery;
+  SDL_Surface *temp;
+  char *_text, *font, *_characters;
+  Uint8 character_width, character_height;
+  Uint16 amplitude;
+
+  _sine_restart = restart;
+
+  _sine_sine_index = 0;
+
+  _text = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  font = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  _characters = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  character_width = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  character_height = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  amplitude = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  _sine_pixels = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
 
   if ((_sine_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
     {

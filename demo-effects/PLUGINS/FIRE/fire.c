@@ -30,7 +30,7 @@ static Uint16 _fire_xpos;
 static Uint16 _fire_ypos;
 static Uint8 *_fire_fire;
 
-void fire_LTX_init_effect(SDL_Surface* s, void (*restart)(void), va_list parameters)
+void fire_LTX_init_effect_valist(SDL_Surface* s, void (*restart)(void), va_list parameters)
 {
   unsigned int i;
 
@@ -39,6 +39,80 @@ void fire_LTX_init_effect(SDL_Surface* s, void (*restart)(void), va_list paramet
   _fire_height = (Uint16)va_arg(parameters, int);
   _fire_xpos = (Uint16)va_arg(parameters, int);
   _fire_ypos = (Uint16)va_arg(parameters, int);
+
+  if (_fire_width > _fire_surface->w || _fire_width == 0)
+    {
+      _fire_width = _fire_surface->w;
+    }
+
+  if (_fire_height > _fire_surface->h || _fire_height == 0)
+    {
+      _fire_height = _fire_surface->h;
+    }
+
+  if (_fire_xpos > _fire_surface->w || _fire_xpos + _fire_width >= _fire_surface->w)
+    {
+      _fire_xpos = 0;
+    }
+
+  if (_fire_ypos > _fire_surface->h || _fire_ypos + _fire_height >= _fire_surface->h)
+    {
+      _fire_ypos = 0;
+    }
+
+  /* create fire array */
+
+  _fire_fire = (Uint8*)calloc(_fire_width * _fire_height, sizeof(Uint8));
+ 
+  /* create a suitable fire palette, this is crucial for a good effect */
+  /* black to blue, blue to red, red to yellow, yellow to white*/
+  
+ for (i = 0; i < 32; ++i)
+    {
+      /* black to blue, 32 values*/
+      _fire_colors[i].b = i << 1;
+
+      /* blue to red, 32 values*/
+      _fire_colors[i + 32].r = i << 3;
+      _fire_colors[i + 32].b =  64 - (i << 1);
+
+      /*red to yellow, 32 values*/
+      _fire_colors[i + 64].r = 255;
+      _fire_colors[i + 64].g = i << 3;
+
+      /* yellow to white, 162 */
+      _fire_colors[i + 96].r = 255;
+      _fire_colors[i + 96].g = 255;
+      _fire_colors[i + 96].b = i << 2;
+      _fire_colors[i + 128].r = 255;
+      _fire_colors[i + 128].g = 255;
+      _fire_colors[i + 128].b = 64 + (i << 2);
+      _fire_colors[i + 160].r = 255;
+      _fire_colors[i + 160].g = 255;
+      _fire_colors[i + 160].b = 128 + (i << 2);
+      _fire_colors[i + 192].r = 255;
+      _fire_colors[i + 192].g = 255;
+      _fire_colors[i + 192].b = 192 + i;
+      _fire_colors[i + 224].r = 255;
+      _fire_colors[i + 224].g = 255;
+      _fire_colors[i + 224].b = 224 + i;
+    } 
+ 
+ if (_fire_surface->format->palette)
+   {
+     SDL_SetPalette(_fire_surface, SDL_LOGPAL | SDL_PHYSPAL, _fire_colors, 0, 256); 
+   }
+}
+
+void fire_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  unsigned int i;
+
+  _fire_surface = s;
+  _fire_width = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  _fire_height = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  _fire_xpos =*(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  _fire_ypos = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
 
   if (_fire_width > _fire_surface->w || _fire_width == 0)
     {

@@ -32,12 +32,51 @@ static int _plasma_aSin[512];
 static SDL_Color _plasma_colors[256];
 static Uint8 _plasma_pixelspcolor;
 
-void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void plasma_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   int i;
   float rad;
 
   _plasma_pixelspcolor = (Uint8)va_arg(parameters, int);
+ 
+  _plasma_surface = s;
+
+  _plasma_pos1 = 0;
+  _plasma_pos2 = 0;
+  _plasma_pos3 = 0;
+  _plasma_pos4 = 0;
+
+  /*create sin lookup table */
+  for (i = 0; i < 512; i++)
+    {
+      rad =  ((float)i * 0.703125) * 0.0174532; /* 360 / 512 * degree to rad, 360 degrees spread over 512 values to be able to use AND 512-1 instead of using modulo 360*/
+      _plasma_aSin[i] = sin(rad) * 1024; /*using fixed point math with 1024 as base*/
+    }
+      
+  /* create color palette */
+  for (i = 0; i < 64; ++i)
+    {
+      _plasma_colors[i].r = i << 2;
+      _plasma_colors[i].g = 255 - ((i << 2) + 1); 
+      _plasma_colors[i+64].r = 255;
+      _plasma_colors[i+64].g = (i << 2) + 1;
+      _plasma_colors[i+128].r = 255 - ((i << 2) + 1);
+      _plasma_colors[i+128].g = 255 - ((i << 2) + 1);
+      _plasma_colors[i+192].g = (i << 2) + 1; 
+    } 
+
+  if (_plasma_surface->format->palette)
+    {
+      SDL_SetPalette(_plasma_surface, SDL_LOGPAL | SDL_PHYSPAL, _plasma_colors, 0, 256); 
+    }
+}
+
+void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  int i;
+  float rad;
+
+  _plasma_pixelspcolor = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
  
   _plasma_surface = s;
 

@@ -19,15 +19,15 @@
 
 typedef struct tdec_node
 {
-	void *data;
+	const void *data;
 	struct tdec_node *next_node;
 	struct tdec_node *previous_node;	
 } TDEC_NODE;
 
-extern TDEC_NODE* TDEC_LIST_create(void *data);
-extern void TDEC_LIST_append(TDEC_NODE *start, void *data);
-extern void TDEC_LIST_remove(TDEC_NODE *start, void *data);
+extern TDEC_NODE* TDEC_LIST_create(const void *data);
+extern void TDEC_LIST_append(TDEC_NODE *start, const void *data);
+extern void TDEC_LIST_remove(TDEC_NODE *start, const void *data);
 extern void TDEC_LIST_destroy(TDEC_NODE *start);
-extern void* TDEC_LIST_get_data_next(TDEC_NODE **node);
+extern const void* TDEC_LIST_get_data_next(TDEC_NODE **node);
 
 #endif

@@ -29,10 +29,10 @@ static Uint8 _fade_color_r;
 static Uint8 _fade_color_g;
 static Uint8 _fade_color_b;
 
-void fade_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void fade_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
-   _fade_surface = s;
-   _fade_restart = restart;
+  _fade_surface = s;
+  _fade_restart = restart;
   _fade_type = (Uint8)va_arg(parameters, int);
   _fade_factor = (Uint8)va_arg(parameters, int);
   _fade_color_r = (Uint8)va_arg(parameters, int);
@@ -40,8 +40,23 @@ void fade_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list paramet
   _fade_color_b = (Uint8)va_arg(parameters, int);
 
   _fade_alpha = TDEC_get_layer_alpha( TDEC_get_layer_id(_fade_surface) );
-   TDEC_set_layer_colorkey(TDEC_get_layer_id(_fade_surface), 0);
-   SDL_FillRect(_fade_surface, 0, SDL_MapRGBA(_fade_surface->format, _fade_color_r, _fade_color_g, _fade_color_b, 0));
+  TDEC_set_layer_colorkey(TDEC_get_layer_id(_fade_surface), 0);
+  SDL_FillRect(_fade_surface, 0, SDL_MapRGBA(_fade_surface->format, _fade_color_r, _fade_color_g, _fade_color_b, 0));
+}
+
+void fade_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  _fade_surface = s;
+  _fade_restart = restart;
+  _fade_type = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _fade_factor = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _fade_color_r = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _fade_color_g = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _fade_color_b = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+
+  _fade_alpha = TDEC_get_layer_alpha( TDEC_get_layer_id(_fade_surface) );
+  TDEC_set_layer_colorkey(TDEC_get_layer_id(_fade_surface), 0);
+  SDL_FillRect(_fade_surface, 0, SDL_MapRGBA(_fade_surface->format, _fade_color_r, _fade_color_g, _fade_color_b, 0));	
 }
 
 void fade_LTX_draw_effect(void)

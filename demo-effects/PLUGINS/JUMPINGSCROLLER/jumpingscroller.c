@@ -45,7 +45,7 @@ static SDL_Rect _jump_srect;
 static char _jump_scroll_id;
 static void (*_jump_restart)(void);
 
-void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void jumpingscroller_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   float rad;
   Uint16 i, j;
@@ -62,6 +62,83 @@ void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_l
   character_height = (Uint8)va_arg(parameters, int);
   _jump_width = (Uint16)va_arg(parameters, int);
   _jump_height = (Uint16)va_arg(parameters, int);;
+  centery = _jump_height / 2;
+
+  if ((_jump_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
+    {
+      printf("Error, initiating jumping scroller\n");
+      return;
+    }
+
+  _jump_surface = s;
+ 
+  /*create sin lookup table */
+
+  for (i = 0, j = 0; i < 180; i++)
+    {
+      rad =  (float)j * 0.0174532; 
+      _jump_aSin[i] = centery - (short)((sin(rad) * centery));
+
+      if (!( (i + 1) % 2))
+	{
+	  j++;
+	}
+    } 
+  for (i = 90, j = 90; i < 270; i++)
+    {
+      rad =  (float)j * 0.0174532; 
+      _jump_aSin[i + 90] = centery - (short)((sin(rad) * centery));
+
+      if (!( (i + 1) % 2))
+	{
+	  j++;
+	}
+    }
+ 
+  for (i = 180; i < 270; i++)
+    {
+      rad =  (float)i * 0.0174532; 
+      _jump_aSin[i + 180] = centery - (short)((sin(rad) * centery));
+    } 
+  for (i = 270; i < 360; i++)
+    {
+      rad =  (float)i * 0.0174532; 
+      _jump_aSin[i + 180] = centery - (short)((sin(rad) * centery));
+    }
+
+  _jump_nletters = _jump_width / character_width;
+  _jump_letters = (LETTER*)malloc(_jump_nletters * sizeof(LETTER));
+  
+  /* reset letters */
+  for (i = 0; i < _jump_nletters; ++i)
+    {
+      _jump_letters[i].xpos = -character_width;
+    }
+
+  _jump_displacement = 0;
+
+  _jump_frect.h = TDEC_get_character_height(_jump_scroll_id);
+  _jump_srect.w = TDEC_get_character_width(_jump_scroll_id);
+  _jump_srect.h = _jump_frect.h;
+}
+
+void jumpingscroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  float rad;
+  Uint16 i, j;
+  char *_text, *font, *_characters;
+  Uint8 character_width, character_height;
+  short centery;
+
+  _jump_restart = restart;
+
+  _text = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  font = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  _characters = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  character_width = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  character_height = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _jump_width = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  _jump_height = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
   centery = _jump_height / 2;
 
   if ((_jump_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)

@@ -29,7 +29,7 @@ static Uint8 _rectfill_color_r;
 static Uint8 _rectfill_color_g;
 static Uint8 _rectfill_color_b;
 
-void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void rectfill_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   _rectfill_surface = s;
   _rectfill_restart = restart;
@@ -38,6 +38,39 @@ void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list par
   _rectfill_color_r = (Uint8)va_arg(parameters, int);
   _rectfill_color_g = (Uint8)va_arg(parameters, int);
   _rectfill_color_b = (Uint8)va_arg(parameters, int);
+
+  if (_rectfill_rate % 2)
+    {
+      _rectfill_rate++;
+    }
+
+  if (_rectfill_inner_to_outer)
+    {
+      _rectfill_r.x = _rectfill_surface->w >> 1;
+      _rectfill_r.y = _rectfill_surface->h >> 1;
+      _rectfill_r.w = 0;
+      _rectfill_r.h = 0;
+    }
+  else
+    {
+      _rectfill_r.x = 0;
+      _rectfill_r.y = 0;
+      _rectfill_r.w = _rectfill_surface->w;
+      _rectfill_r.h = _rectfill_surface->w;
+    }
+
+  _rectfill_ratio = _rectfill_surface->h / (float)_rectfill_surface->w;
+}
+
+void rectfill_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  _rectfill_surface = s;
+  _rectfill_restart = restart;
+  _rectfill_inner_to_outer = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _rectfill_rate = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _rectfill_color_r = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _rectfill_color_g = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _rectfill_color_b = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
 
   if (_rectfill_rate % 2)
     {

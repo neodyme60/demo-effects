@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include "list.h"
 
-TDEC_NODE* TDEC_LIST_create(void *data)
+TDEC_NODE* TDEC_LIST_create(const void *data)
 {
 	TDEC_NODE *new_node = (TDEC_NODE*)malloc(sizeof(TDEC_NODE));
 	
@@ -28,7 +28,7 @@ TDEC_NODE* TDEC_LIST_create(void *data)
 	return new_node;
 }
 
-void TDEC_LIST_append(TDEC_NODE *start, void *data)
+void TDEC_LIST_append(TDEC_NODE *start, const void *data)
 {
 	TDEC_NODE *n = start;
 	TDEC_NODE *new_node = (TDEC_NODE*)malloc(sizeof(TDEC_NODE));
@@ -44,7 +44,7 @@ void TDEC_LIST_append(TDEC_NODE *start, void *data)
 	new_node->previous_node = n;		
 }
 
-void TDEC_LIST_remove(TDEC_NODE *start, void *data)
+void TDEC_LIST_remove(TDEC_NODE *start, const void *data)
 {
 	TDEC_NODE *n = start;
 	
@@ -87,9 +87,9 @@ void TDEC_LIST_destroy(TDEC_NODE *start)
 	free(start);
 }
 
-void* TDEC_LIST_get_data_next(TDEC_NODE **node)
+const void* TDEC_LIST_get_data_next(TDEC_NODE **node)
 {
-	void *data = (*node)->data;
+	const void *data = (*node)->data;
 	*node = (*node)->next_node;
 	return data;
 }

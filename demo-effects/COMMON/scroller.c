@@ -39,9 +39,6 @@ typedef struct
 static SCROLLER scrollers[MAX_SCROLLERS];
 static Uint8 scroller_system_initiated = 0;
 
-char *TDEC_FONT1_CHARACTERS = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-char *TDEC_FONT1 = "../GFX/font.pcx";
-
 static Uint16 TDEC_compute_font_pos(Uint8 scroll_id, char scroll_char);
 
 char TDEC_add_scroller(char *_text, char *font, char *_characters,

@@ -30,7 +30,7 @@ extern Uint8 TDEC_get_character_height(Uint8 scroll_id);
 extern void TDEC_draw_font_char(Uint8 scroll_id, SDL_Rect *font_rect, SDL_Surface *destination, SDL_Rect *dest_rect);
 extern void TDEC_set_font_colorkey(Uint8 scroll_id, Uint8 r, Uint8 g, Uint8 b, Uint8 a); 
 
-extern char *TDEC_FONT1_CHARACTERS;
-extern char *TDEC_FONT1;
+const char *TDEC_FONT1_CHARACTERS = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+const char *TDEC_FONT1 = "../GFX/font.pcx";
 
 #endif

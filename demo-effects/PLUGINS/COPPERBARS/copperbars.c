@@ -30,14 +30,8 @@ static Uint16 _copper_red, _copper_red2, _copper_red3, _copper_red4, _copper_red
   _copper_white5, _copper_white6, _copper_white7, _copper_white8, _copper_blue, _copper_blue2, 
   _copper_blue3, _copper_blue4, _copper_blue5, _copper_blue6, _copper_blue7, _copper_blue8;
 
-void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+static void _copper_init_copper(void)
 {
-  int i, centery;
-  float rad;
-  Uint16 sine_amplitude;
-
-  _copper_surface = s;
-
   _copper_red = 96; 
   _copper_red2 = 0;
   _copper_red3 = 88;
@@ -63,18 +57,7 @@ void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list p
   _copper_blue7 = 8;
   _copper_blue8 = 0;
 
-  sine_amplitude = (Uint16)va_arg(parameters, int);
-
-  centery = _copper_surface->h >> 1;
-
-  /*create sin lookup table */
-  for (i = 0; i < 360; i++)
-    {
-      rad =  (float)i * 0.0174532; 
-      _copper_aSin[i] = centery + (sin(rad) * (float)sine_amplitude);
-    }
-
-  /* red copper bar */
+/* red copper bar */
 
   _copper_copper[1].r = 0x22;
   _copper_copper[2].r = 0x44;
@@ -157,11 +140,60 @@ void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list p
   _copper_copper[43].b = 0x66;
   _copper_copper[44].b = 0x44;
   _copper_copper[45].b = 0x22;
-  
+}
+
+void copperbars_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
+{
+  int i, centery;
+  float rad;
+  Uint16 sine_amplitude;
+
+  _copper_surface = s;
+
+  sine_amplitude = (Uint16)va_arg(parameters, int);
+
+  centery = _copper_surface->h >> 1;
+
+  /*create sin lookup table */
+  for (i = 0; i < 360; i++)
+    {
+      rad =  (float)i * 0.0174532; 
+      _copper_aSin[i] = centery + (sin(rad) * (float)sine_amplitude);
+    }
+
+  _copper_init_copper();
+	
   if (_copper_surface->format->palette)
     {
       SDL_SetPalette(_copper_surface, SDL_LOGPAL | SDL_PHYSPAL, _copper_copper, 0, 46); 
     }
+}
+
+void copperbars_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  int i, centery;
+  float rad;
+  Uint16 sine_amplitude;
+
+  _copper_surface = s;
+ 
+  sine_amplitude = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
+  
+  centery = _copper_surface->h >> 1;
+
+  /*create sin lookup table */
+  for (i = 0; i < 360; i++)
+    {
+      rad =  (float)i * 0.0174532; 
+      _copper_aSin[i] = centery + (sin(rad) * (float)sine_amplitude);
+    }
+	
+  _copper_init_copper();
+	  
+  if (_copper_surface->format->palette)
+    {
+      SDL_SetPalette(_copper_surface, SDL_LOGPAL | SDL_PHYSPAL, _copper_copper, 0, 46); 
+    }	
 }
 
 static void _copper_draw(SDL_Rect* r, Uint8 add)
@@ -286,5 +318,3 @@ Uint8 copperbars_LTX_is_filter(void)
 {
   return TDEC_NO_FILTER;
 }
-
-

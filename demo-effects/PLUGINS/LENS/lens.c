@@ -82,7 +82,7 @@ void _lens_apply_lens(int ox, int oy)
     }
 }
 
-void lens_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void lens_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
    int x, y, r, d;
 
@@ -223,6 +223,11 @@ void lens_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list paramet
             _lens_lens[LENS_WIDTH/2 + y][LENS_WIDTH/2 - x].y = tiy;
 	  }
       }
+}
+
+void lens_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+	lens_LTX_init_effect_valist(s, 0, 0);	
 }
 
 void lens_LTX_draw_effect(void)

@@ -19,8 +19,10 @@
 
 #include <stdarg.h>
 #include "SDL/SDL.h"
+#include "list.h"
 
-extern void fire_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void fire_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void fire_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list);
 extern void fire_LTX_draw_effect(void);
 extern void fire_LTX_free_effect(void);
 extern Uint8 fire_LTX_is_filter(void);

@@ -54,12 +54,48 @@ static void _star_init_star(STAR* star, int i)
   star->color = i >> 2; /*the closer to the viewer the brighter*/
 }
 
-void starfield_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void starfield_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   Uint16 i;
 
   _star_surface = s;
   _star_nstars =  (Uint16)va_arg(parameters, int);
+
+  _star_centerx = _star_surface->w >> 1;
+  _star_centery = _star_surface->h >> 1;
+
+  /* create and set palette */
+  _star_colors[0].r = 0;
+  _star_colors[0].g = 0;
+  _star_colors[0].b = 0;
+
+  for (i = 0; i < 255; ++i)
+    {
+      _star_colors[255 - i].r = i;
+      _star_colors[255 - i].g = i;
+      _star_colors[255 - i].b = i;
+    }
+  
+  if (_star_surface->format->palette)
+    {
+      SDL_SetPalette(_star_surface, SDL_LOGPAL | SDL_PHYSPAL, _star_colors, 0, 256); 
+    }
+
+  /*create stars*/
+  _star_stars = (STAR*)malloc(_star_nstars * sizeof(STAR));
+
+  for (i = 0; i < _star_nstars; i++)
+    {
+      _star_init_star(_star_stars + i, i + 1);
+    }
+}
+
+void starfield_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  Uint16 i;
+
+  _star_surface = s;
+  _star_nstars =  *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
 
   _star_centerx = _star_surface->w >> 1;
   _star_centery = _star_surface->h >> 1;
