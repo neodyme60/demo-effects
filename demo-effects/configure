@@ -4166,13 +4166,13 @@ echo "3D effects depending on OpenGL will not be build "
 echo "run configure --enable-opengl=yes to include OpenGL support"
 fi
 
-#file OPC_TreeCollider.cpp of OPCODE-1.2 is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
-#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+#file OPC_TreeCollider.cpp of OPCODE-1.2 generates run-time errors when compiled with optimization -O2 when
+#using gcc >= 3.0. Therefore this check is made, so when gcc >= 3.0, file OPC_TreeCollider.cpp is compiled with -O1
 echo "$as_me:$LINENO: checking checking gcc version" >&5
 echo $ECHO_N "checking checking gcc version... $ECHO_C" >&6
 
 
-if gcc -dumpversion | grep 3. > /dev/null; then
+if gcc -dumpversion | grep ^3. > /dev/null; then
   GCCVERSION3_TRUE=
   GCCVERSION3_FALSE='#'
 else

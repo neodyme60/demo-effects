@@ -1,4 +1,5 @@
-12-26-03 Added 4 new effects, added scaling functions to libTDEC and improved libWPCG's collision detection and 
+01-28-03 libWPCG was extended with an animation manager. Object instancing is now complete for animation and collision detection. Many other changes to libWPCG. The DEMONS effect was added to show the new features, the DEMON effect was extended. XHACKS directory was added containng X ports of effects.
+12-26-02 Added 4 new effects, added scaling functions to libTDEC and improved libWPCG's collision detection and 
 overall performance
 12-15-02 Added 3 new effects, fixed a bug in WPCG's lighting system and added a namespace to it. Added logo to 3D 
 effects.

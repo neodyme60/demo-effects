@@ -14,8 +14,8 @@
 
 @SET_MAKE@
 
-#file OPC_TreeCollider.cpp is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
-#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+#file OPC_TreeCollider.cpp generates run-time errors when compiled with optimisation -O2 when using gcc >= 3.0 
+#Therefore this check is made, so when gcc >= 3.0, file OPC_TreeCollider.cpp is compiled with -O1
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -79,8 +79,10 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
+lib_LIBRARIES = libOPCODE.a
+libOPCODEincludedir = $(includedir)/OPCODE-1.2
+libOPCODEinclude_HEADERS = *.h
 
-noinst_LIBRARIES = libOPCODE.a
 libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_OptimizedTree.h      OPC_Ray.cpp  OPC_Triangle.h \
 	OPC_Collider.cpp   OPC_Model.cpp          OPC_Plane.cpp            OPC_Ray.h                OPC_TriBoxOverlap.h \
         OPC_Collider.h     OPC_Model.h            OPC_Plane.h              OPC_RayTriOverlap.h      OPC_TriTriOverlap.h \
@@ -99,7 +101,7 @@ libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_O
 subdir = OPCODE-1.2
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+LIBRARIES = $(lib_LIBRARIES)
 
 libOPCODE_a_AR = $(AR) cru
 libOPCODE_a_LIBADD =
@@ -157,9 +159,11 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libOPCODE_a_SOURCES)
-DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-	Makefile.in NEWS configure configure.in depcomp install-sh \
-	missing mkinstalldirs
+HEADERS = $(libOPCODEinclude_HEADERS)
+
+DIST_COMMON = README $(libOPCODEinclude_HEADERS) AUTHORS COPYING \
+	ChangeLog INSTALL Makefile.am Makefile.in NEWS configure \
+	configure.in depcomp install-sh missing mkinstalldirs
 SOURCES = $(libOPCODE_a_SOURCES)
 
 all: all-am
@@ -173,9 +177,36 @@ Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
 AR = ar
+libLIBRARIES_INSTALL = $(INSTALL_DATA)
+install-libLIBRARIES: $(lib_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " $(libLIBRARIES_INSTALL) $$p $(DESTDIR)$(libdir)/$$f"; \
+	    $(libLIBRARIES_INSTALL) $$p $(DESTDIR)$(libdir)/$$f; \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    p="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
+	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
+	  else :; fi; \
+	done
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+uninstall-libLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  p="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(libdir)/$$p"; \
+	  rm -f $(DESTDIR)$(libdir)/$$p; \
+	done
+
+clean-libLIBRARIES:
+	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 libOPCODE.a: $(libOPCODE_a_OBJECTS) $(libOPCODE_a_DEPENDENCIES) 
 	-rm -f libOPCODE.a
 	$(libOPCODE_a_AR) libOPCODE.a $(libOPCODE_a_OBJECTS) $(libOPCODE_a_LIBADD)
@@ -228,6 +259,24 @@ distclean-depend:
 	$(CXXCOMPILE) -c -o $@ `cygpath -w $<`
 CXXDEPMODE = @CXXDEPMODE@
 uninstall-info-am:
+libOPCODEincludeHEADERS_INSTALL = $(INSTALL_HEADER)
+install-libOPCODEincludeHEADERS: $(libOPCODEinclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libOPCODEincludedir)
+	@list='$(libOPCODEinclude_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(libOPCODEincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(libOPCODEincludedir)/$$f"; \
+	  $(libOPCODEincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(libOPCODEincludedir)/$$f; \
+	done
+
+uninstall-libOPCODEincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(libOPCODEinclude_HEADERS)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(libOPCODEincludedir)/$$f"; \
+	  rm -f $(DESTDIR)$(libOPCODEincludedir)/$$f; \
+	done
 
 ETAGS = etags
 ETAGSFLAGS =
@@ -292,9 +341,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 
 installdirs:
+	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(libOPCODEincludedir)
 
 install: install-am
 install-exec: install-exec-am
@@ -322,7 +372,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-libLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 
@@ -337,9 +387,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-libOPCODEincludeHEADERS
 
-install-exec-am:
+install-exec-am: install-libLIBRARIES
 
 install-info: install-info-am
 
@@ -355,18 +405,20 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-libLIBRARIES \
+	uninstall-libOPCODEincludeHEADERS
 
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES distclean distclean-compile \
-	distclean-depend distclean-generic distclean-tags distdir dvi \
-	dvi-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic tags uninstall uninstall-am \
-	uninstall-info-am
+	clean-libLIBRARIES distclean distclean-compile distclean-depend \
+	distclean-generic distclean-tags distdir dvi dvi-am info \
+	info-am install install-am install-data install-data-am \
+	install-exec install-exec-am install-info install-info-am \
+	install-libLIBRARIES install-libOPCODEincludeHEADERS \
+	install-man install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic tags \
+	uninstall uninstall-am uninstall-info-am uninstall-libLIBRARIES \
+	uninstall-libOPCODEincludeHEADERS
 
 
 @GCCVERSION3_TRUE@OPC_TreeCollider.o:

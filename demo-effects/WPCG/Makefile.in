@@ -76,7 +76,9 @@ VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-noinst_LIBRARIES = libWPCG.a
+lib_LIBRARIES = libWPCG.a
+libWPCGincludedir = $(includedir)/WPCG
+libWPCGinclude_HEADERS = *.h
 libWPCG_a_SOURCES = WP_2D.C WP_Camera.C WP_Endian.C WP_GLState.C WP_Image.C WP_Init.C WP_Line2D.C WP_Material.C WP_Math.C WP_Matrix2D.C \
 WP_Matrix3D.C WP_Model.C WP_ObjectManager.C WP_Point2D.C WP_Point3D.C WP_Ray2D.C WP_Ray3D.C WP_SkyBox.C WP_Terrain.C \
 WP_TextureManager.C WP_Triangle.C WP_Vector2D.C WP_Vector3D.C WP_AnimationManager.C
@@ -86,7 +88,7 @@ INCLUDES = -I../OPCODE-1.2
 subdir = WPCG
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+LIBRARIES = $(lib_LIBRARIES)
 
 libWPCG_a_AR = $(AR) cru
 libWPCG_a_LIBADD =
@@ -132,7 +134,9 @@ CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 CXXFLAGS = @CXXFLAGS@
 DIST_SOURCES = $(libWPCG_a_SOURCES)
-DIST_COMMON = Makefile.am Makefile.in
+HEADERS = $(libWPCGinclude_HEADERS)
+
+DIST_COMMON = $(libWPCGinclude_HEADERS) Makefile.am Makefile.in
 SOURCES = $(libWPCG_a_SOURCES)
 
 all: all-am
@@ -146,9 +150,36 @@ Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
 AR = ar
+libLIBRARIES_INSTALL = $(INSTALL_DATA)
+install-libLIBRARIES: $(lib_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " $(libLIBRARIES_INSTALL) $$p $(DESTDIR)$(libdir)/$$f"; \
+	    $(libLIBRARIES_INSTALL) $$p $(DESTDIR)$(libdir)/$$f; \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    p="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
+	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
+	  else :; fi; \
+	done
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+uninstall-libLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	  p="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(libdir)/$$p"; \
+	  rm -f $(DESTDIR)$(libdir)/$$p; \
+	done
+
+clean-libLIBRARIES:
+	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 libWPCG.a: $(libWPCG_a_OBJECTS) $(libWPCG_a_DEPENDENCIES) 
 	-rm -f libWPCG.a
 	$(libWPCG_a_AR) libWPCG.a $(libWPCG_a_OBJECTS) $(libWPCG_a_LIBADD)
@@ -201,6 +232,24 @@ distclean-depend:
 	$(CXXCOMPILE) -c -o $@ `cygpath -w $<`
 CXXDEPMODE = @CXXDEPMODE@
 uninstall-info-am:
+libWPCGincludeHEADERS_INSTALL = $(INSTALL_HEADER)
+install-libWPCGincludeHEADERS: $(libWPCGinclude_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libWPCGincludedir)
+	@list='$(libWPCGinclude_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(libWPCGincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(libWPCGincludedir)/$$f"; \
+	  $(libWPCGincludeHEADERS_INSTALL) $$d$$p $(DESTDIR)$(libWPCGincludedir)/$$f; \
+	done
+
+uninstall-libWPCGincludeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(libWPCGinclude_HEADERS)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(libWPCGincludedir)/$$f"; \
+	  rm -f $(DESTDIR)$(libWPCGincludedir)/$$f; \
+	done
 
 ETAGS = etags
 ETAGSFLAGS =
@@ -265,9 +314,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 
 installdirs:
+	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(libWPCGincludedir)
 
 install: install-am
 install-exec: install-exec-am
@@ -295,7 +345,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-libLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 
@@ -310,9 +360,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-libWPCGincludeHEADERS
 
-install-exec-am:
+install-exec-am: install-libLIBRARIES
 
 install-info: install-info-am
 
@@ -328,18 +378,20 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-info-am uninstall-libLIBRARIES \
+	uninstall-libWPCGincludeHEADERS
 
 .PHONY: GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES distclean distclean-compile \
-	distclean-depend distclean-generic distclean-tags distdir dvi \
-	dvi-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic tags uninstall uninstall-am \
-	uninstall-info-am
+	clean-libLIBRARIES distclean distclean-compile distclean-depend \
+	distclean-generic distclean-tags distdir dvi dvi-am info \
+	info-am install install-am install-data install-data-am \
+	install-exec install-exec-am install-info install-info-am \
+	install-libLIBRARIES install-libWPCGincludeHEADERS install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic tags uninstall \
+	uninstall-am uninstall-info-am uninstall-libLIBRARIES \
+	uninstall-libWPCGincludeHEADERS
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,5 @@
-#file OPC_TreeCollider.cpp is faulty when compiled with optimization -O2 when using gcc > 3.0 therefore this check is made
-#so when gcc > 3.0, file OPC_TreeCollider.cpp is compiled with -O1
+#file OPC_TreeCollider.cpp generates run-time errors when compiled with optimisation -O2 when using gcc >= 3.0 
+#Therefore this check is made, so when gcc >= 3.0, file OPC_TreeCollider.cpp is compiled with -O1
 
 if GCCVERSION3
 OPC_TreeCollider.o:
@@ -8,8 +8,10 @@ OPC_TreeCollider.o:
 	$(CXXDEPMODE) $(depcomp) \
 	$(CXXCOMPILE) -O1 -c -o OPC_TreeCollider.o `test -f 'OPC_TreeCollider.cpp' || echo '$(srcdir)/'`OPC_TreeCollider.cpp
 endif
-	
-noinst_LIBRARIES = libOPCODE.a
+lib_LIBRARIES = libOPCODE.a
+libOPCODEincludedir = $(includedir)/OPCODE-1.2
+libOPCODEinclude_HEADERS = *.h
+
 libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_OptimizedTree.h      OPC_Ray.cpp  OPC_Triangle.h \
 	OPC_Collider.cpp   OPC_Model.cpp          OPC_Plane.cpp            OPC_Ray.h                OPC_TriBoxOverlap.h \
         OPC_Collider.h     OPC_Model.h            OPC_Plane.h              OPC_RayTriOverlap.h      OPC_TriTriOverlap.h \
