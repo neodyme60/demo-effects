@@ -50,7 +50,7 @@ public:
 	 */
 	WP_Ray3D(const WP_Point3D& p, const WP_Vector3D& v);
 
-	virtual ~WP_Ray3D(){};
+	~WP_Ray3D(){};
 
 	/**
 	 * this function computes the intersection time of this ray and a sphere.See F.S. Hill's Computer Graphics using OpenGL, second edition, page 739 and 747

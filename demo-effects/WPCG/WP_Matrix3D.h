@@ -44,7 +44,7 @@ public:
 	friend class WP_Point3D;
 
 	WP_Matrix3D();
-	virtual ~WP_Matrix3D(){};	
+	~WP_Matrix3D(){};	
 	
 	/**
 	 * @param type the type of the matrix. TRANSLATION_MATRIX for a translation matrix and SCALING_MATRIX for a scaling matrix. Any other value creates the identity matrix
@@ -86,7 +86,7 @@ public:
 	WP_Matrix3D(scalar* f);
 
 	/**
-	 * copy constructor
+	 * assignment operator
 	 * @param m the matrix containing the to be copied values
 	 * @return a reference to this matrix containing the copied values
 	 */
@@ -227,7 +227,7 @@ public:
 	 */
 	scalar data[16];
 
-protected:
+private:
 
 	/**
 	 * this function creates the matrix belonging to a rotation around the x-axis of <i>angle</i> degrees

@@ -166,6 +166,9 @@ WP_Matrix3D::WP_Matrix3D(scalar* f)
 
 WP_Matrix3D& WP_Matrix3D::operator=(const WP_Matrix3D& m)
 {
+  if (this == &m)
+    return *this;
+
   for (int i = 0; i < 16; i++)
     {
       data[i] = m.data[i];

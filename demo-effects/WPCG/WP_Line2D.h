@@ -49,7 +49,7 @@ public:
 	 * @param p2 a WP_Point2D object indicating the end point of the line
 	 */
 	WP_Line2D(const WP_Point2D& p1, const WP_Point2D& p2);
-	virtual ~WP_Line2D();
+	~WP_Line2D();
 
 	/**
 	 * this function draws the line to the screen using OpenGL

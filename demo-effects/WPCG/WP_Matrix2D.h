@@ -43,7 +43,7 @@ public:
 	friend class WP_Vector2D;
 
 	WP_Matrix2D();
-	virtual ~WP_Matrix2D(){};	
+	~WP_Matrix2D(){};	
 
 	/**
 	 * @param type the type of the matrix. TRANSLATION_MATRIX for a translation matrix and SCALING_MATRIX for a scaling matrix. Any other value creates the identity matrix
@@ -64,7 +64,7 @@ public:
 	WP_Matrix2D(scalar angle);
 
 	/**
-	 * copy constructor
+	 * assigment operator
 	 * @param m the matrix containing the to be copied values
 	 * @return a reference to this matrix containing the copied values
 	 */

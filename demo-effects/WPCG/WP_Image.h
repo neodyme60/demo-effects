@@ -17,10 +17,7 @@
 #ifndef WP_IMAGE_H
 #define WP_IMAGE_H
 
-#include <iostream>
-#include <fstream>
-using namespace std;
-
+#include <string>
 #include "WP_Def.h"
 #include "WP_RGBA.h"
 
@@ -47,10 +44,13 @@ class WP_Image
  public:
   WP_Image();
 
-  virtual ~WP_Image();
+  //copy constructor
+  WP_Image(const WP_Image &image);
+
+  ~WP_Image();
   
   /**
-   * copy contructor
+   * assignment operator
    * @param image the to be copied WP_Image object
    * @return a reference to this new object containing the new copied image values
    */
@@ -114,7 +114,7 @@ class WP_Image
    * @param file the name of the file containing the image
    * @return a boolean indicating the succes or failure of this function
    */
-  bool loadImage(const char* file);
+  bool loadImage(const string &file);
 
   /**
    * this function is able to set the alpha of all pixels matching the key pixel (chroma keying or blue screening)
@@ -133,7 +133,7 @@ class WP_Image
    */
   int rasterpos_y;
 
- protected:
+ private:
   
   /**
    * the number of pixel rows in the image
@@ -151,31 +151,26 @@ class WP_Image
   WP_RGBA* pixels;
 
   /**
-   * the file input stream for reading the image from disk
-   */
-  fstream input;
-  
-  /**
    * this function checks the extension of a file
    * @param file the file name
    * @param extension the extension which is checked
    * @return a boolean indicating if the file has the extension
    */
-  bool hasValidExtension(const char* file, const char* extension);
+  bool hasValidExtension(const string &file, const string &extension);
 
   /**
    * this function loads a bitmap (.bmp). Currently compressed/uncompressed 8 bit (indexed) and uncompressed 24 bit RGB bmp\n
    * @param file the bitmap file
    * @return a boolean indicating the succes or failure of this function
    */
-  bool loadBMP(const char* file);
+  bool loadBMP(const string &file);
 
   /**
    * this function loads ZSoft pcx file format (.pcx). Currently compressed 24 bit indexed and compressed 24 bit RGB pcs\n
    * @param file the pcx file
    * @return a boolean indicating the succes or failure of this function
    */
-  bool loadPCX(const char* file);
+  bool loadPCX(const string &file);
 };
 #endif
 

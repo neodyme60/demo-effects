@@ -45,7 +45,7 @@ using namespace std;
 class WP_Endian
 {
  public:
-  virtual ~WP_Endian(){};
+  ~WP_Endian(){};
   
   /**
    * this function returns a pointer to the only instance of this class (singleton)
@@ -71,7 +71,7 @@ class WP_Endian
    */
   bool little_endian;
 
-protected:
+private:
 	WP_Endian();
 
 	/**

@@ -18,7 +18,6 @@
 #define WP_MODEL_H
 
 #include <string>
-using namespace std;
 #include <list>
 
 #include "WPCG.h"
@@ -40,8 +39,14 @@ class WP_Model
     {
       scaling_matrix = new WP_Matrix3D(SCALING_MATRIX, scaling.data[0], scaling.data[1], scaling.data[2]);
     };
-  
+
+  //COPY CONSTRUCTOR
+  WP_Model(const WP_Model &model);
+
   virtual ~WP_Model();
+
+  //ASSIGNMENT OPERATOR
+  WP_Model& operator=(const WP_Model &model);
   
   /**
    * this function draws the model according to its world matrix into the 3D scene but only if its bounding sphere is in the viewing frustum
@@ -109,7 +114,13 @@ class WP_AnimatedModel: public WP_Model
   WP_AnimatedModel(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling),
     numberFrames(0), currentFrame(0), interpolate(0.0){}; 
 
+  //COPY CONSTRUCTOR
+  WP_AnimatedModel(const WP_AnimatedModel& amodel);
+
   virtual ~WP_AnimatedModel();
+
+  //ASSIGNMENT OPERATOR
+  WP_AnimatedModel& operator=(const WP_AnimatedModel &amodel);
 
   virtual void drawOpenGL(const WP_Matrix3D& matrix) = 0;
   virtual bool initModel() = 0;
@@ -123,10 +134,17 @@ protected:
     {
     public:
       WP_Frame():numberVertices(0), vertices(0){};
-      virtual ~WP_Frame()
+
+      //copy constructor
+      WP_Frame(const WP_Frame &frame);
+
+      ~WP_Frame()
 	{
 	  delete[] vertices;
 	}
+
+      //assignment operator
+      WP_Frame& operator=(const WP_Frame &frame);
 
       /**
        * the number of vertices in the frame
@@ -146,7 +164,17 @@ protected:
       /**
        * the name of the frame
        */
-      char name[64];
+      string name;
+
+      /**
+       * a WP_Point3D object holding the position of the center of the frame, this is used for the definition of a bounding sphere to determine if the frame is in the viewing frustum or not
+       */
+      WP_Point3D center;
+
+      /**
+       * the radius of the bounding sphere of the frame
+       */
+      scalar radius;
 
       /**
        * this function computes the maximum values of the vertices in the frame. This to determine the size of the model its bounding sphere
@@ -165,17 +193,6 @@ protected:
        * @param scaling_matrix a pointer to a WP_Vector3D object representing the frame its scaling matrix (used for scaling of bounding sphere and in the future for the collision hull)
        */
       void computeBoundingSphere(WP_Matrix3D* scaling_matrix);
-
-      /**
-       * a WP_Point3D object holding the position of the center of the frame, this is used for the definition of a bounding sphere to determine if the frame is in the viewing frustum or not
-       */
-      WP_Point3D center;
-
-      /**
-       * the radius of the bounding sphere of the frame
-       */
-      scalar radius;
-
     };
 
   scalar interpolate;
@@ -198,7 +215,21 @@ class WP_Model_MD2: public WP_AnimatedModel
    */
   WP_Model_MD2(const string& name, const WP_Vector3D& scaling);
 
-  virtual ~WP_Model_MD2(){};
+  //COPY CONSTRUCTOR
+  WP_Model_MD2(const WP_Model_MD2 &md2model);
+
+  ~WP_Model_MD2()
+    {
+      list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
+      while (i != triangle_groups.end())
+	{
+	  delete *i;
+	  i++;
+	}
+    };
+
+  //ASSIGNMENT OPERATOR
+  WP_Model_MD2& operator=(const WP_Model_MD2 &md2model);
 
   void drawOpenGL(const WP_Matrix3D& matrix);
   
@@ -207,8 +238,7 @@ class WP_Model_MD2: public WP_AnimatedModel
    */
   bool initModel();
 
-
- protected:
+ private:
 
   // nested class WP_MD2_HEADER 
   class WP_MD2_HEADER
@@ -241,8 +271,12 @@ class WP_Model_MD2: public WP_AnimatedModel
 class WP_MetaBall: public WP_Model
 {
  public:
-  WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling);
-  virtual WP_MetaBall::~WP_MetaBall(){};
+  WP_MetaBall(const string& name, const WP_Vector3D& scaling);
+  WP_MetaBall(const WP_MetaBall &ball);
+
+  WP_MetaBall::~WP_MetaBall(){};
+
+  WP_MetaBall& operator=(const WP_MetaBall &ball);
 
   void drawOpenGL(const WP_Matrix3D& matrix);
   

@@ -1,4 +1,4 @@
-/* Copyright (C) 2001 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2002 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -15,8 +15,6 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 #include <stdlib.h>
-#include <stdio.h>
-#include <search.h>
 #include <values.h>
 #include <iostream.h>
 #include <fstream.h>
@@ -33,8 +31,33 @@
 WP_Model::~WP_Model()
 {
   delete scaling_matrix;
-
   WP_TextureManager::getInstance()->removeTextures(this);
+}
+
+//COPY CONSTRUCTOR
+WP_Model::WP_Model(const WP_Model &model)
+{
+  scaling_matrix = new WP_Matrix3D(*model.scaling_matrix);
+  center = model.center;
+  radius = model.radius;
+  model_name = model.model_name;
+  count = model.count;
+  tex_id = model.tex_id;
+}
+
+WP_Model& WP_Model::operator=(const WP_Model &model)
+{
+  if (this == &model)
+    return *this;
+
+  delete scaling_matrix;
+  scaling_matrix = new WP_Matrix3D(*model.scaling_matrix);
+  center = model.center;
+  radius = model.radius;
+  model_name = model.model_name;
+  count = model.count;
+  tex_id = model.tex_id;
+  return *this;
 }
 
 bool WP_Model::init()
@@ -88,14 +111,84 @@ bool WP_Model::finalizeAll()
     }
 }
 
+
+////////////////////////////////// WP_FRAME ////////////////////////////////////////////
+
+WP_AnimatedModel::WP_Frame::WP_Frame(const WP_AnimatedModel::WP_Frame &frame)
+{
+  numberVertices = frame.numberVertices;
+  
+  int i = 0;
+  for (; i < numberVertices; ++i)
+      vertices[i] = frame.vertices[i];
+  
+  material = frame.material;
+  name = frame.name;
+  center = frame.center;
+  radius = frame.radius;
+}
+
+WP_AnimatedModel::WP_Frame& WP_AnimatedModel::WP_Frame::operator=(const WP_AnimatedModel::WP_Frame &frame)
+{
+  if (this == &frame)
+    return *this;
+
+  delete[] vertices;
+  numberVertices = frame.numberVertices;
+  vertices = new WP_Vertex[numberVertices];
+  
+  int i = 0;
+  for (; i < numberVertices; ++i)
+      vertices[i] = frame.vertices[i];
+  
+  material = frame.material;
+  name =  frame.name;
+  center = frame.center;
+  radius = frame.radius;
+  return *this;
+}
+
 ////////////////////////////////// WP_AnimatedModel ////////////////////////////////////
+
+//COPY CONSTRUCTOR
+WP_AnimatedModel::WP_AnimatedModel(const WP_AnimatedModel& amodel):WP_Model(amodel)
+{
+  interpolate = amodel.interpolate;
+  numberFrames = amodel.numberFrames;
+  frames = new WP_Frame[numberFrames];
+
+  int i = 0;
+  for (; i < numberFrames; ++i)
+    frames[i] = amodel.frames[i];
+
+  currentFrame = amodel.currentFrame;
+}
 
 WP_AnimatedModel::~WP_AnimatedModel()
 {
   delete frames;
 }
 
+WP_AnimatedModel& WP_AnimatedModel::operator=(const WP_AnimatedModel &amodel)
+{
+  if (this == &amodel)
+    return *this;
 
+  WP_Model::operator=(amodel);
+
+  interpolate = amodel.interpolate;
+  delete[] frames;
+  numberFrames = amodel.numberFrames;
+  frames = new WP_Frame[numberFrames];
+
+  int i = 0;
+  for (; i < numberFrames; ++i)
+    frames[i] = amodel.frames[i];
+
+  currentFrame = amodel.currentFrame;
+
+  return *this;
+}
 
 WP_Point3D 
 WP_AnimatedModel::WP_Frame::getMaxPoint() const
@@ -404,6 +497,51 @@ void WP_AnimatedModel::WP_Frame::computeBoundingSphere(WP_Matrix3D* scaling_matr
 
 WP_Model_MD2::WP_Model_MD2(const string& name, const WP_Vector3D& scaling): WP_AnimatedModel(name, scaling){}
 
+//COPY CONSTRUCTOR
+//FIXME get rid of dynamic cast !!!
+WP_Model_MD2::WP_Model_MD2(const WP_Model_MD2 &md2model):WP_AnimatedModel(md2model)
+{
+  list<WP_TriangleGroup*>::const_iterator j = md2model.triangle_groups.begin();
+  while (j != md2model.triangle_groups.end())
+    {
+      if (WP_TriangleFan *fan = dynamic_cast<WP_TriangleFan*>(*j))
+	triangle_groups.push_back(new WP_TriangleFan(*fan));
+      else if (WP_TriangleStrip* strip = dynamic_cast<WP_TriangleStrip*>(*j))
+	triangle_groups.push_back(new WP_TriangleStrip(*strip));
+      j++;
+    }  
+}
+
+//ASSIGNMENT OPERATOR
+WP_Model_MD2& WP_Model_MD2::operator=(const WP_Model_MD2 &md2model)
+{
+  if (this == &md2model)
+    return *this;
+
+  WP_AnimatedModel::operator=(md2model);
+
+  list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
+  while (i != triangle_groups.end())
+    {
+      delete *i;
+      i++;
+    } 
+
+  triangle_groups.clear();
+
+  list<WP_TriangleGroup*>::const_iterator j = md2model.triangle_groups.begin();
+  while (j != md2model.triangle_groups.end())
+    {
+      if (WP_TriangleFan *fan = dynamic_cast<WP_TriangleFan*>(*j))
+	triangle_groups.push_back(new WP_TriangleFan(*fan));
+      else if (WP_TriangleStrip* strip = dynamic_cast<WP_TriangleStrip*>(*j))
+	triangle_groups.push_back(new WP_TriangleStrip(*strip));
+      j++;
+    }  
+
+  return *this;
+}
+
 bool WP_Model_MD2::initModel()
 {
   int i = 0;
@@ -418,15 +556,13 @@ bool WP_Model_MD2::initModel()
 
       if (!input)
 	{
-	  char buf[256];
-	  sprintf(buf, "WP_Model_MD2::initModel - error while initing model %s", model_name.c_str());
-	  throw(buf);
+	  throw("");
 	}
 
       //read file to memory
 
       int size = 0;
-      byte c;
+      char c;
       while(input.get(c))
 	{
 	  size++;
@@ -443,9 +579,7 @@ bool WP_Model_MD2::initModel()
       input.open(model_name.c_str(), ios::binary | ios::in);
       if(input.fail())
 	{ 
-	  char buf[256];
-	  sprintf(buf, "WP_Model_MD2::initModel - error while initing model %s", model_name.c_str());
-	  throw(buf);
+	  throw("");
 	}
 
       byte* p = buffer;
@@ -616,10 +750,7 @@ bool WP_Model_MD2::initModel()
 	  }
       }
       
-      if (buffer)
-	{
-	  delete[] buffer;
-	}
+      delete[] buffer;
       
       return true;
     }
@@ -671,9 +802,23 @@ WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix)
 
 ////////////////////////// WP_MetaBall ////////////////////
 
-WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling)
+WP_MetaBall::WP_MetaBall(const string& name, const WP_Vector3D& scaling):WP_Model(name, scaling){}
+
+WP_MetaBall::WP_MetaBall(const WP_MetaBall &ball):WP_Model(ball)
 {
-  
+  center = ball.center;
+}
+
+WP_MetaBall& 
+WP_MetaBall::operator=(const WP_MetaBall &ball)
+{
+  if (this == &ball)
+    return *this;
+
+  WP_Model::operator=(ball);
+  center = ball.center;
+
+  return *this;
 }
 
 void 

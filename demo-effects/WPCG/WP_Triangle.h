@@ -45,7 +45,7 @@ class WP_Triangle
 {
 public:
 	WP_Triangle(){};
-	virtual ~WP_Triangle(){};
+	~WP_Triangle(){};
 
 	/**
 	 * this function draws the solid triangle using OpenGL
@@ -85,10 +85,14 @@ class WP_TriangleGroup
 {
 public:
 	WP_TriangleGroup(){};
+	WP_TriangleGroup(const WP_TriangleGroup &group);
+
 	virtual ~WP_TriangleGroup(){
 	  delete[] indices;
 	  delete[] texCoords;
 	};
+
+	WP_TriangleGroup& operator=(const WP_TriangleGroup &group);
 
 	virtual void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const = 0; 
 
@@ -119,7 +123,10 @@ class WP_TriangleStrip: public WP_TriangleGroup
 {
 public:
 	WP_TriangleStrip(){};
-	virtual ~WP_TriangleStrip(){};
+	WP_TriangleStrip(const WP_TriangleStrip &strip):WP_TriangleGroup(strip){};
+	~WP_TriangleStrip(){};
+
+	WP_TriangleStrip& operator=(const WP_TriangleStrip &strip);
 
 	void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const; 
 };
@@ -147,7 +154,10 @@ class WP_TriangleFan: public WP_TriangleGroup
 {
 public:
 	WP_TriangleFan(){};
-	virtual ~WP_TriangleFan(){};
+	WP_TriangleFan(const WP_TriangleFan &fan):WP_TriangleGroup(fan){};
+	~WP_TriangleFan(){};
+
+	WP_TriangleFan& operator=(const WP_TriangleFan &fan);
 
 	void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const; 
 };

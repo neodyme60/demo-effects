@@ -54,7 +54,7 @@ public:
   ~WP_Vector2D(){};
   
   /**
-   * copy constructor
+   * assignment operator
    * @param v the WP_Vector2D object which is copied to this object
    * @return a reference to this object containing the copied vector values
    */

@@ -1,4 +1,4 @@
-/* Copyright (C) 2001 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2002 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -14,28 +14,50 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#include <stdio.h>
-#include <string.h>
+//#include <stdio.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <iostream>
+#include <fstream>
 #include "WP_Endian.h"
 #include "WP_Image.h"
 
 WP_Image::WP_Image(): rasterpos_x(0), rasterpos_y(0), rows(0), columns(0), pixels(0){}
 
-// COPY CONSTRUCTOR 
-WP_Image& WP_Image::operator=(const WP_Image& image)
+//COPY CONSTRUCTOR
+WP_Image::WP_Image(const WP_Image &image)
 {
   rows = image.rows;
   columns = image.columns;
+  rasterpos_x = image.rasterpos_x;
+  rasterpos_y = image.rasterpos_y;
   int size = rows * columns;
   
-  if (pixels)
-    delete[] pixels;
+  pixels = new WP_RGBA[size];
+
+  int i = 0;
+  for (; i < size; i++)
+    pixels[i] = image.pixels[i];
+}
+
+// ASSIGMENT OPERATOR 
+WP_Image& WP_Image::operator=(const WP_Image& image)
+{
+  if (this == &image)
+    return *this;
+
+  rows = image.rows;
+  columns = image.columns;
+  rasterpos_x = image.rasterpos_x;
+  rasterpos_y = image.rasterpos_y;
+  int size = rows * columns;
+  
+  delete[] pixels;
   
   pixels = new WP_RGBA[size];
   
-  for (int i = 0; i < size; i++)
+  int i = 0;
+  for (; i < size; i++)
     pixels[i] = image.pixels[i];
 
   return *this;
@@ -44,8 +66,7 @@ WP_Image& WP_Image::operator=(const WP_Image& image)
 
 WP_Image::~WP_Image()
 {
-  if (pixels)
-    delete[] pixels;
+  delete[] pixels;
 }
 
 void WP_Image::setPixel(int x, int y, const WP_RGBA& p)
@@ -73,12 +94,9 @@ void WP_Image::drawToFrameBuffer() const
 
 bool WP_Image::readFromFrameBuffer(int x, int y, int width, int height)
 {
-  if (pixels)
-    {
-      delete[] pixels;
-      pixels = 0;
-    }
-  
+  delete[] pixels;
+  pixels = 0;
+
   rows = height;
   columns = width;
   pixels = new WP_RGBA[rows * columns];
@@ -98,7 +116,7 @@ void WP_Image::copy(int x, int y, int width, int height)
   glCopyPixels(x, y, width, height, GL_COLOR);
 }
 
-bool WP_Image::loadImage(const char* file)
+bool WP_Image::loadImage(const string &file)
 {
   //check file extensions
 
@@ -117,25 +135,13 @@ bool WP_Image::loadImage(const char* file)
   return false;
 }
 
-bool WP_Image::hasValidExtension(const char* file, const char* extension)
+bool WP_Image::hasValidExtension(const string &file, const string &extension)
 {
-  //find the '.' separating the extension
-  const char* copy = file;
-  copy += strlen(file); //set pointer to last token
-  while(*copy != '.' && copy != file)
-    {
-      copy--;
-    }
-
-  if (*copy != '.')
-    {
-      return false; //file has no extension
-    }
-
-  return strcasecmp(++copy, extension) == 0;
+  int pos = file.find('.' + extension);
+  return pos != string::npos;
 }
 
-bool WP_Image::loadBMP(const char* file)
+bool WP_Image::loadBMP(const string &file)
 {
   //.BMP is always stored little endian, pixels are stored bottom up, left to right
   
@@ -143,18 +149,16 @@ bool WP_Image::loadBMP(const char* file)
 
   try
     {
-      input.open(file, ios::binary | ios::in);
+      fstream input(file.c_str(), ios::binary | ios::in);
       if(input.fail())
 	{ 
-	  char buf[256];
-	  sprintf(buf, "I can't find or open BMP file: %s", file);
-	  throw(buf);
+	  throw("");
 	}
 
       //read file to memory
 
       int size = 0;
-      byte c;
+      char c;
       while(input.get(c))
 	{
 	  size++;
@@ -168,12 +172,10 @@ bool WP_Image::loadBMP(const char* file)
 	}
 
       input.close();
-      input.open(file, ios::binary | ios::in);
+      input.open(file.c_str(), ios::binary | ios::in);
       if(input.fail())
 	{ 
-	  char buf[256];
-	  sprintf(buf, "I can't find or open BMP file: %s", file);
-	  throw(buf);
+	  throw("");
 	}
 
       byte* p = buffer;
@@ -224,13 +226,8 @@ bool WP_Image::loadBMP(const char* file)
       
       if ((bitsPerPixel == 24 && compression != 0) || (bitsPerPixel != 8 && bitsPerPixel != 24))
 	{
-	  char buf[256];
-	  sprintf(buf, "Error BMP file %s is not an uncompressed/compressed 8-bit indexed or uncompressed 24-bit RGB BMP file", file);
-	  if (buffer)
-	    {
-	      delete[] buffer;
-	    }
-	  throw(buf);
+	  delete[] buffer;
+	  throw("");
 	}
   
       int numberBytesInRow = ((_columns * (bitsPerPixel / 8)) + 3) & (~3);
@@ -239,20 +236,14 @@ bool WP_Image::loadBMP(const char* file)
       rows = _rows;
       columns = _columns;
       
-      if (pixels)
-	{
-	  delete[] pixels;
-	  pixels = 0;
-	}
+      delete[] pixels;
+      pixels = 0;
       
       pixels = new WP_RGBA[rows * columns];
       
       if (!pixels)
 	{
-	  if (buffer)
-	    {
-	      delete[] buffer;
-	    }
+	  delete[] buffer;
 	  throw("WP_Image::loadBMP: Unable to allocate memory for storage of image");
 	}
   
@@ -400,10 +391,7 @@ bool WP_Image::loadBMP(const char* file)
 	    }	  
 	}
       
-      if (buffer)
-	{
-	  delete[] buffer;
-	}
+      delete[] buffer;
       return true;
     }
   catch(char* s)
@@ -417,24 +405,22 @@ bool WP_Image::loadBMP(const char* file)
     }
 }
 
-bool WP_Image::loadPCX(const char* file)
+bool WP_Image::loadPCX(const string &file)
 {
   WP_Endian* endian = WP_Endian::getInstance();
 
   try
     {
-      input.open(file, ios::binary | ios::in);
+      fstream input(file.c_str(), ios::binary | ios::in);
       if(input.fail())
 	{ 
-	  char buf[256];
-	  sprintf(buf, "I can't find or open PCX file: %s", file);
-	  throw(buf);
+	  throw("");
 	}
 
       //read file to memory
 
       int size = 0;
-      byte c;
+      char c;
       while(input.get(c))
 	{
 	  size++;
@@ -448,12 +434,10 @@ bool WP_Image::loadPCX(const char* file)
 	}
 
       input.close();
-      input.open(file, ios::binary | ios::in);
+      input.open(file.c_str(), ios::binary | ios::in);
       if(input.fail())
 	{ 
-	  char buf[256];
-	  sprintf(buf, "I can't find or open PCX file: %s", file);
-	  throw(buf);
+	  throw("");
 	}
 
       byte* p = buffer;
@@ -524,22 +508,14 @@ bool WP_Image::loadPCX(const char* file)
 
       if (encoding != 1 || bitsPerPixel != 8 || version < 5 || manufacturer != 10)
 	{
-	  char buf[256];
-	  sprintf(buf, "File: %s is not a compressed 24 bit RGB or compressed 24 bit indexed file", file);
-	  if (buffer)
-	    {
-	      delete[] buffer;
-	    }
-	  throw(buf);
+	  delete[] buffer;
+	  throw("");
 	}
 
       //uncompress pcx file and fill scanlines
       
-      if (pixels)
-	{
-	  delete[] pixels;
-	  pixels = 0;
-	}
+      delete[] pixels;
+      pixels = 0;
       
       rows = yMax - yMin + 1;
       columns = xMax - xMin + 1;
@@ -548,10 +524,7 @@ bool WP_Image::loadPCX(const char* file)
          
       if (!pixels)
 	{
-	  if (buffer)
-	    {
-	      delete[] buffer;
-	    }
+	  delete[] buffer;
 	  throw("WP_Image::loadPCX: Unable to allocate memory for storage of image");
 	}
 
@@ -682,11 +655,7 @@ bool WP_Image::loadPCX(const char* file)
 	    }
 	}
       
-      if (buffer)
-	{
-	  delete[] buffer;
-	}
-
+      delete[] buffer;
       return true;
     }
   catch(char* s)

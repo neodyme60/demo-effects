@@ -49,7 +49,7 @@ public:
    * @param _y the y coordinate of the point
    */
   WP_Point2D(scalar _x, scalar _y): x(_x), y(_y){};
-  virtual ~WP_Point2D(){};
+  ~WP_Point2D(){};
 
   /**
    * this operator subtracts a point from this point resulting in a vector

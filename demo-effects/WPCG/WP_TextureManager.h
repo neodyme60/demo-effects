@@ -41,7 +41,7 @@
 class WP_TextureManager
 {
 public:
-  virtual ~WP_TextureManager();
+  ~WP_TextureManager();
 	
   /**
    * this function is used to obtain a pointer to the only instance of this class (singleton)
@@ -55,7 +55,7 @@ public:
    * @param owner a void pointer to the owner of the texture (e.g. an object). This is used to internally keep track of how many objects use a particular texture
    * @return a texture ID with can be directly used in OpenGL's glBindTexture call, 0 in case of failure
    */
-  int getTexture(const char* name, void* owner);
+  int getTexture(const string &name, void* owner);
 
   /**
    * this function removes all textures belonging to this object. In fact it only removes this object from the textures' internal owner list. Only if this list is empty, the texture is removed from the texture manager. It should be called when an object is destroyed
@@ -69,7 +69,7 @@ public:
    */
   bool mipmapping;
 
-protected:
+private:
 	WP_TextureManager();
 
 	/**
@@ -98,8 +98,8 @@ protected:
 	  /**
 	   * @param name the name of the image, for example <i>texture1.bmp</i> or <i>roof.pcx</i>.  For now only the 24 bit .bmp and 24 bit compressed/uncompressed .pcx format are supported\n
 	   */
-	  WP_Texture(const char* name);
-	  virtual ~WP_Texture();
+	  WP_Texture(const string &name);
+	  ~WP_Texture();
 
 	  /**
 	   * this function removes an owner of the texture's internal list of owners
@@ -111,7 +111,7 @@ protected:
 	  /**
 	   * this variable stores texture name
 	   */
-	  char name[64];
+	  string name;
 
 	  /**
 	   * this variable represents an OpenGL texture ID
@@ -134,7 +134,7 @@ protected:
 	 * @param name the name of the texture
 	 * @return a pointer to a WP_Texture object, the wanted texture
 	 */
-	WP_Texture* findInstance(const char* name);
+	WP_Texture* findInstance(const string &name);
 
 	/**
 	 * this function counts the number of textures belonging to an object 

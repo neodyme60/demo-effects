@@ -52,20 +52,6 @@ class WP_RGBA
 	  byte _a):r(_r), g(_g), b(_b),a(_a){}
   
   /**
-   * copy contructor
-   * @param c the to be copied WP_RGBA object
-   * @return a reference to this new object containing the new copied rgba values
-   */
-  WP_RGBA& operator=(const WP_RGBA& c)
-    { 
-      r = c.r;
-      g = c.g;
-      b = c.b;
-      a = c.a;
-      return *this;
-    };
-  
-  /**
    * red component
    */
   byte r;

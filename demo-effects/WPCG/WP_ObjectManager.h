@@ -19,8 +19,6 @@
 
 #include <string>
 
-using namespace std;
-
 #include <list>
 #include "WPCG.h"
 
@@ -198,14 +196,9 @@ class WP_StaticObject: public WP_Object
   friend class WP_ObjectManager;
   
  public:
-  virtual ~WP_StaticObject(){};
+  ~WP_StaticObject(){};
 
-  void print() const
-    {
-      WP_Object::print();
-    }
-  
- protected:
+ private:
   WP_StaticObject(){};
   
   /**
@@ -239,7 +232,7 @@ class WP_DynamicObject: public WP_Object
   friend class WP_ObjectManager;
   
  public:
-  virtual ~WP_DynamicObject(){};
+  ~WP_DynamicObject(){};
   
   /**
    * a WP_Vector3D object representing the velocity vector of the object
@@ -315,7 +308,7 @@ class WP_DynamicObject: public WP_Object
    */
   void print() const;
 
- protected:
+ private:
   WP_DynamicObject(){};
 
   /**
@@ -379,7 +372,7 @@ class WP_DynamicObject: public WP_Object
 class WP_ObjectManager
 {
 public:
-  virtual ~WP_ObjectManager();
+  ~WP_ObjectManager();
 
   /**
    * this function is used to obtain a pointer to the only instance of this class (singleton)
@@ -514,7 +507,7 @@ public:
    */
   WP_Object* pickObject(int x, int y);
 
-protected:
+private:
   WP_ObjectManager();
 
   /**

@@ -53,15 +53,18 @@ public:
       texCoords[0] = texCoords[1] = 0.0;
     };
 
-  virtual ~WP_Vertex(){};
+  ~WP_Vertex(){};
 
   /**
-   * copy constructor
+   * assignment operator
    * @param v the WP_Vertex object which is copied to this object
    * @return a reference to this object containing the copied vertex values
    */
   WP_Vertex& operator=(const WP_Vertex& v)
     {
+      if (this == &v)
+	return *this;
+
       point = v.point;
       normal = v.normal;
       texCoords[0] = v.texCoords[0];

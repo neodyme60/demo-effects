@@ -15,7 +15,7 @@
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 #include <iostream.h>
-#include <stdio.h>
+#include <string>
 #include "WP_TextureManager.h"
 
 WP_TextureManager* WP_TextureManager::tm_instance = 0;
@@ -42,7 +42,7 @@ WP_TextureManager* WP_TextureManager::getInstance()
   return tm_instance;
 }
 
-int WP_TextureManager::getTexture(const char* name, void* owner)
+int WP_TextureManager::getTexture(const string &name, void* owner)
 {
   //search texture list for instance of texture 'name'
 
@@ -123,13 +123,13 @@ bool WP_TextureManager::removeTextures(void* owner)
     return removed == counter;
 }
 
-WP_TextureManager::WP_Texture* WP_TextureManager::findInstance(const char* name)
+WP_TextureManager::WP_Texture* WP_TextureManager::findInstance(const string &name)
 {
    list<WP_Texture*>::iterator i = textures.begin();
    
    while (i != textures.end())
      {		
-       if (strcmp((*i)->name, name) == 0)
+       if ((*i)->name.compare(name) == 0)
 	 {
 	   return *i; //instance found
 	 }
@@ -138,14 +138,14 @@ WP_TextureManager::WP_Texture* WP_TextureManager::findInstance(const char* name)
    return 0; //instance not found
 }
 
-WP_TextureManager::WP_Texture::WP_Texture(const char* _name):texture_id(0), texture_ok(false)
+WP_TextureManager::WP_Texture::WP_Texture(const string &name):texture_id(0), texture_ok(false)
 {  
   try
     {
-      sprintf(name, "../TEXTURES/%s",_name);
+      const string _name = string("../TEXTURES/") + name;
       
       WP_Image image;
-      if (image.loadImage(name))
+      if (image.loadImage(_name))
 	{
 	  if (WP_TextureManager::getInstance()->mipmapping)
 	    {
@@ -163,7 +163,7 @@ WP_TextureManager::WP_Texture::WP_Texture(const char* _name):texture_id(0), text
 	}
       else
 	{
-	  cerr << "Creation of texture " << name << " failed" << endl;
+	  cerr << "Creation of texture " << _name << " failed" << endl;
 	}
     }
   catch(...){}

@@ -43,10 +43,10 @@ class WP_Material
 public:
 
 	WP_Material();
-	virtual ~WP_Material();
+	~WP_Material();
 
 	/**
-	 * copy constructor
+	 * assignment operator
 	 * @param m the to be copied material
 	 * @return a reference to this object containing the copied material settings
 	 */
@@ -67,11 +67,11 @@ public:
 	 */
 	void setTransparency(scalar t)
 	{ 
-		transparency = t; 
-		ambient.components[3] = 1.0 - t;
-		diffuse.components[3] = ambient.components[3];
-		specular.components[3] = ambient.components[3];
-		emissive.components[3] = ambient.components[3];
+	  transparency = t; 
+	  ambient.components[3] = 1.0 - t;
+	  diffuse.components[3] = ambient.components[3];
+	  specular.components[3] = ambient.components[3];
+	  emissive.components[3] = ambient.components[3];
 	};
 
 	/**

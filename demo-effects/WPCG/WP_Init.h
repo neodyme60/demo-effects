@@ -42,7 +42,7 @@ class WP_Init
  public:
 
   WP_Init();
-  virtual ~WP_Init();
+  ~WP_Init();
   
   /**
    * this function sets the world window in OpenGL. Pass normal screen coordinates to this function so 0,0 is upper left corner (left top) and 640,480 is lower right corner (right bottom)
@@ -62,7 +62,6 @@ class WP_Init
    */
   void vSetViewPort(GLint left, GLint right, GLint bottom, GLint top);
 };
-
 
 #endif
 

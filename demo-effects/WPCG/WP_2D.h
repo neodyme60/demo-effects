@@ -45,9 +45,8 @@ class WP_Draw_2D
 {
 public:
   
-  
   WP_Draw_2D();
-  virtual ~WP_Draw_2D();
+  ~WP_Draw_2D();
   
   /**
    * this function draws a 2D point to the screen
@@ -96,87 +95,5 @@ public:
   void vDrawString(void* font, const char* text, GLint xpos, GLint ypos) const;
 };
 
-/*
-#include <list>
-class WP_PolyLine
-{
- public:
-		
-		WP_PolyLine();
-		WP_PolyLine(GLfloat, GLfloat, GLfloat, bool);
-		virtual ~WP_PolyLine();
-
-		void vAddPoint(WP_Point2D*);
-		void vRemoveAllPoints();
-		void vSetColor(GLfloat, GLfloat, GLfloat);
-		void vGetColor(GLfloat*, GLfloat*, GLfloat*) const;
-		void vSetClosed(bool);
-		bool iGetClosed();
-		void vDraw() const;
-
-protected:
-		void vFreeAll();
-		
-		std::list<WP_Point2D*> points;
-		GLfloat red, green, blue;
-		bool closed;
-};
-
-
-
-//////////////////// WP_PolyFileReader ////////////////////////////////
-
-class WP_PolyFileReader
-{
-public:
-
-	WP_PolyFileReader();
-	virtual ~WP_PolyFileReader();
-
-	GLint vReadFile(const char*);
-	void vDrawPolyLines() const;
-
-protected:
-
-	void vFreeAll();
-	
-	GLint iLoadNormalFile(const char*);
-	GLint iLoadDifferentialFile(const char*);
-	GLint number;
-	WP_PolyLine** lines;
-};
-
-
-//////////////////// WP_TROCHOIDS ////////////////////////////////
-
-class WP_Trochoids
-{
-
-public:
-	WP_Trochoids();
-	WP_Trochoids(GLfloat, GLfloat, GLfloat);
-	virtual ~WP_Trochoids();
-
-	void vDraw(GLfloat, GLfloat);
-	void vIncreaseRadius1(GLfloat);
-	void vIncreaseRadius2(GLfloat);
-	void vIncreaseRod(GLfloat);
-	void vDecreaseRadius1(GLfloat);
-	void vDecreaseRadius2(GLfloat);
-	void vDecreaseRod(GLfloat);
-	void vSetMode(bool);
-	GLfloat fGetRadius1() const;
-	GLfloat fGetRadius2() const;
-	GLfloat fGetRod() const;
-	bool epitrochoid() const;
-	
-
-protected:
-	void vDrawEpiTrochoid(GLfloat, GLfloat) const;
-	void vDrawHypoTrochoid(GLfloat, GLfloat) const;
-	GLfloat radius1, radius2, rod;
-	bool mode;
-};
-*/
 #endif
 

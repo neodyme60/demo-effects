@@ -34,6 +34,8 @@ WP_Vector2D::WP_Vector2D(scalar x, scalar y)
 
 WP_Vector2D& WP_Vector2D::operator=(const WP_Vector2D& v)
 {
+  if (this == &v)
+    return *this;
   data[0] = v.data[0];
   data[1] = v.data[1];
   return *this;

@@ -33,6 +33,56 @@ WP_Triangle::drawOpenGL() const
   glVertex3fv(vertices[2]->point.data);
 }
 
+WP_TriangleGroup::WP_TriangleGroup(const WP_TriangleGroup &group)
+{
+  numberIndices = group.numberIndices;
+  indices = new unsigned int[numberIndices];
+  texCoords = new scalar[numberIndices << 1];
+
+  int i = 0, j = 0;
+  for (; i < numberIndices; ++i, j+= 2)
+    {
+      indices[i] = group.indices[i];
+      texCoords[j] = group.texCoords[j];
+      texCoords[j + 1] = group.texCoords[j + 1];
+    }
+}
+
+WP_TriangleGroup& 
+WP_TriangleGroup::operator=(const WP_TriangleGroup &group)
+{
+  if (this == &group)
+    return *this;
+
+  delete indices;
+  delete texCoords;
+
+  numberIndices = group.numberIndices;
+  indices = new unsigned int[numberIndices];
+  texCoords = new scalar[numberIndices << 1];
+
+  int i = 0, j = 0;
+  for (; i < numberIndices; ++i, j+= 2)
+    {
+      indices[i] = group.indices[i];
+      texCoords[j] = group.texCoords[j];
+      texCoords[j + 1] = group.texCoords[j + 1];
+    }
+
+  return *this;
+}
+
+WP_TriangleStrip& 
+WP_TriangleStrip::operator=(const WP_TriangleStrip &strip)
+{
+  if (this == &strip)
+    return *this;
+
+  WP_TriangleGroup::operator=(strip);
+
+  return *this;
+}
+
 void 
 WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const
 {
@@ -62,6 +112,17 @@ WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *v
 	}    
       glEnd();
     }
+}
+
+WP_TriangleFan& 
+WP_TriangleFan::operator=(const WP_TriangleFan &fan)
+{
+  if (this == &fan)
+    return *this;
+
+  WP_TriangleGroup::operator=(fan);
+
+  return *this;
 }
 
 void 

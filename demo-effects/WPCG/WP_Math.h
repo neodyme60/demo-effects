@@ -40,7 +40,7 @@
 class WP_Math
 {
 public:
-	virtual ~WP_Math(){};
+	~WP_Math(){};
 
 	/**
 	 * this function returns a pointer to the only instance of this class (singleton)
@@ -131,7 +131,7 @@ public:
 	    return aCos[i];
 	  };
 
-protected:
+private:
 	WP_Math();
 
 	/**

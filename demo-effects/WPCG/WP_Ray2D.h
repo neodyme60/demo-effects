@@ -57,7 +57,7 @@ public:
 	 */
 	WP_Ray2D(WP_Line2D& l);
 
-	virtual ~WP_Ray2D(){};
+	~WP_Ray2D(){};
 
 	/**
 	 * this function computes the intersection point of this ray and the given ray. See Chapter 4, page 186, Computer Graphics using OpenGL, F.S. Hill

@@ -52,11 +52,11 @@ public:
 		  const char* top_texture,
 		  const char* bottom_texture);
 	
-	virtual ~WP_SkyBox();
+	~WP_SkyBox();
 
 	void drawSkyBox(const WP_Point3D& p) const;
 
- protected:
+ private:
 	GLuint displayID;
 };
 #endif

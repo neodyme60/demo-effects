@@ -43,6 +43,8 @@ WP_Vector3D::WP_Vector3D(scalar* s)
 
 WP_Vector3D& WP_Vector3D::operator=(const WP_Vector3D& v)
 {
+  if (this == &v)
+    return *this;
   data[0] = v.data[0];
   data[1] = v.data[1];
   data[2] = v.data[2];

@@ -57,10 +57,10 @@ public:
 	 */
 	WP_Vector3D(scalar* s);
 
-	virtual ~WP_Vector3D(){};
+	~WP_Vector3D(){};
 
 	/**
-	 * copy constructor
+	 * assignment operator
 	 * @param v the WP_Vector3D object which is copied to this object
 	 * @return a reference to this object containing the copied vector values
 	 */

@@ -49,7 +49,7 @@ public:
 
 	WP_Terrain(int width, int height, int number_iterations, scalar resolution, int scale);
 	
-	virtual ~WP_Terrain();
+	~WP_Terrain();
 
 	void drawTerrain() const;
 
@@ -58,10 +58,9 @@ public:
 	    middle = p;
 	  }
 
- protected:
+ private:
 	GLuint displayID;
 	scalar displacement_x, displacement_y;
-	
 	WP_Point3D middle;
 };
 #endif

@@ -91,136 +91,139 @@ WP_Matrix2D::WP_Matrix2D(scalar angle)
 
 WP_Matrix2D& WP_Matrix2D::operator=(const WP_Matrix2D& m)
 {
-	for (int i = 0; i < 3; i++)
+  if (this == &m)
+    return *this;
+
+  for (int i = 0; i < 3; i++)
+    {
+      for (int j = 0; j < 3; j++)
 	{
-		for (int j = 0; j < 3; j++)
-		{
-			data[i][j] = m.data[i][j];
-		}
+	  data[i][j] = m.data[i][j];
 	}
-	return *this;
+    }
+  return *this;
 }
 
 WP_Matrix2D WP_Matrix2D::operator*(const WP_Matrix2D& m) const
 {
-	WP_Matrix2D temp = *this;
-	temp *= m;
-	return temp;
+  WP_Matrix2D temp = *this;
+  temp *= m;
+  return temp;
 }
 
 WP_Matrix2D WP_Matrix2D::operator*(scalar s) const
 {
-	WP_Matrix2D temp = *this;
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			temp.data[i][j] *= s;
-	return temp;
+  WP_Matrix2D temp = *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      temp.data[i][j] *= s;
+  return temp;
 }
 
 WP_Matrix2D WP_Matrix2D::operator/(scalar s) const
 {
-	WP_Matrix2D temp = *this;
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			temp.data[i][j] /= s;
-	return temp;
+  WP_Matrix2D temp = *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      temp.data[i][j] /= s;
+  return temp;
 }
 
 WP_Matrix2D WP_Matrix2D::operator-(const WP_Matrix2D& m) const
 {
-	WP_Matrix2D temp = *this;
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			temp.data[i][j] -= m.data[i][j];
-	return temp;
+  WP_Matrix2D temp = *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      temp.data[i][j] -= m.data[i][j];
+  return temp;
 }
 
 WP_Matrix2D WP_Matrix2D::operator+(const WP_Matrix2D& m) const
 {
-	WP_Matrix2D temp = *this;
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			temp.data[i][j] += m.data[i][j];
-	return temp;
+  WP_Matrix2D temp = *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      temp.data[i][j] += m.data[i][j];
+  return temp;
 }
 
 WP_Matrix2D& WP_Matrix2D::operator-()
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			data[i][j] = -data[i][j];
-
-	return *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      data[i][j] = -data[i][j];
+  
+  return *this;
 }
 
 WP_Matrix2D& WP_Matrix2D::operator*=(const WP_Matrix2D& m)
 {
-	WP_Matrix2D matrix = *this;
-	
-	for (int i = 0; i < 3; i++)
-	{ 
-		for (int j = 0; j < 3; j++)
-		{
-			scalar sum = 0.0;
-
-			for (int k = 0; k < 3; k++)
-				sum += matrix.data[i][k] * m.data[k][j];
-		
-			data[i][j] = sum;
-		}
+  WP_Matrix2D matrix = *this;
+  
+  for (int i = 0; i < 3; i++)
+    { 
+      for (int j = 0; j < 3; j++)
+	{
+	  scalar sum = 0.0;
+	  
+	  for (int k = 0; k < 3; k++)
+	    sum += matrix.data[i][k] * m.data[k][j];
+	  
+	  data[i][j] = sum;
 	}
-	return *this;
+    }
+  return *this;
 }
 
 WP_Matrix2D& WP_Matrix2D::operator*=(scalar s)
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			data[i][j] *= s;
-
-	return *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      data[i][j] *= s;
+  
+  return *this;
 }
 
 
 WP_Matrix2D& WP_Matrix2D::operator/=(scalar s)
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			data[i][j] /= s;
-
-	return *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      data[i][j] /= s;
+  
+  return *this;
 }
 
 WP_Matrix2D& WP_Matrix2D::operator+=(const WP_Matrix2D& m)
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			data[i][j] += m.data[i][j];
-
-	return *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      data[i][j] += m.data[i][j];
+  
+  return *this;
 }
 
 WP_Matrix2D& WP_Matrix2D::operator-=(const WP_Matrix2D& m)
 {
-	for (int i = 0; i < 3; i++)
-		for (int j = 0; j < 3; j++)
-			data[i][j] -= m.data[i][j];
-
-	return *this;
+  for (int i = 0; i < 3; i++)
+    for (int j = 0; j < 3; j++)
+      data[i][j] -= m.data[i][j];
+  
+  return *this;
 }
 
 void WP_Matrix2D::createIdentity()
 {
-	data[0][0] = 1.0;
-	data[0][1] = 0.0;
-	data[0][2] = 0.0;
-
-	data[1][0] = 0.0;
-	data[1][1] = 1.0;
-	data[1][2] = 0.0;
-
-	data[2][0] = 0.0;
-	data[2][1] = 0.0;
-	data[2][2] = 1.0;
+  data[0][0] = 1.0;
+  data[0][1] = 0.0;
+  data[0][2] = 0.0;
+  
+  data[1][0] = 0.0;
+  data[1][1] = 1.0;
+  data[1][2] = 0.0;
+  
+  data[2][0] = 0.0;
+  data[2][1] = 0.0;
+  data[2][2] = 1.0;
 }
 

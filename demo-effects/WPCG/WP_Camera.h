@@ -43,7 +43,7 @@ class WP_Object;
 class WP_Camera
 {
 public:
-	virtual ~WP_Camera(){};
+	~WP_Camera(){};
 
 	/**
 	 * this function is used for moving the camera along one of its own axes in the <b>u</b>, <b>v</b> or <b>n</b> direction. Movement along <b>n</b> is <i>forward</i> or <i>backward</i>. Movement along <b>u</b> is <i>left</i> or <i>right</i>. Movement along <b>v</b> is <i>up</i> or <i>down</i>
@@ -206,7 +206,7 @@ public:
 	 */
 	bool normal_viewing_volume;
 
-protected:
+private:
 	WP_Camera();
 
 	/**

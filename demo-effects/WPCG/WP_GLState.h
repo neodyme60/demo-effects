@@ -41,7 +41,7 @@
 class WP_GLState
 {
 public:
-	virtual ~WP_GLState(){};
+	~WP_GLState(){};
 
 	/**
 	 * this static function is used to obtain an instance of this class
@@ -602,7 +602,7 @@ public:
 	 */
 	bool _selection;
 
- protected:
+ private:
 	WP_GLState();
 };
 #endif

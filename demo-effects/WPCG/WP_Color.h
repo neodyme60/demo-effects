@@ -66,20 +66,22 @@ public:
 	    components[3] = a * m;
 	  };
 
-	virtual ~WP_Color(){};
+	~WP_Color(){};
 
 	/**
-	 * copy constructor
+	 * assigment operator
 	 * @param c the to be copied color
 	 * @return a reference to this new object containing the new color components
 	 */
 	WP_Color& operator=(const WP_Color& c)
-	{ 
-		components[0] = c.components[0];
-		components[1] = c.components[1]; 
-		components[2] = c.components[2];
-		components[3] = c.components[3];
-		return *this;
+	{
+	  if (this == &c)
+	    return *this;
+	  components[0] = c.components[0];
+	  components[1] = c.components[1]; 
+	  components[2] = c.components[2];
+	  components[3] = c.components[3];
+	  return *this;
 	};
 
 	/**

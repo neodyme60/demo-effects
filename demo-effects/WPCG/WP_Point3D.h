@@ -53,10 +53,10 @@ public:
    */
   WP_Point3D(scalar x, scalar y, scalar z){ data[0] = x; data[1] = y; data[2] = z; data[3] = 1.0f;};
   
-  virtual ~WP_Point3D(){};
+  ~WP_Point3D(){};
 
   /**
-   * copy constructor
+   * assignment operator
    * @param p the WP_Point3D object which is copied to this object
    * @return a reference to this object containing the copied point values
    */

@@ -26,7 +26,7 @@ class WP_Vector3D;
 
 /**
  * this class represents a light in OpenGL\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
+ * @author Copyright (C) 2001-2002 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -46,7 +46,6 @@ class WP_Vector3D;
 class WP_Light
 { 
  public:
-
   /**
    * an enumeration of the kind of position stored in a WP_Light object, being point or vector
    */
@@ -58,24 +57,54 @@ class WP_Light
       p = new WP_Point3D(0.0, 0.0, 0.0);
     }
 
-  virtual ~WP_Light()
+  //COPY CONSTRUCTOR
+  WP_Light(const WP_Light &light)
+    {
+      k = light.k;
+
+      if (k == point)
+	p = light.p;
+      else
+	v = light.v;
+
+      color = light.color;
+    }
+  
+  ~WP_Light()
     {
       if (k == point)
 	{
-	  if (p)
-	    {
-	      delete p;
-	    }
+	  delete p;
 	}
-      else if (k == vector)
+      else
 	{
-	  if (v)
-	    {
-	      delete v;
-	    }
+	  delete v;
 	}
     }
 
+  /**
+   * assignment operator
+   */
+  WP_Light& operator=(const WP_Light& light)
+    {
+      if (this == &light)
+	return *this;
+
+      k = light.k;
+      if (k == point)
+	{
+	  delete p;
+	  p = light.p;
+	}
+      else
+	{
+	  delete v;
+	  v = light.v;
+	}
+      color = light.color;
+      return *this;
+    }
+  
   /**
    * this function returns the kind of positional data which is stored in this light, being point or vector (directional lighting)
    * @return the kind of positional data which is stored in this light, being point or vector (directional lighting)
@@ -89,7 +118,7 @@ class WP_Light
    * this function returns a pointer to a WP_Point3D object representing the position of the light
    * @return a pointer to a WP_Point3D object representing the position of the light, 0 in case the position is stored as a vector
    */
-  WP_Point3D* getPointPosition()
+  WP_Point3D* getPointPosition() const 
     {
       if (k == point)
 	{
@@ -102,7 +131,7 @@ class WP_Light
    * this function returns a pointer to a WP_Vector3D object representing directional (infinite) light, for example the sun
    * @return a pointer to a WP_Vector3D object representing the position of the light, 0 in case the position is stored as a point
    */
-  WP_Vector3D* getVectorPosition()
+  WP_Vector3D* getVectorPosition() const
     {
       if (k == vector)
 	{
@@ -124,17 +153,11 @@ class WP_Light
 	{
 	  if (k == vector)
 	    {
-	      if (v)
-		{
-		  delete v;
-		}
+	      delete v;
 	    }
-	  if (k == point)
+	  else
 	    {
-	      if (p)
-		{
-		  delete p;
-		}
+	      delete p;
 	    }
 
 	  k = point;
@@ -144,17 +167,11 @@ class WP_Light
 	{
 	  if (k == vector)
 	    {
-	      if (v)
-		{
-		  delete v;
-		}
+	      delete v;
 	    }
-	  if (k == point)
+	  else 
 	    {
-	      if (p)
-		{
-		  delete p;
-		}
+	      delete p;
 	    }
 
 	  k = vector;
@@ -167,7 +184,7 @@ class WP_Light
    */
   WP_Color color;
  
- protected:
+ private:
 
   //an enumeration holding the representation of the position, being a point or a vector
   WP_Light_Pos_Kind k;
