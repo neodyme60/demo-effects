@@ -45,17 +45,19 @@ static Uint8 nlayers = 0;
 
 int TDEC_init_layer_system()
 {
+  nlayers = 0;
   return lt_dlinit();
 }
 int TDEC_exit_layer_system()
 {
+  TDEC_free_layers();
   return lt_dlexit();
 }
 
 void TDEC_free_layers(void)
 {
   Uint8 i;
-
+  
   for (i = 0; i < nlayers; ++i)
     {
       (*layers[i]->effect->free)();
@@ -64,11 +66,12 @@ void TDEC_free_layers(void)
 	printf("TDEC: Error closing plugin\n");
       }
       free(layers[i]->effect);
-      if (i != TDEC_BACKGROUND_LAYER)
+      if (layers[i]->surface != screen)
 	{
 	  SDL_FreeSurface(layers[i]->surface);
 	}
       free(layers[i]);
+      layers[i] = (LAYER*)0;
     }
   nlayers = 0;
 }
@@ -206,13 +209,13 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
   
       background = (LAYER*)malloc(sizeof(LAYER));
       background->surface = screen;
-      background->r.x = 0;
-      background->r.y = 0;
-      background->r.w = screen->w;
-      background->r.h = screen->h;
+      background->r.x = xstart;
+      background->r.y = ystart;
+      background->r.w = width;
+      background->r.h = height;
       background->alpha = 0xFF;
       background->visible = 1;
-      res = 0;
+      res = TDEC_BACKGROUND_LAYER;
 
       background->effect = effect;
       layers[TDEC_BACKGROUND_LAYER] = background;
@@ -246,11 +249,13 @@ void TDEC_draw_layers(void)
 
   for (i = 1; i < nlayers; ++i)
     {
-      LAYER *l = layers[i];
-      if (l->visible)
+      if (layers[i]->visible)
 	{
-	  (*l->effect->draw)();
-	  SDL_BlitSurface(l->surface, 0, screen, &l->r);
+	  (*layers[i]->effect->draw)();
+	  if (layers[i]->surface != screen)
+	    {
+	      SDL_BlitSurface(layers[i]->surface, 0, screen, &layers[i]->r);
+	    }
 	}
     }
   SDL_Flip(screen);
@@ -297,8 +302,10 @@ void TDEC_flatten_layers()
       Uint8 i;
       for (i = 1; i < nlayers; ++i)
 	{
-	  LAYER *l = layers[i];
-	  SDL_BlitSurface(l->surface, 0, screen, &l->r);
+	  if (layers[i]->visible && layers[i]->surface != screen)
+	    {
+	      SDL_BlitSurface(layers[i]->surface, 0, screen, &layers[i]->r);
+	    }
 	}
     }
 }
@@ -337,9 +344,8 @@ void TDEC_disable_layer(Uint8 id)
 
 void TDEC_set_layer_alpha(Uint8 id, Uint8 alpha)
 {
-  LAYER *l = layers[id];
-  l->alpha = alpha;
-  SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
+  layers[id]->alpha = alpha;
+  SDL_SetAlpha(layers[id]->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
 }
 
 Uint8 TDEC_get_layer_alpha(Uint8 id)
