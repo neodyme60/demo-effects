@@ -121,7 +121,7 @@ void TDEC_draw_3dstarfield(void)
     }
 }
 
-inline void TDEC_free_3dstarfield(void)
+void TDEC_free_3dstarfield(void)
 {
   free(stars);
 }

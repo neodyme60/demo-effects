@@ -76,20 +76,26 @@ void process_events( void )
 void init()
 {
   Uint32 i;
-  /*SDL_Surface *scrollerlayer, *firelayer;
-    char *text = " tDeC TdEc ";*/
+  char *text = " tDeC TdEc ";
+  char *text2 = "The Demo Effects Collection ";
 
   if (!TDEC_add_layer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0xFF, "../PLUGINS/PLASMA/plasma", 4))
     {
       exit(1);
     }
+  if (!TDEC_add_layer(SCREEN_WIDTH, 200, 0, SCREEN_HEIGHT - (100 + 32) , 0xFF, "../PLUGINS/JUMPINGSCROLLER/jumpingscroller",  text2, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, SCREEN_WIDTH, 100))
+    {
+      exit(1);
+      }
   if (!TDEC_add_layer(SCREEN_WIDTH, 60, 0, SCREEN_HEIGHT - 60, 0xFF, "../PLUGINS/FIRE/fire", SCREEN_WIDTH, 60, 0, 0))
     {
       exit(1);
       }
+  if (!TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF, "../PLUGINS/SINESCROLLER/sinescroller",  text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2))
+    {
+      exit(1);
+      }
 
-  /*  scrollerlayer = TDEC_add_layer(SCREEN_WIDTH, 150, 0, 0, 0xFF);
-      TDEC_init_sine_scroller(scrollerlayer, text, TDEC_FONT1, TDEC_FONT1_CHARACTERS, 16, 32, 40, 2);*/
 
  /*disable events */
   
@@ -112,8 +118,7 @@ int main( int argc, char* argv[] )
       return -1;
     }
 
- if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA/* | 
-																     SDL_FULLSCREEN*/))
+ if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_DOUBLEBUF | SDL_ANYFORMAT | SDL_HWSURFACE | SDL_HWPALETTE | SDL_SRCALPHA /*|SDL_FULLSCREEN*/))
    quit(1);
 
  TDEC_init_timer();

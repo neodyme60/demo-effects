@@ -29,6 +29,7 @@ static SDL_Rect srect;
 static SDL_Rect frect;
 static Uint16 sine_index = 0;
 static Uint8 pixels;
+static char scroll_id;
 
 void TDEC_init_sine_scroller(SDL_Surface *s, char *_text, char *font, char *_characters,
 			     Uint8 character_width, Uint8 character_height, Uint16 amplitude, Uint8 pixel_width)
@@ -37,7 +38,11 @@ void TDEC_init_sine_scroller(SDL_Surface *s, char *_text, char *font, char *_cha
   Uint16 i, centery;
   SDL_Surface *temp;
 
-  TDEC_init_scroller(_text, font, _characters, character_width, character_height);
+  if ((scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
+    {
+      printf("Error, initiating sine scroller\n");
+      return;
+    }
 
   surface = s;
   centery = surface->h >> 1;
@@ -78,7 +83,7 @@ void TDEC_draw_sine_scroller(void)
       
   if (displacement > 30)
     {
-      TDEC_draw_font_char(TDEC_get_font_char(), scroll_surface, &frect);
+      TDEC_draw_font_char(scroll_id, TDEC_get_font_char(scroll_id), scroll_surface, &frect);
       displacement = 0;
     }
     
@@ -99,6 +104,7 @@ void TDEC_draw_sine_scroller(void)
 void TDEC_free_sine_scroller(void)
 {
   SDL_FreeSurface(scroll_surface);
+  TDEC_free_scroller(scroll_id);
 }
 
 

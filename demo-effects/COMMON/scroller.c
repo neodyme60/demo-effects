@@ -17,51 +17,68 @@
 #include "SDL/SDL_image.h"
 #include "scroller.h"
 
-static SDL_Surface *font_surface;
-static char *text;
-static char *characters;
-static char *text_pointer;
-static Uint8 cwidth;
-static Uint8 cheight;
-static SDL_Rect frect;
-static Uint8 restarted = 0;
+typedef struct
+{
+  SDL_Surface *font_surface;
+  char *text;
+  char *characters;
+  char *text_pointer;
+  Uint8 cwidth;
+  Uint8 cheight;
+  SDL_Rect frect;
+  Uint8 restarted;
+} SCROLLER;
+
+#define MAX_SCROLLERS 10
+static SCROLLER scrollers[MAX_SCROLLERS];
+static Uint8 scroller_index = 0;
 
 char *TDEC_FONT1_CHARACTERS = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 char *TDEC_FONT1 = "../GFX/font.pcx";
 
-static Uint16 TDEC_compute_font_pos(char scroll_char);
+static Uint16 TDEC_compute_font_pos(Uint8 scroll_id, char scroll_char);
 
-void TDEC_init_scroller(char *_text, char *font, char *_characters,
+char TDEC_add_scroller(char *_text, char *font, char *_characters,
 			Uint8 character_width, Uint8 character_height)
 {
-  text = _text;
-  text_pointer = text;
-  font_surface = (SDL_Surface*)(IMG_Load(font));
-  characters = _characters;
-  cwidth = character_width;
-  cheight = character_height;
-  frect.x = 0;
-  frect.y = 0;
-  frect.w = cwidth - 1;
-  frect.h = cheight;
+  /* TODO find empty space and add scroller */
+  if (scroller_index < MAX_SCROLLERS)
+    {
+      scrollers[scroller_index].text = _text;
+      scrollers[scroller_index].text_pointer = _text;
+      scrollers[scroller_index].font_surface = (SDL_Surface*)(IMG_Load(font)); /* TODO, share font surfaces */
+      scrollers[scroller_index].characters = _characters;
+      scrollers[scroller_index].cwidth = character_width;
+      scrollers[scroller_index].cheight = character_height;
+      scrollers[scroller_index].frect.x = 0;
+      scrollers[scroller_index].frect.y = 0;
+      scrollers[scroller_index].frect.w = character_width - 1;
+      scrollers[scroller_index].frect.h = character_height;
+    }
+  else
+    {
+      printf("Unable to add scroller, maximum of %i scrollers reached\n",MAX_SCROLLERS);
+      return -1;
+    }
+  return scroller_index++;
 }
 
 /* determine the font character */
-Uint16 TDEC_compute_font_pos(char scroll_char)
+Uint16 TDEC_compute_font_pos(Uint8 scroll_id, char scroll_char)
 {
-  char* p = characters;
+  char* p = scrollers[scroll_id].characters;
   Uint16 pos = 0;
 
   if (scroll_char == '\0')
     {
-      text_pointer = text;
-      scroll_char = *text_pointer++;
-      restarted = 1;
+      scrollers[scroll_id].text_pointer = scrollers[scroll_id].text;
+      scroll_char = *scrollers[scroll_id].text_pointer++;
+      scrollers[scroll_id].restarted = 1;
     }
 
   while (*p++ != scroll_char)
     {
-      pos += cwidth;
+      pos += scrollers[scroll_id].cwidth;
     }
 
   if (pos > 0)
@@ -70,41 +87,42 @@ Uint16 TDEC_compute_font_pos(char scroll_char)
   return 0;
 }
 
-SDL_Rect* TDEC_get_font_char(void) 
+SDL_Rect* TDEC_get_font_char(Uint8 scroll_id) 
 {
   /* determine font character according to position in scroll text */
   
-  frect.x = TDEC_compute_font_pos(*text_pointer++);
+  scrollers[scroll_id].frect.x = TDEC_compute_font_pos(scroll_id, *scrollers[scroll_id].text_pointer++);
 
-  return &frect;
+  return &scrollers[scroll_id].frect;
 }
 
-void TDEC_free_scroller(void)
+void TDEC_free_scroller(Uint8 scroll_id)
 {
-  SDL_FreeSurface(font_surface);
+  SDL_FreeSurface(scrollers[scroll_id].font_surface);
+  scroller_index--;
 }
 
-Uint8 TDEC_scroller_ready(void)
+Uint8 TDEC_scroller_ready(Uint8 scroll_id)
 {
-  if(restarted)
+  if(scrollers[scroll_id].restarted)
     {
-      restarted = 0;
+      scrollers[scroll_id].restarted = 0;
       return 1;
     }
   return 0;
 }
 
-inline Uint8 TDEC_get_character_width(void)
+Uint8 TDEC_get_character_width(Uint8 scroll_id)
 {
-  return cwidth;
+  return scrollers[scroll_id].cwidth;
 }
 
-inline Uint8 TDEC_get_character_height(void)
+Uint8 TDEC_get_character_height(Uint8 scroll_id)
 {
-  return cheight;
+  return scrollers[scroll_id].cheight;
 }
 
-inline void TDEC_draw_font_char(SDL_Rect *font_rect, SDL_Surface *destination, SDL_Rect *dest_rect)
+void TDEC_draw_font_char(Uint8 scroll_id, SDL_Rect *font_rect, SDL_Surface *destination, SDL_Rect *dest_rect)
 {
-  SDL_BlitSurface(font_surface, font_rect, destination, dest_rect);
+  SDL_BlitSurface(scrollers[scroll_id].font_surface, font_rect, destination, dest_rect);
 }

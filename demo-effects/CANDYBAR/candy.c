@@ -183,7 +183,7 @@ int main( int argc, char* argv[] )
  
       for (i = 0; i < 128; ++i)
 	{
-	  temp = *(Uint8*)(copper_surface->pixels + pitch);
+	  temp = *((Uint8*)copper_surface->pixels + pitch);
 	  SDL_GetRGB(temp, screen->format, &col.r, &col.g, &col.b);
 	  
 	  if (i < 64)

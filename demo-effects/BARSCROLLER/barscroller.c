@@ -275,7 +275,7 @@ int main( int argc, char* argv[] )
 	      TDEC_scale_copy_vscanline(scroll_surface, copy_surface, i, aSin2[sin_index]);
 	      rs.x = i;
 	      SDL_FillRect(screen, &rs2, 0);
-	      image = (Uint8*)(screen->pixels + 12 * screen->w);
+	      image = (Uint8*)screen->pixels + 12 * screen->w;
 	      *image = 1;
 	      image += screen->w;
 	      *image = 2;
@@ -295,7 +295,7 @@ int main( int argc, char* argv[] )
 	  else
 	    {
 	      TDEC_scale_copy_vscanline(flipped_surface, copy_surface, i, -aSin2[sin_index]);
-	      image = (Uint8*)(copy_surface->pixels + 12 * copy_surface->w + i);
+	      image = (Uint8*)copy_surface->pixels + 12 * copy_surface->w + i;
 	      *image = 1;
 	      image += copy_surface->w;
 	      *image = 2;

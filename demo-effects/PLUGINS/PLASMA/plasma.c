@@ -88,9 +88,9 @@ void plasma_LTX_draw_effect()
 	  _plasma_tpos2 &= 511;
 	  
 	  x = _plasma_aSin[_plasma_tpos1] + _plasma_aSin[_plasma_tpos2] 
-	    + _plasma_aSin[_plasma_tpos3] + _plasma_aSin[_plasma_tpos4]; //actual plasma calculation
+	    + _plasma_aSin[_plasma_tpos3] + _plasma_aSin[_plasma_tpos4]; /* actual plasma calculation */
 	  
-	  index = 128 + (x >> 4); //fixed point multiplication but optimized so basically it says (x * (64 * 1024) / (1024 * 1024)), x is already multiplied by 1024
+	  index = 128 + (x >> 4); /*fixed point multiplication but optimized so basically it says (x * (64 * 1024) / (1024 * 1024)), x is already multiplied by 1024 */
 	  
 	  for (k = 0; k < _plasma_pixelspcolor; ++j, ++k)
 	    {

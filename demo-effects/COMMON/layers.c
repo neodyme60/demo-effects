@@ -144,6 +144,8 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
     }
   else if (nlayers == 0)
     {
+      LAYER *background;
+
       /* first layer so init layering system */
 
       /* check if video was set */
@@ -155,7 +157,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 
       /* screen is the display buffer and therefore the background */
   
-      LAYER *background = (LAYER*)malloc(sizeof(LAYER));
+      background = (LAYER*)malloc(sizeof(LAYER));
       background->surface = screen;
       background->r.x = 0;
       background->r.y = 0;
@@ -217,7 +219,7 @@ SDL_Surface* TDEC_add_layer(Uint16 width, Uint16 height, Uint16 xstart, Uint16 y
 }
 
 /* draw each effect attached to every surface and flatten layer*/
-inline void TDEC_draw_layers(void)
+void TDEC_draw_layers(void)
 {
   Uint8 i;
   for (i = 0; i < nlayers; ++i)
@@ -229,12 +231,12 @@ inline void TDEC_draw_layers(void)
   SDL_Flip(screen);
 }
 
-inline SDL_Surface* TDEC_get_background_layer(void)
+SDL_Surface* TDEC_get_background_layer(void)
 {
   return layers[TDEC_BACKGROUND_LAYER]->surface;
 }
 
-inline SDL_Surface* TDEC_get_layer(Uint8 index)
+SDL_Surface* TDEC_get_layer(Uint8 index)
 {
   if (index < nlayers)
     {
@@ -243,7 +245,7 @@ inline SDL_Surface* TDEC_get_layer(Uint8 index)
   return (SDL_Surface*)0;
 }
 
-inline void TDEC_flatten_layers()
+void TDEC_flatten_layers()
 {
   if (nlayers > 1)
     {
@@ -256,12 +258,12 @@ inline void TDEC_flatten_layers()
     }
 }
 
-inline void TDEC_clear_layer(SDL_Surface* surface)
+void TDEC_clear_layer(SDL_Surface* surface)
 {
       SDL_FillRect(surface, 0, SDL_MapRGB(surface->format, 0, 0, 0));
 }
 
-inline void TDEC_remove_layer(void)
+void TDEC_remove_layer(void)
 {
   if (nlayers > 1)
     {

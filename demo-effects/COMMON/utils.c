@@ -23,9 +23,7 @@ static void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint1
 
 SDL_Surface* TDEC_copy_surface(SDL_Surface *surface)
 {
-  SDL_Surface *res;
-
-  res = SDL_ConvertSurface(surface, surface->format, surface->flags);
+  SDL_Surface *res = SDL_ConvertSurface(surface, surface->format, surface->flags);
 
   if (res->format->palette)
     SDL_SetPalette(res, SDL_LOGPAL | SDL_PHYSPAL, surface->format->palette->colors, 0, surface->format->palette->ncolors);
@@ -83,7 +81,6 @@ Uint8 TDEC_fadeout( SDL_Surface *s, Uint8 rate )
 {
   Uint8 res;
   SDL_Palette *p = s->format->palette;
-  
   res = TDEC_fadeout_palette(p, rate);
   SDL_SetPalette(s, SDL_PHYSPAL, p->colors, 0, p->ncolors);
   return res;
@@ -140,7 +137,6 @@ Uint8 TDEC_fadein( SDL_Surface *s, SDL_Palette *d, Uint8 rate )
 {
   Uint8 res;
   SDL_Palette *ps = s->format->palette;
-  
   res = TDEC_fadein_palette(d,ps,rate);
   SDL_SetPalette(s, SDL_LOGPAL | SDL_PHYSPAL, ps->colors, 0, ps->ncolors);
   return res;
@@ -166,8 +162,11 @@ void TDEC_scalex_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 perc
 {
   float skip_columns, rest;
   Uint16 i,j;
-  SDL_Rect o = {0, 0, 1, original->h};
-  SDL_Rect c = {0, 0, 1, original->h};
+  SDL_Rect o = {0, 0, 1, 0};
+  SDL_Rect c = {0, 0, 1, 0};
+
+  o.h = original->h;
+  c.h = original->h;
 
   if (original->w != copy->w)
     {
@@ -232,8 +231,11 @@ void TDEC_scaley_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 perc
 {
   float skip_scanlines, rest;
   Uint16 i, j;
-  SDL_Rect o = {0, 0, original->w, 1};
-  SDL_Rect c = {0, 0, copy->w, 1};
+  SDL_Rect o = {0, 0, 0, 1};
+  SDL_Rect c = {0, 0, 0, 1};
+
+  o.w = original->w;
+  c.w = copy->w;
 
   if (original->h != copy->h)
     {
@@ -304,9 +306,8 @@ void TDEC_scale_copy_image(SDL_Surface *original, SDL_Surface *copy, Uint8 perce
 
 void TDEC_scalex_image(SDL_Surface *surface, Uint8 percentage)
 {
-  SDL_Surface *s;
+  SDL_Surface *s = TDEC_copy_surface(surface);
 
-  s = TDEC_copy_surface(surface);
   TDEC_scalex_copy_image(surface, s, percentage);
 
   SDL_BlitSurface(s, 0, surface, 0);
@@ -316,9 +317,8 @@ void TDEC_scalex_image(SDL_Surface *surface, Uint8 percentage)
 
 void TDEC_scaley_image(SDL_Surface *surface, Uint8 percentage)
 {
-  SDL_Surface *s;
+  SDL_Surface *s = TDEC_copy_surface(surface);
 
-  s = TDEC_copy_surface(surface);
   TDEC_scaley_copy_image(surface, s, percentage);
 
   SDL_BlitSurface(s, 0, surface, 0);
@@ -340,8 +340,13 @@ SDL_Surface* TDEC_scale_image_new(SDL_Surface *source, Uint8 percentage)
   Uint16 i, j;
   Uint16 width = (source->w / 100.0) * percentage;
   Uint16 height = (source->h / 100.0) * percentage;
-  SDL_Rect start = {0,source->h, width, height};
+  SDL_Rect start;
   
+  start.x = 0;
+  start.y = source->h;
+  start.w = width;
+  start.h = height;
+
   /* source should be unchanged */
 
   s = TDEC_copy_surface(source);
@@ -407,16 +412,27 @@ void TDEC_scale_copy_hscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 
   
   if (percentage == 0)
     {
-      SDL_Rect c = {0, scanline_index, copy->w, 1};
+      SDL_Rect c;
+      c.x = 0;
+      c.y = scanline_index;
+      c.w = copy->w;
+      c.h = 1;
       SDL_FillRect(copy, &c, SDL_MapRGB(copy->format, 0,0,0));
       return;
     }
 
   if (percentage >= 100)
     {
-      SDL_Rect o = {0, scanline_index, original->w, 1};
-      SDL_Rect c = {0, scanline_index, copy->w, 1};
-      
+      SDL_Rect o;
+      SDL_Rect c;
+      o.x = 0;
+      o.y = scanline_index;
+      o.w = original->w;
+      o.h = 1;
+      c.x = 0;
+      c.y = scanline_index;
+      c.w = copy->w;
+      c.h = 1;
       SDL_BlitSurface(original, &o, copy, &c);
       
       return;
@@ -479,10 +495,13 @@ void TDEC_scale_copy_hscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 
 
 void TDEC_scale_hscanline(SDL_Surface *surface, Uint16 scanline_index, Uint8 percentage)
 {
-  SDL_Surface *s;
-  SDL_Rect o = {0, scanline_index, surface->w, 1};
-
-  s = TDEC_copy_surface(surface);
+  SDL_Rect o;
+  SDL_Surface *s = TDEC_copy_surface(surface);
+  o.x = 0;
+  o.y = scanline_index;
+  o.w = surface->w;
+  o.h = 1;
+  
   TDEC_scale_copy_hscanline(surface, s, scanline_index, percentage);
 
   SDL_BlitSurface(s, &o, surface, &o);
@@ -513,15 +532,29 @@ void TDEC_scale_copy_vscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 
   
   if (percentage == 0)
     {
-      SDL_Rect c = {scanline_index, 0, 1, copy->h};
+      SDL_Rect c;
+      c.x = scanline_index;
+      c.y = 0;
+      c.w = 1;
+      c.h = copy->h;
       SDL_FillRect(copy, &c, SDL_MapRGB(copy->format, 0,0,0));
       return;
     }
 
   if (percentage >= 100)
     {
-      SDL_Rect o = {scanline_index, 0, 1, original->h};
-      SDL_Rect c = {scanline_index, 0, 1, copy->h};
+      SDL_Rect o;
+      SDL_Rect c;
+
+      o.x = scanline_index;
+      o.y = 0;
+      o.w = 1;
+      o.h = original->h;
+
+      c.x = scanline_index;
+      c.y = 0;
+      c.w = 1;
+      c.h = copy->h;
       
       SDL_BlitSurface(original, &o, copy, &c);
       
@@ -582,10 +615,13 @@ void TDEC_scale_copy_vscanline(SDL_Surface *original, SDL_Surface *copy, Uint16 
 
 void TDEC_scale_vscanline(SDL_Surface *surface, Uint16 scanline_index, Uint8 percentage)
 {
-  SDL_Surface *s;
-  SDL_Rect o = {scanline_index, 0, 1, surface->h};
+  SDL_Rect o;
+  SDL_Surface *s = TDEC_copy_surface(surface);
+  o.x = scanline_index;
+  o.y = 0;
+  o.w = 1;
+  o.h = surface->h;
 
-  s = TDEC_copy_surface(surface);
   TDEC_scale_copy_vscanline(surface, s, scanline_index, percentage);
 
   SDL_BlitSurface(s, &o, surface, &o);
@@ -596,8 +632,18 @@ void TDEC_scale_vscanline(SDL_Surface *surface, Uint16 scanline_index, Uint8 per
 void TDEC_flipx_copy_image(SDL_Surface *original, SDL_Surface *copy)
 {
   Uint16 i;
-  SDL_Rect o = {0, 0, original->w, 1};
-  SDL_Rect c = {0, 0, copy->w, 1};
+  SDL_Rect o;
+  SDL_Rect c;
+  
+  o.x = 0;
+  o.y = 0;
+  o.w = original->w;
+  o.h = 1;
+
+  c.x = 0;
+  c.y = 0;
+  c.w = copy->w;
+  c.h = 1;
 
   if (original->h != copy->h)
     {
@@ -615,9 +661,8 @@ void TDEC_flipx_copy_image(SDL_Surface *original, SDL_Surface *copy)
 
 void TDEC_flipx_image(SDL_Surface *surface)
 {
-  SDL_Surface *s;
+  SDL_Surface *s = TDEC_copy_surface(surface);
 
-  s = TDEC_copy_surface(surface);
   TDEC_flipx_copy_image(surface, s);
 
   SDL_BlitSurface(s, 0, surface, 0);
@@ -628,8 +673,18 @@ void TDEC_flipx_image(SDL_Surface *surface)
 void TDEC_flipy_copy_image(SDL_Surface *original, SDL_Surface *copy)
 {
   Uint16 i;
-  SDL_Rect o = {0, 0, 1, original->h};
-  SDL_Rect c = {0, 0, 1, copy->h};
+  SDL_Rect o;
+  SDL_Rect c;
+
+  o.x = 0;
+  o.y = 0;
+  o.w = 1;
+  o.h = original->h;
+
+  c.x = 0;
+  c.y = 0;
+  c.w = 1;
+  c.h = copy->h;
 
   if (original->w != copy->w)
     {
@@ -647,9 +702,8 @@ void TDEC_flipy_copy_image(SDL_Surface *original, SDL_Surface *copy)
 
 void TDEC_flipy_image(SDL_Surface *surface)
 {
-  SDL_Surface *s;
+  SDL_Surface *s = TDEC_copy_surface(surface);
 
-  s = TDEC_copy_surface(surface);
   TDEC_flipy_copy_image(surface, s);
   
   SDL_BlitSurface(s, 0, surface, 0);
@@ -885,6 +939,7 @@ void TDEC_rquaddivide(SDL_Surface *s, Uint16 startx, Uint16 starty, Uint16 width
 Uint32 TDEC_get_pixel(SDL_Surface *surface, int x, int y)
 {
   Uint32 res;
+  Uint8 *p;
   int bpp = surface->format->BytesPerPixel;
   
   if (SDL_MUSTLOCK(surface))
@@ -893,7 +948,7 @@ Uint32 TDEC_get_pixel(SDL_Surface *surface, int x, int y)
     }
   
   /* Here p is the address to the pixel we want to retrieve */
-  Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+  p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
   switch(bpp) 
     {
@@ -929,15 +984,16 @@ Uint32 TDEC_get_pixel(SDL_Surface *surface, int x, int y)
  */
 void TDEC_put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
+  Uint8 *p;
   int bpp = surface->format->BytesPerPixel;
-  
+
   if (SDL_MUSTLOCK(surface))
     {
       SDL_LockSurface(surface);
     }
   
   /* Here p is the address to the pixel we want to set */
-  Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+  p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
   
   switch(bpp) 
     {

@@ -28,23 +28,23 @@ void TDEC_set_fps(unsigned char _fps)
 	Min_Tick = ((1000 / fps) / 10) * 10;
 }
 
-inline void TDEC_print_fps()
+void TDEC_print_fps()
 {
   printf("Preferred FPS was: %i\n", fps);
 }
 
-inline void TDEC_new_time()
+void TDEC_new_time()
 {
      next = SDL_GetTicks() + Tick_Interval;
 }
 
-inline int TDEC_get_fps()
+int TDEC_get_fps()
 {
   /*return 1000 / (Ticks / Drawn_Frames);*/
   return fps;
 }
 
-inline int TDEC_fps_ok()
+int TDEC_fps_ok()
 {
   now = SDL_GetTicks();
   
@@ -59,7 +59,7 @@ inline int TDEC_fps_ok()
   return 1;
 }
 
-inline void TDEC_init_timer()
+void TDEC_init_timer()
 {
   SDL_InitSubSystem(SDL_INIT_TIMER);
 }

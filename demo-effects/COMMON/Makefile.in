@@ -93,7 +93,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 lib_LTLIBRARIES = libTDEC.la
-libTDEC_la_SOURCES = fps.c fps.h video.c video.h utils.h utils.c layers.c layers.h c scroller.h scroller.c jumpingscroller.h jumpingscroller.c 3dstarfield.h 3dstarfield.c copperbars.h copperbars.c sinescroller.h sinescroller.c 
+libTDEC_la_SOURCES = fps.c fps.h video.c video.h utils.h utils.c layers.c layers.h c scroller.h scroller.c 3dstarfield.h 3dstarfield.c copperbars.h copperbars.c  
 libTDEC_la_LDFLAGS = $(LIBLTDL) -export-dynamic
 EXTRA_DIST = tdec.h
 INCLUDES = $(INCLTDL)		
@@ -105,7 +105,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libTDEC_la_LIBADD =
 am_libTDEC_la_OBJECTS = fps.lo video.lo utils.lo layers.lo scroller.lo \
-	jumpingscroller.lo 3dstarfield.lo copperbars.lo sinescroller.lo
+	3dstarfield.lo copperbars.lo
 libTDEC_la_OBJECTS = $(am_libTDEC_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -117,10 +117,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/3dstarfield.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/copperbars.Plo ./$(DEPDIR)/fps.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/jumpingscroller.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/layers.Plo ./$(DEPDIR)/scroller.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/sinescroller.Plo ./$(DEPDIR)/utils.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/video.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/utils.Plo ./$(DEPDIR)/video.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
@@ -182,10 +180,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/3dstarfield.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/copperbars.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fps.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jumpingscroller.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/layers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scroller.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sinescroller.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/video.Plo@am__quote@
 

@@ -14,9 +14,7 @@ extern "C" {
 #include "layers.h"
 #include "fire.h"
 #include "scroller.h"
-#include "jumpingscroller.h"
 #include "3dstarfield.h"
-#include "sinescroller.h"
 
 #ifdef __cplusplus
 }

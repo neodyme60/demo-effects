@@ -53,7 +53,7 @@ void quit( int code )
   exit( code );
 }
 
-inline int rand_fun ()
+int rand_fun ()
 {
     return rand() % 256;
 }

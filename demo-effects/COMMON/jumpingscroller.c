@@ -37,6 +37,7 @@ static Uint16 width;
 static Uint16 height;
 static SDL_Rect frect;
 static SDL_Rect srect;
+static char scroll_id;
 
 void TDEC_init_jumping_scroller(SDL_Surface *s, char *_text, char *font, char *_characters,
 				Uint8 character_width, Uint8 character_height,
@@ -49,7 +50,11 @@ void TDEC_init_jumping_scroller(SDL_Surface *s, char *_text, char *font, char *_
   height = _height;
   short centery = height / 2;
 
-  TDEC_init_scroller(_text, font, _characters, character_width, character_height);
+  if ((scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
+    {
+      printf("Error, initiating jumping scroller\n");
+      return;
+    }
 
   surface = s;
  
@@ -98,9 +103,9 @@ void TDEC_init_jumping_scroller(SDL_Surface *s, char *_text, char *font, char *_
 
   displacement = 0;
 
-  frect.h = TDEC_get_character_height();
-  srect.w = TDEC_get_character_width();
-  srect.h = TDEC_get_character_height();
+  frect.h = TDEC_get_character_height(scroll_id);
+  srect.w = TDEC_get_character_width(scroll_id);
+  srect.h = TDEC_get_character_height(scroll_id);
 }
 
 void TDEC_draw_jumping_scroller(void)
@@ -116,9 +121,9 @@ void TDEC_draw_jumping_scroller(void)
 	{
 	  /* find an unused letter */
 	  
-	  if (letters[i].xpos < -TDEC_get_character_width())
+	  if (letters[i].xpos < -TDEC_get_character_width(scroll_id))
 	    {
-	      SDL_Rect *r = TDEC_get_font_char();
+	      SDL_Rect *r = TDEC_get_font_char(scroll_id);
 	      letters[i].xpos = width;
 	      letters[i].sin_index = 0;
 	      letters[i].font_pos = r->x;
@@ -140,7 +145,7 @@ void TDEC_draw_jumping_scroller(void)
   for (i = 0; i < nletters; ++i)
     {
       letters[i].xpos -= 3;
-      if (letters[i].xpos  > -TDEC_get_character_width())
+      if (letters[i].xpos  > -TDEC_get_character_width(scroll_id))
 	{
 	  letters[i].sin_index += 8;
 	  letters[i].sin_index %= 540;
@@ -151,19 +156,19 @@ void TDEC_draw_jumping_scroller(void)
 	      
 	      short diff = letters[i].xpos;
 	      frect.x = letters[i].font_pos - 1 - diff;
-	      frect.w = TDEC_get_character_width() +  diff;
+	      frect.w = TDEC_get_character_width(scroll_id) +  diff;
 	      srect.x = 0;
 	    }
 	  else
 	    {
 	      frect.x = letters[i].font_pos - 1;
-	      frect.w = TDEC_get_character_width();
+	      frect.w = TDEC_get_character_width(scroll_id);
 	      srect.x = letters[i].xpos;
 	    }
 
 	  srect.y = aSin[letters[i].sin_index];
 	  
-	  TDEC_draw_font_char(&frect, surface, &srect);
+	  TDEC_draw_font_char(scroll_id, &frect, surface, &srect);
 	}
     }
 }
@@ -171,4 +176,5 @@ void TDEC_draw_jumping_scroller(void)
 void TDEC_free_jumping_scroller(void)
 {
   free(letters);
+  TDEC_free_scroller(scroll_id);
 }

@@ -174,9 +174,9 @@ int main( int argc, char* argv[] )
 	      tpos1 &= 511;
 	      tpos2 &= 511;
 	      
-	      x = aSin[tpos1] + aSin[tpos2] + aSin[tpos3] + aSin[tpos4]; //actual plasma calculation
+	      x = aSin[tpos1] + aSin[tpos2] + aSin[tpos3] + aSin[tpos4]; /*actual plasma calculation*/
 	      
-	      index = 128 + (x >> 4); //fixed point multiplication but optimized so basically it says (x * (64 * 1024) / (1024 * 1024)), x is already multiplied by 1024
+	      index = 128 + (x >> 4); /*fixed point multiplication but optimized so basically it says (x * (64 * 1024) / (1024 * 1024)), x is already multiplied by 1024*/
 	      
 	      *image++ = index;
 	      

@@ -14,21 +14,14 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-#ifndef SCROLLER_H
-#define SCROLLER_H
+#ifndef JUMPING_SCROLLER_H
+#define JUMPING_SCROLLER_H
 
+#include <stdarg.h>
 #include "SDL/SDL.h"
 
-extern char TDEC_add_scroller(char *_text, char *font, char *_characters, 
-			       Uint8 character_width, Uint8 character_height);
-extern SDL_Rect* TDEC_get_font_char(Uint8 scroll_id);
-extern void TDEC_free_scroller(Uint8 scroll_id);
-extern Uint8 TDEC_scroller_ready(Uint8 scroll_id);
-extern Uint8 TDEC_get_character_width(Uint8 scroll_id);
-extern Uint8 TDEC_get_character_height(Uint8 scroll_id);
-extern void TDEC_draw_font_char(Uint8 scroll_id, SDL_Rect *font_rect, SDL_Surface *destination, SDL_Rect *dest_rect);
-
-extern char *TDEC_FONT1_CHARACTERS;
-extern char *TDEC_FONT1;
+extern void jumpingscroller_LTX_init_effect(SDL_Surface *s, va_list parameters);
+extern void jumpingscroller_LTX_draw_effect(void);
+extern void jumpingscroller_LTX_free_effect(void);
 
 #endif

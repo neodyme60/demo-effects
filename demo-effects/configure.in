@@ -100,7 +100,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Get compile and linking flags
-CFLAGS="$CFLAGS `sdl-config --cflags` -Wall"
+CFLAGS="$CFLAGS `sdl-config --cflags` -Wall -std=c89 -U__STRICT_ANSI__ -pedantic"
 LIBS="$LIBS `sdl-config --libs`"
 
 ACLOCAL="aclocal -I m4 \$(ACLOCAL_FLAGS)"
@@ -119,4 +119,5 @@ BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLE
 FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile OPCODE-1.2/Makefile WPCG/Makefile 
 DEMON/Makefile BUMP2D/Makefile TERRAIN/Makefile UFOS/Makefile PLASMACUBE/Makefile TWINSCROLLER/Makefile 
 SPIRALSINESCROLL/Makefile BARSCROLLER/Makefile TUNNEL/Makefile BLOB/Makefile TUXTRAIL/Makefile DEMONS/Makefile 
-MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile)
+MULTILAYER/Makefile PLUGINS/Makefile PLUGINS/PLASMA/Makefile PLUGINS/FIRE/Makefile PLUGINS/SINESCROLLER/Makefile 
+PLUGINS/JUMPINGSCROLLER/Makefile)

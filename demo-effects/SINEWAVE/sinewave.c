@@ -183,8 +183,13 @@ void sinewave( void )
 {
   Uint16 i, sin_backup = sin_index;
   static SINE_EFFECT* e = EFFECTS.sine_effects;
-  SDL_Rect r = {e->sine_table[sin_backup], 0,SCREEN_WIDTH, 1};
   SDL_Rect d = {0, 0, SCREEN_WIDTH, 1};
+  SDL_Rect r;
+
+  r.x = e->sine_table[sin_backup];
+  r.y = 0;
+  r.w = SCREEN_WIDTH;
+  r.h = 1;
  
  if (e->effect)
    {
