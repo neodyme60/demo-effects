@@ -31,7 +31,7 @@ typedef struct
 
 static PIXEL _lens_lens[LENS_WIDTH][LENS_WIDTH];
 static SDL_Surface *_lens_surface;
-static Uint32 _lens_x = 60, _lens_y = 60, _lens_xd = 1, _lens_yd = 1;
+static Uint32 _lens_x, _lens_y, _lens_xd, _lens_yd;
 
 void _lens_apply_lens(int ox, int oy)
 {
@@ -87,6 +87,10 @@ void lens_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list paramet
    int x, y, r, d;
 
    _lens_surface = s;
+   _lens_x = 60; 
+   _lens_y = 60; 
+   _lens_xd = 1;
+   _lens_yd = 1;
  
     /* generate the lens distortion */
     r = LENS_WIDTH/2;

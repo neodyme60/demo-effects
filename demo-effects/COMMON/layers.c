@@ -43,6 +43,15 @@ typedef struct
 static LAYER* layers[NLAYERS];
 static Uint8 nlayers = 0;
 
+int TDEC_init_layer_system()
+{
+  return lt_dlinit();
+}
+int TDEC_exit_layer_system()
+{
+  return lt_dlexit();
+}
+
 void TDEC_free_layers(void)
 {
   Uint8 i;
@@ -50,7 +59,10 @@ void TDEC_free_layers(void)
   for (i = 0; i < nlayers; ++i)
     {
       (*layers[i]->effect->free)();
-      lt_dlclose(layers[i]->effect->effect_module);
+      if ((lt_dlclose(layers[i]->effect->effect_module)) != 0)
+      {
+	printf("TDEC: Error closing plugin\n");
+      }
       free(layers[i]->effect);
       if (i != TDEC_BACKGROUND_LAYER)
 	{
@@ -59,7 +71,6 @@ void TDEC_free_layers(void)
       free(layers[i]);
     }
   nlayers = 0;
-  lt_dlexit();
 }
 
 SDL_Surface* TDEC_get_background_layer(void)
@@ -75,8 +86,6 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
   EFFECT *effect;
   Uint8 is_filter;
 
-  lt_dlinit();
-
   /* dynamically load effects-plugin, attach it to a layer and init it */
 
   effect = (EFFECT*)malloc(sizeof(EFFECT));
@@ -88,7 +97,7 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
       fprintf (stderr, "%s\n", lt_dlerror());
       return -1;
     }
-
+  
   effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
   if (!effect->init)  
     {

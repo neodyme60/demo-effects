@@ -26,7 +26,7 @@
 #include "plasma.h"
 
 static SDL_Surface *_plasma_surface;
-static Uint16 _plasma_pos1 = 0, _plasma_pos2 = 0, _plasma_pos3 = 0, _plasma_pos4 = 0, 
+static Uint16 _plasma_pos1, _plasma_pos2, _plasma_pos3, _plasma_pos4, 
   _plasma_tpos1, _plasma_tpos2, _plasma_tpos3, _plasma_tpos4;
 static int _plasma_aSin[512];
 static SDL_Color _plasma_colors[256];
@@ -40,6 +40,11 @@ void plasma_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list param
   _plasma_pixelspcolor = (Uint8)va_arg(parameters, int);
  
   _plasma_surface = s;
+
+  _plasma_pos1 = 0;
+  _plasma_pos2 = 0;
+  _plasma_pos3 = 0;
+  _plasma_pos4 = 0;
 
   /*create sin lookup table */
   for (i = 0; i < 512; i++)

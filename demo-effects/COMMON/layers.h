@@ -25,6 +25,9 @@
 #define TDEC_NO_FILTER 0
 #define TDEC_FILTER 1
 
+extern int TDEC_init_layer_system();
+extern int TDEC_exit_layer_system();
+
 extern char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, 
 				   const char *module, void (*restart_callback)(void),  ...);
 extern SDL_Surface* TDEC_get_backgroundlayer(void);
