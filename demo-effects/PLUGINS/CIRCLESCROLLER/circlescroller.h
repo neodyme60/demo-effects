@@ -19,8 +19,10 @@
 
 #include <stdarg.h>
 #include "SDL/SDL.h"
+#include "list.h"
 
-extern void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void circlescroller_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters);
+extern void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list);
 extern void circlescroller_LTX_draw_effect(void);
 extern void circlescroller_LTX_free_effect(void);
 extern Uint8 circlescroller_LTX_is_filter(void);

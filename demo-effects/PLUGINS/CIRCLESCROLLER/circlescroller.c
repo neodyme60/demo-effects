@@ -48,7 +48,7 @@ static char _circle_scroll_id;
 static Uint16 _circle_x_move, _circle_y_move;
 static void (*_circle_restart)(void);
 
-void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_list parameters)
+void circlescroller_LTX_init_effect_valist(SDL_Surface *s, void (*restart)(void), va_list parameters)
 {
   float rad;
   Uint16 i;
@@ -67,6 +67,76 @@ void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), va_li
   character_width = (Uint8)va_arg(parameters, int);
   character_height = (Uint8)va_arg(parameters, int);
   _circle_radius = (Uint16)va_arg(parameters, int);
+
+  if ((_circle_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
+    {
+      printf("Error, initiating circle scroller\n");
+      return;
+    }
+
+  /* letters can overlap so blit with black as transparant color */
+
+  TDEC_set_font_colorkey(_circle_scroll_id, 0, 0, 0, 0);
+
+  _circle_surface = s;
+ 
+  centerx = _circle_surface->w >> 1;
+  centery = _circle_surface->h >> 1;
+
+  _circle_rightborder = _circle_surface->w - character_width;
+  _circle_bottomborder = _circle_surface->h - character_height;
+
+  /*create sin lookup table */
+
+  for (i = 0; i < 360; ++i)
+    {
+      rad =  (float)i * 0.0174532;
+      _circle_aSin[i] = centery - (short)((sin(rad) * (float)_circle_radius));
+      _circle_aCos[i] = centerx - (short)((cos(rad) * (float)_circle_radius));
+    }
+
+  for (i = 0; i < 512; ++i)
+    {
+      rad =  (float)i * 0.0174532 * 0.703125;
+      _circle_movement[i] = sin(rad) * (_circle_surface->w / 3.0); 
+    }
+
+  _circle_nletters = (_circle_radius / character_height) * 10;
+  _circle_letters = (LETTER*)malloc(_circle_nletters * sizeof(LETTER));
+  
+  /* reset letters */
+  for (i = 0; i < _circle_nletters; ++i)
+    {
+      _circle_letters[i].sin_index = 0;
+    }
+
+  _circle_displacement = 0;
+
+  _circle_frect.w = TDEC_get_character_width(_circle_scroll_id);
+  _circle_frect.h = TDEC_get_character_height(_circle_scroll_id);
+  _circle_srect.w = _circle_frect.w;
+  _circle_srect.h = _circle_frect.h;
+}
+
+void circlescroller_LTX_init_effect(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list)
+{
+  float rad;
+  Uint16 i;
+  short centerx, centery;
+  char *_text, *font, *_characters;
+  Uint8 character_width, character_height;
+
+  _circle_x_move = 0;
+  _circle_y_move = 0;
+
+  _circle_restart = restart;
+
+  _text = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  font = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  _characters = *(char**)TDEC_LIST_get_data_next(&argument_list);
+  character_width = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  character_height = *(Uint8*)TDEC_LIST_get_data_next(&argument_list);
+  _circle_radius = *(Uint16*)TDEC_LIST_get_data_next(&argument_list);
 
   if ((_circle_scroll_id = TDEC_add_scroller(_text, font, _characters, character_width, character_height)) == -1)
     {
