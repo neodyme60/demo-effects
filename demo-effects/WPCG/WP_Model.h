@@ -1,4 +1,4 @@
-/* Copyright (C) 2001/2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -19,13 +19,14 @@
 
 #include <string>
 #include <list>
+#include <map>
 
-#include "WPCG.h"
+#include "WPCG.h"//FIXME don't include all headers!
 
 namespace WPCG
 {
 /**
- * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding sphere for frustum culling and in the future its bounding hull for collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
+ * this abstract class represents a 3D model which is used in WP_Object to composite a 3D entity. The model is only the 3D shape, its textures, its bounding hull for collision detection. A WP_Object contains far more, it can contain for instance among others mass, heading, velocity etc etc\n
  */
 
 class WP_Model
@@ -35,7 +36,7 @@ class WP_Model
   WP_Model();
   
   /**
-   * @param the name of the to be loaded model
+   * @param the name of the model to load
    */
   WP_Model(const string& name): model_name(name) ,numberTriangles(0), triangles(0), numberVertices(0) 
     {
@@ -72,12 +73,12 @@ class WP_Model
   
   int numberTriangles;
 
-  virtual OPCODE_Model* getCollisionModel() const = 0;
+  virtual OPCODE_Model* getCollisionModel(const WP_Object *object) = 0;
 
-  virtual WP_Vertex* getVertex(unsigned int index) const = 0;
+  virtual WP_Vertex* getVertex(const WP_Object *object, unsigned int index) = 0;
 
   /**
-   * indices into the vertices array, so every three indices make up an triangle 
+   * indices into the vertices array, so every three indices make up a triangle 
    */
   unsigned int *triangles; 
 
@@ -99,7 +100,7 @@ class WP_Model
  protected:
 
   /**
-   * this function finalizes all after the model was read and everything was initialized. The textures are sorted and the model bounding sphere is created
+   * this function finalizes all after the model was read and everything was initialized. It for instance builds the collision mesh
    */
   virtual bool finalizeAll() = 0;  
 
@@ -183,16 +184,15 @@ class WP_NonAnimatedModel: public WP_Model
       return *this;
     }
   
-  OPCODE_Model* getCollisionModel() const
+  OPCODE_Model* getCollisionModel(const WP_Object *object) 
     {
       return &frame->collision_model;
     }
 
-  WP_Vertex* getVertex(unsigned int index) const
+  WP_Vertex* getVertex(const WP_Object *object, unsigned int index) 
     {
       return &frame->vertices[index];
     }
-  
   
   virtual void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) = 0;
   virtual bool initModel() = 0;
@@ -214,12 +214,23 @@ class WP_AnimatedModel: public WP_Model
  {
  public:
   WP_AnimatedModel(const string& name):WP_Model(name),
-    frames(0), numberFrames(0), currentFrame(0), interpolate(0.0){}; 
+    frames(0), numberFrames(0){}; 
 
   //COPY CONSTRUCTOR
   WP_AnimatedModel(const WP_AnimatedModel& amodel);
 
-  virtual ~WP_AnimatedModel();
+  virtual ~WP_AnimatedModel()
+    {
+      delete[] frames;
+
+      //empty map
+      map<string, WP_FrameCategory*>::iterator i = categories.begin();
+      while(i != categories.end())
+	  {
+	    delete (*i).second;
+	    i++;
+	  }
+    }
 
   //ASSIGNMENT OPERATOR
   WP_AnimatedModel& operator=(const WP_AnimatedModel &amodel);
@@ -227,22 +238,75 @@ class WP_AnimatedModel: public WP_Model
   virtual void drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) = 0;
   virtual bool initModel() = 0;
 
-  OPCODE_Model* getCollisionModel() const
+  OPCODE_Model* getCollisionModel(const WP_Object *object) 
     {
-      return &frames[0].collision_model;
+      static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+      unsigned short cf = ani->getCurrentFrame(object);
+      cf += categories[ani->getCategory(object)]->start_frame;
+      return &frames[cf].collision_model;
     }
 
-  WP_Vertex* getVertex(unsigned int index) const
+  WP_Vertex* getVertex(const WP_Object *object, unsigned int index) 
     {
-      return &frames[0].vertices[index];
+      static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+      unsigned short cf = ani->getCurrentFrame(object);
+      cf += categories[ani->getCategory(object)]->start_frame;
+      return &frames[cf].vertices[index];
+    }
+
+  unsigned short getCategoryStartFrame(const string& category) 
+    {
+      if (categories.count(category))
+	  return categories[category]->start_frame;
+      return 0;
+    }
+
+  unsigned short getCategoryNumberFrames(const string& category) 
+    {
+      if (categories.count(category))
+	  return categories[category]->number_frames;
+      return 0;
+    }
+
+  string getCategoryName(unsigned int index) const
+    {
+      map<string, WP_FrameCategory*>::const_iterator i = categories.begin();
+      unsigned int count = 0;
+
+      while(i != categories.end())
+	{
+	  if (index == count)
+	    return (*i).first;
+	  i++;
+	  count++;
+	}
+
+      return ""; 
+    }
+
+  unsigned int getNumberCategories() const
+    {
+      return categories.size();
     }
 
 protected:
 
   WP_Frame* frames;
   unsigned int numberFrames;
-  unsigned int currentFrame;
-  scalar interpolate;
+
+  //nested class 
+  class WP_FrameCategory
+    {
+    public:
+      WP_FrameCategory(){};
+      WP_FrameCategory(unsigned short start): start_frame(start), number_frames(1){};
+      ~WP_FrameCategory(){};   
+
+      unsigned short start_frame;
+      unsigned short number_frames;
+    };
+
+  map<string, WP_FrameCategory*> categories;
 
   bool finalizeAll();
 };

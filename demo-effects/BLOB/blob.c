@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2002-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -14,7 +14,7 @@
    along with this program; see the file COPYING.  If not, write to the Free
    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
-/*note that the code has not been fully optimized*/
+/*01-12-2003 drawing directly to screen for speed increase - WP - */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +30,6 @@
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
 
-static Uint8 blub[SCREEN_WIDTH * SCREEN_HEIGHT];
 static SDL_Color colors[256];
 
 Uint8 blob[BLOB_DRADIUS][BLOB_DRADIUS];
@@ -61,7 +60,6 @@ void quit( int code )
 
 void init_blob(BLOB *blob)
 {
-  /* randomly init blobs, generate them around the center of the screen */
   blob->xpos =  (SCREEN_WIDTH >> 1) - BLOB_RADIUS;
   blob->ypos =  (SCREEN_HEIGHT >> 1) - BLOB_RADIUS;
 }
@@ -191,9 +189,9 @@ int main( int argc, char* argv[] )
   /* Lock the screen for direct access to the pixels */
   SDL_LockSurface(screen);
 
-  image_start = (Uint8*)screen->pixels + (screen->pitch * SCREEN_HEIGHT);  /*start in the right bottom corner*/
+  TDEC_set_fps(50);
 
-  /* fill fire array with black */
+  image = (Uint8*)screen->pixels;
 
   /* time based demo loop */
   while( 1 ) 
@@ -202,9 +200,9 @@ int main( int argc, char* argv[] )
 
       process_events();
       
-      memset(blub, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint8));
+      memset(image, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint8));
 
-      /* move and draw blobs into blub array */
+      /* move and draw blobs to screen */
 
       for (i = 0; i < NUMBER_OF_BLOBS; i++)
 	{
@@ -222,10 +220,10 @@ int main( int argc, char* argv[] )
 		{
 		  for (j = 0; j < BLOB_DRADIUS; ++j)
 		  {
-		    if (blub[start + j] + blob[i][j] > 255)
-		    blub[start + j] = 255;
+		    if (image[start + j] + blob[i][j] > 255)
+		    image[start + j] = 255;
 		    else 
-		    blub[start + j] += blob[i][j];     
+		    image[start + j] += blob[i][j];     
 		  }
 		  start += SCREEN_WIDTH;
 		}
@@ -234,20 +232,6 @@ int main( int argc, char* argv[] )
 	    init_blob(blobs + k);
 	}   
       
-      image = image_start;
-      
-      /* draw blub array to screen from bottom to top*/
-      
-      for (i = SCREEN_HEIGHT - 1; i >= 0; --i)
-	{
-	  temp = i * SCREEN_WIDTH;
-	  for (j = SCREEN_WIDTH - 1; j >= 0; --j)
-	    {
-	      *image= blub[temp + j];
-	      image --;
-	    }
-	}
-
       if (TDEC_fps_ok())
 	SDL_Flip(screen);
     }

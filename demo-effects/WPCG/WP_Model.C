@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -17,10 +17,12 @@
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <string>
 #include <cmath>
 #include "WP_GLState.h"
 #include "WP_Camera.h"
 #include "WP_TextureManager.h"
+#include "WP_AnimationManager.h"
 #include "WP_Model.h"
 
 namespace WPCG
@@ -119,7 +121,6 @@ WP_Model::WP_Frame& WP_Model::WP_Frame::operator=(const WP_Model::WP_Frame &fram
 //COPY CONSTRUCTOR
 WP_AnimatedModel::WP_AnimatedModel(const WP_AnimatedModel& amodel):WP_Model(amodel)
 {
-  interpolate = amodel.interpolate;
   numberFrames = amodel.numberFrames;
   frames = new WP_Frame[numberFrames];
 
@@ -127,12 +128,13 @@ WP_AnimatedModel::WP_AnimatedModel(const WP_AnimatedModel& amodel):WP_Model(amod
   for (; i < numberFrames; ++i)
     frames[i] = amodel.frames[i];
 
-  currentFrame = amodel.currentFrame;
-}
-
-WP_AnimatedModel::~WP_AnimatedModel()
-{
-  delete[] frames;
+  map<string, WP_FrameCategory*>::const_iterator iter = amodel.categories.begin();
+  while(iter != amodel.categories.end())
+    {
+      WP_FrameCategory *c = new WP_FrameCategory(*(*iter).second);
+      categories.insert(map<string, WP_FrameCategory*>::value_type((*iter).first, c));
+      iter++;
+    }
 }
 
 WP_AnimatedModel& WP_AnimatedModel::operator=(const WP_AnimatedModel &amodel)
@@ -142,53 +144,63 @@ WP_AnimatedModel& WP_AnimatedModel::operator=(const WP_AnimatedModel &amodel)
 
   WP_Model::operator=(amodel);
 
-  interpolate = amodel.interpolate;
   delete[] frames;
   numberFrames = amodel.numberFrames;
   frames = new WP_Frame[numberFrames];
 
-  int i = 0;
-  for (; i < numberFrames; ++i)
-    frames[i] = amodel.frames[i];
+  int j = 0;
+  for (; j < numberFrames; ++j)
+    frames[j] = amodel.frames[j];
 
-  currentFrame = amodel.currentFrame;
+  map<string, WP_FrameCategory*>::iterator i = categories.begin();
+  while(i != amodel.categories.end())
+    {
+      delete (*i).second;
+      i++;
+    }
 
+  categories.clear();
+
+  map<string, WP_FrameCategory*>::const_iterator iter = amodel.categories.begin();
+  while(iter != amodel.categories.end())
+    {
+      WP_FrameCategory *c = new WP_FrameCategory(*(*iter).second);
+      categories.insert(map<string, WP_FrameCategory*>::value_type((*iter).first, c));
+      iter++;
+    }
+  
   return *this;
 }
 
 bool 
 WP_AnimatedModel::finalizeAll()
 {
-
- //FIXME init OPCODE_Model for every frame
- // for testing only of the first frame a collision model is created
-
   OPCODECREATE OPCC;
-
+  
   OPCC.NbTris = numberTriangles;
   OPCC.NbVerts = numberVertices;
-
-  OPCC.Tris = triangles;
-
-  //convert WP_Vertex to Point of OPC library
-
-  Point* points = new Point[numberVertices];
-
-  int i = 0;
-
-  for (; i < numberVertices; ++i)
-      points[i].Set(frames[0].vertices[i].point.data);
-
-  OPCC.Verts = points;
-
   OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
   OPCC.NoLeaf = true;
   OPCC.Quantized = true;
+  OPCC.Tris = triangles;
 
-  frames[0].collision_model.Build(OPCC);
+  int k;
+  Point* points = new Point[numberVertices];
+  OPCC.Verts = points;
+
+  cout << "Creating collision models" << endl;
+
+  for (k = 0; k < numberFrames; ++k)
+    {
+
+      int i = 0;
+      for (; i < numberVertices; ++i)
+	points[i].Set(frames[k].vertices[i].point.data);
+
+      frames[k].collision_model.Build(OPCC);
+    }
 
   delete[] points;
-
   return true;
 }
 
@@ -222,6 +234,7 @@ WP_NonAnimatedModel::finalizeAll()
   OPCC.NoLeaf = true;
   OPCC.Quantized = true;
 
+  cout << "Creating collision model" << endl;
   frame->collision_model.Build(OPCC);
 
   delete[] points;
@@ -562,6 +575,7 @@ bool WP_Model_MD2::initModel()
       
       WP_Matrix3D internal_orientation = WP_Matrix3D(Y_ROTATION_MATRIX, 90.0) * WP_Matrix3D(X_ROTATION_MATRIX, -90.0);
 
+      string numerics("0123456789");
       for (k = 0; k < header.numFrames; ++k)
 	{
 	  (frames + k)->model = this;
@@ -583,6 +597,25 @@ bool WP_Model_MD2::initModel()
       
 	  for (i = 0; i < 16; i++)
 	      (frames + k)->name += *p++;
+
+	  string::size_type pos = (frames + k)->name.find_last_of(numerics);
+	  string category = (frames + k)->name.substr(0, pos - 1);
+
+	  WP_FrameCategory *frame_cat;
+
+	  //check if animation cateory already exist, if yes get it, if no create it	
+	  if (categories.count(category))
+	    {
+	      // exists, so get it and increase total frames
+	      frame_cat = categories[category];
+	      frame_cat->number_frames++;
+	    }
+	  else
+	    {
+	      //does not exist, create it,set start frame and insert it into categories map
+	      frame_cat = new WP_FrameCategory(k);
+	      categories.insert(map<string, WP_FrameCategory*>::value_type(category, frame_cat));
+	    }
 
 	  for (j = 0; j < header.numVertices; j++)
 	    {
@@ -685,36 +718,39 @@ bool WP_Model_MD2::initModel()
 void 
 WP_Model_MD2::drawOpenGL(const WP_Matrix3D& matrix, WP_Object *object) 
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+  static WP_GLState *state = WP_GLState::getInstance();
+
+  list<WP_TriangleGroup*>::const_iterator i = triangle_groups.begin();
+  unsigned short start_frame, next_frame;
+  scalar interpolate;
+
   glPushMatrix();
   glMultMatrixf(matrix.data); 
   
   glFrontFace(GL_CW); //FIXME 
 
-  if (object->animate)
-    {
-      if (interpolate >= 1.0)
-	{
-	  currentFrame++;
-	  currentFrame %= numberFrames;
-	  interpolate = 0.0;
-	}
-      interpolate += 0.1;  
-    }
-
-  list<WP_TriangleGroup*>::iterator i = triangle_groups.begin();
   glBindTexture(GL_TEXTURE_2D, tex_id);
-  WP_GLState::getInstance()->enableTexture2D();
+  state->enableTexture2D(); 
 
-  while (i != triangle_groups.end())
+  if (ani->animateObject(object, &start_frame, &next_frame, &interpolate))
     {
-      if (currentFrame == numberFrames - 1 || interpolate == 0.0)
-	(*i)->drawOpenGL((frames + currentFrame)->vertices, 0, interpolate);
-      else
-	(*i)->drawOpenGL((frames + currentFrame)->vertices, (frames + currentFrame + 1)->vertices, interpolate);
-      i++;
+      while (i != triangle_groups.end())
+	{
+	  (*i)->drawOpenGL((frames + start_frame)->vertices, (frames + next_frame)->vertices, interpolate);
+	  i++;
+	}
+    }
+  else
+    {
+      while (i != triangle_groups.end())
+	{
+	  (*i)->drawOpenGL((frames + start_frame)->vertices, interpolate);
+	  i++;
+	}
     }
 
-  WP_GLState::getInstance()->disableTexture2D();
+  state->disableTexture2D();
   glPopMatrix();
   glFrontFace(GL_CCW);
 }

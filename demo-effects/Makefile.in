@@ -84,7 +84,7 @@ SUBDIRS = COMMON PLASMA FIRE EXPLOSION STARFIELD COPPERBARS CANDYBAR SINUSSCROLL
 EXTRA_DIST = GFX/eye.png GFX/tuxblackbg.png GFX/font.pcx GFX/tile.png SOUND/MODS/tuneforit.mod  GFX/TDEC_2.png TEXTURES/cd2000.pcx \
 	MODELS/tris1.MD2 MODELS/weapon.MD2 TEXTURES/weapon.pcx TEXTURES/SKY3_FT.pcx TEXTURES/SKY3_RT.pcx TEXTURES/SKY3_BK.pcx \
 	TEXTURES/SKY3_LF.pcx TEXTURES/terrain.pcx TEXTURES/ufo.pcx \
-	MODELS/ufo.MD2 GFX/tdec-small.pcx TEXTURES/tex35.pcx
+	MODELS/ufo.MD2 GFX/tdec-small.pcx TEXTURES/tex35.pcx XHACKS/blob.c XHACKS/eruption.c
 
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -232,7 +232,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/GFX $(distdir)/MODELS $(distdir)/SOUND/MODS $(distdir)/TEXTURES
+	$(mkinstalldirs) $(distdir)/GFX $(distdir)/MODELS $(distdir)/SOUND/MODS $(distdir)/TEXTURES $(distdir)/XHACKS
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \

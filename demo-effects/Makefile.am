@@ -5,4 +5,4 @@ SUBDIRS = COMMON PLASMA FIRE EXPLOSION STARFIELD COPPERBARS CANDYBAR SINUSSCROLL
 EXTRA_DIST = GFX/eye.png GFX/tuxblackbg.png GFX/font.pcx GFX/tile.png SOUND/MODS/tuneforit.mod  GFX/TDEC_2.png TEXTURES/cd2000.pcx \
 	MODELS/tris1.MD2 MODELS/weapon.MD2 TEXTURES/weapon.pcx TEXTURES/SKY3_FT.pcx TEXTURES/SKY3_RT.pcx TEXTURES/SKY3_BK.pcx \
 	TEXTURES/SKY3_LF.pcx TEXTURES/terrain.pcx TEXTURES/ufo.pcx \
-	MODELS/ufo.MD2 GFX/tdec-small.pcx TEXTURES/tex35.pcx
+	MODELS/ufo.MD2 GFX/tdec-small.pcx TEXTURES/tex35.pcx XHACKS/blob.c XHACKS/eruption.c

@@ -92,33 +92,33 @@ void
 WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const
 {
   unsigned int i, j;
-  if (verticesFrameB)
+  glBegin(GL_TRIANGLE_STRIP);
+  for(i = 0, j =0; i < numberIndices; i++, j += 2)
     {
-      glBegin(GL_TRIANGLE_STRIP);
-      for(i = 0, j =0; i < numberIndices; i++, j += 2)
-	{
-	  WP_Vertex v = verticesFrameA[indices[i]];
-	  glColor4f(1.0, 1.0, 1.0, 1.0);
-	  glNormal3fv(v.normal.data);
-	  glTexCoord2fv(texCoords + j);
-	  v.lerp3D(verticesFrameB + indices[i], interpolation);
-	  glVertex3fv(v.point.data);
-	}
-      glEnd();
+      WP_Vertex v = verticesFrameA[indices[i]];
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glNormal3fv(v.normal.data);
+      glTexCoord2fv(texCoords + j);
+      v.lerp3D(verticesFrameB + indices[i], interpolation);
+      glVertex3fv(v.point.data);
     }
-  else
+  glEnd();
+}
+
+void 
+WP_TriangleStrip::drawOpenGL(const WP_Vertex *verticesFrameA, scalar interpolation) const
+{
+  unsigned int i, j;
+  glBegin(GL_TRIANGLE_STRIP);
+  for(i = 0, j = 0; i < numberIndices; i++, j += 2)
     {
-      glBegin(GL_TRIANGLE_STRIP);
-      for(i = 0, j = 0; i < numberIndices; i++, j += 2)
-	{
-	  const WP_Vertex *v = verticesFrameA + indices[i];
-	  glColor4f(1.0, 1.0, 1.0, 1.0);
-	  glNormal3fv(v->normal.data);
-	  glTexCoord2fv(texCoords + j);
-	  glVertex3fv(v->point.data);
-	}    
-      glEnd();
-    }
+      const WP_Vertex *v = verticesFrameA + indices[i];
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glNormal3fv(v->normal.data);
+      glTexCoord2fv(texCoords + j);
+      glVertex3fv(v->point.data);
+    }    
+  glEnd();
 }
 
 WP_TriangleFan& 
@@ -136,32 +136,33 @@ void
 WP_TriangleFan::drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const
 {
   unsigned int i, j;
-  if (verticesFrameB)
+  glBegin(GL_TRIANGLE_FAN);
+  for(i = 0, j = 0; i < numberIndices; i++, j += 2)
     {
-      glBegin(GL_TRIANGLE_FAN);
-      for(i = 0, j = 0; i < numberIndices; i++, j += 2)
-	{
-	  WP_Vertex v = verticesFrameA[indices[i]];
-	  glColor4f(1.0, 1.0, 1.0, 1.0);
-	  glNormal3fv(v.normal.data);
-	  glTexCoord2fv(texCoords + j);
-	  v.lerp3D(verticesFrameB + indices[i], interpolation);
-	  glVertex3fv(v.point.data);
-	}
-      glEnd();
+      WP_Vertex v = verticesFrameA[indices[i]];
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glNormal3fv(v.normal.data);
+      glTexCoord2fv(texCoords + j);
+      v.lerp3D(verticesFrameB + indices[i], interpolation);
+      glVertex3fv(v.point.data);
     }
-  else
-    {
-      glBegin(GL_TRIANGLE_FAN);
-      for(i = 0, j = 0; i < numberIndices; i++, j += 2)
-	{
-	  const WP_Vertex *v = verticesFrameA + indices[i];
-	  glColor4f(1.0, 1.0, 1.0, 1.0);
-	  glNormal3fv(v->normal.data);
-	  glTexCoord2fv(texCoords + j);
-	  glVertex3fv(v->point.data);
-	}
-      glEnd();
-    }
+  glEnd();
 }
+
+void 
+WP_TriangleFan::drawOpenGL(const WP_Vertex *verticesFrameA, scalar interpolation) const
+{
+  unsigned int i, j;
+  glBegin(GL_TRIANGLE_FAN);
+  for(i = 0, j = 0; i < numberIndices; i++, j += 2)
+    {
+      const WP_Vertex *v = verticesFrameA + indices[i];
+      glColor4f(1.0, 1.0, 1.0, 1.0);
+      glNormal3fv(v->normal.data);
+      glTexCoord2fv(texCoords + j);
+      glVertex3fv(v->point.data);
+    }
+  glEnd();
+}
+
 }

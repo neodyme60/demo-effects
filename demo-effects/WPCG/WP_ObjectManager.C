@@ -1,4 +1,4 @@
-/* Copyright (C) 2001 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -18,13 +18,14 @@
 #include <cmath>
 #include "WP_Model.h"
 #include "WP_Camera.h"
+#include "WP_AnimationManager.h"
 #include "WP_ObjectManager.h"
 
 namespace WPCG
 {
 WP_Math* WP_DynamicObject::math = WP_Math::getInstance();
 
-WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0), animate(false),roll(0), inFrustum(true)
+WP_Object::WP_Object(const WP_Matrix3D& _matrix, const string& name):matrix(_matrix),object_name(name), heading(0), pitch(0),roll(0), inFrustum(true)
 {
   //determine dir and up vectors, it is assumed that the object is orientated correctly thus facing north (0.0f, 0.0f, -1.0f) and up is (0.0f, 1.0f, 0.0f)
   
@@ -46,6 +47,39 @@ void WP_Object::print() const
   cout << "Heading: " << heading << " degrees" << endl;
   cout << "Pitch: " << pitch << " degrees" << endl;
   cout << "Roll: " << roll << " degrees" << endl;
+}
+
+bool 
+WP_Object::isAnimated() const
+{
+  return WP_AnimationManager::getInstance()->isObjectPresent(this);
+}
+
+unsigned short 
+WP_Object::getAnimationCategories(string **strings) const
+{
+  if (isAnimated())
+    {
+      WP_AnimatedModel* amodel = dynamic_cast<WP_AnimatedModel*>(model);
+      if (amodel)
+	{
+	  unsigned short n = amodel->getNumberCategories();
+	  *strings = new string[n];
+	  unsigned short i;
+	  for (i = 0; i < n; ++i)
+	    strings[0][i] = amodel->getCategoryName(i);
+	  return n;
+	}
+    }
+  *strings = 0;
+  return 0;
+}
+
+bool 
+WP_Object::setAnimationCategory(const string &category) const
+{
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+  ani->setCategory(this, category);
 }
 
 //********************************************* WP_ObjectManager *******************************************************
@@ -72,37 +106,11 @@ WP_ObjectManager::~WP_ObjectManager()
   om_instance = 0;
 }
 
-WP_ObjectManager* WP_ObjectManager::getInstance()
-{
-  if (!om_instance)
-    {
-      om_instance = new WP_ObjectManager();
-    }
-  return om_instance;
-}
-
-//FIXME this function is also used in WP_Image.C, therefore better to create a WP_File class and park this function there
-bool WP_ObjectManager::hasValidExtension(const char* file, const char* extension)
-{
-  //find the '.' separating the extension
-  const char* copy = file;
-  copy += strlen(file); //set pointer to last token
-  while(*copy != '.' && copy != file)
-    {
-      copy--;
-    }
-
-  if (*copy != '.')
-    {
-      return false; //file has no extension
-    }
-
-  return strcasecmp(++copy, extension) == 0;
-}
-
 WP_StaticObject* WP_ObjectManager::createStaticObject(const WP_Matrix3D& matrix, const string& object_name, 
 							    const string& model_name)
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+
   WP_StaticObject* sobject;
   WP_Model* model;
 try
@@ -159,10 +167,13 @@ try
 	    model->count++;
 	    sobject->model = model;
 	    static_objects.push_back(sobject);
+	    if (dynamic_cast<WP_AnimatedModel*>(model))
+	      //add to animationmanager  
+	      ani->addObject(sobject);
 	  }
 	else
 	  {
-	    if (hasValidExtension(m_name.c_str(), "md2"))
+	    if (hasValidExtension(m_name, "MD2"))
 	      {
 		//quake2 md2 file
 		model = new WP_Model_MD2(m_name);
@@ -172,14 +183,16 @@ try
 		  }
 		sobject->model = model;
 		static_objects.push_back(sobject);
+		//add to animationmanager  
+		ani->addObject(sobject);
 	      }
 	    else
 	      {
 		//other formats like for example lightwave format
-		cerr << "ERROR: Unable to load model " << m_name << "only quake2 md2 file format supported at the moment" << endl;
+		cerr << "ERROR: Unable to load model " << m_name << "only quake2 MD2 file format supported at the moment" << endl;
 		throw("");
 	      }
-	  }
+ 	  }
       }
   }
 catch(...)
@@ -194,6 +207,7 @@ catch(...)
 WP_DynamicObject* WP_ObjectManager::createDynamicObject(const WP_Matrix3D& matrix, const string& object_name, 
 							    const string& model_name, const WP_Vector3D& velocity)
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
   WP_DynamicObject* dobject;
   WP_Model* model;
 try
@@ -220,13 +234,24 @@ try
 	  {
 	    internal = true;
 	    dobject->name_id = unique++;
-	    model = new WP_MetaBall(model_name);
-	    if (!model->init())
+	    model = findInstance(model_name);
+	    if (model)
 	      {
-		throw("");
+		model->count++;
+		dobject->model = model;
+
+		dynamic_objects.push_back(dobject);
 	      }
-	    dobject->model = model;
-	    dynamic_objects.push_back(dobject);
+	    else
+	      {
+		model = new WP_MetaBall(model_name);
+		if (!model->init())
+		  {
+		    throw("");
+		  }
+		dobject->model = model;
+		dynamic_objects.push_back(dobject);
+	      }
 	    break;
 	  }
       }
@@ -235,35 +260,38 @@ try
       {
 	string m_name = "../MODELS/" + model_name;
 	dobject->name_id = unique++;
-
-	/*model = findInstance(m_name);
-  
-	if (model) //FIXME add possibility to share animated models (current frame, interpolation etc) disabled for now 
-	{
-	model->count++;
-	dobject->model = model;
-	dynamic_objects.push_back(dobject);
-	}
-	else
-	{
-	*/
-     
-	if (hasValidExtension(m_name.c_str(), "md2"))
+	model = findInstance(m_name);
+	
+	if (model) 
 	  {
-	    //quake2 MD2 file
-	    model = new WP_Model_MD2(m_name);
-	    if (!model->init())
-	      {
-		throw("");
-	      }
+	    model->count++;
 	    dobject->model = model;
 	    dynamic_objects.push_back(dobject);
+	    if (dynamic_cast<WP_AnimatedModel*>(model))
+	      //add to animationmanager  
+	      ani->addObject(dobject);
 	  }
 	else
 	  {
-	    //other formats like for example lightwave format
-	    cout << "ERROR: Unable to load model " << m_name << "\nonly quake2 md2 fileformat supported at the moment" << endl;
-	    throw("");
+	    if (hasValidExtension(m_name, "MD2"))
+	      {
+		//quake2 MD2 file
+		model = new WP_Model_MD2(m_name);
+		if (!model->init())
+		  {
+		    throw("");
+		  }
+		dobject->model = model;
+		dynamic_objects.push_back(dobject);
+		//add to animationmanager  
+		ani->addObject(dobject);
+	      }
+	    else
+	      {
+		//other formats like for example lightwave format
+	      cout << "ERROR: Unable to load model " << m_name << "\nonly quake2 MD2 fileformat supported at the moment" << endl;
+	      throw("");
+	      }
 	  }
       }
   }
@@ -400,8 +428,8 @@ WP_ObjectManager::checkCollisions()
   list<WP_CollisionPair*>::const_iterator i = collision_pairs.begin();
   while (i != collision_pairs.end())
     {	
-      TC.SetCallback0(&ColCallback, udword((*i)->object1->model));
-      TC.SetCallback1(&ColCallback, udword((*i)->object2->model));
+      TC.SetCallback0(&ColCallback, udword((*i)->object1));
+      TC.SetCallback1(&ColCallback, udword((*i)->object2));
    
       if (TC.Collide((*i)->cache, reinterpret_cast<Matrix4x4*>(&(*i)->object1->matrix), 
 		     reinterpret_cast<Matrix4x4*>(&(*i)->object2->matrix)))
@@ -421,6 +449,8 @@ WP_ObjectManager::checkCollisions()
 
 void WP_ObjectManager::drawObjects() 
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+
   cam->objects_in_frustum = 0;
 
   cam->followObject();
@@ -428,11 +458,15 @@ void WP_ObjectManager::drawObjects()
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	
+      //UPDATE ANIMATION
+
+      ani->updateAnimation(*i);
+      
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback, udword((*i)->model));
+      PC.SetCallback(&ColCallback, udword(*i));
     
-      if (PC.Collide((*i)->planesCache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(), 
+      if (PC.Collide((*i)->planesCache, cam->getFrustum(), 6, (*i)->model->getCollisionModel(*i), 
 		     reinterpret_cast<Matrix4x4*>(&(*i)->matrix)))
 	{
 	  if (PC.GetContactStatus())
@@ -456,11 +490,15 @@ void WP_ObjectManager::drawObjects()
   list<WP_DynamicObject*>::const_iterator j = dynamic_objects.begin();
   while (j != dynamic_objects.end())
     {	
+      //UPDATE ANIMATION
+
+      ani->updateAnimation(*j);
+
       //OBJECT IN FRUSTUM??
       
-      PC.SetCallback(&ColCallback, udword((*j)->model));
+      PC.SetCallback(&ColCallback, udword(*j));
  
-      if (PC.Collide((*j)->planesCache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(), 
+      if (PC.Collide((*j)->planesCache, cam->getFrustum(), 6, (*j)->model->getCollisionModel(*j), 
 		     reinterpret_cast<Matrix4x4*>(&(*j)->matrix)))
 	{
 	  if (PC.GetContactStatus())
@@ -541,6 +579,8 @@ WP_Model* WP_ObjectManager::findInstance(const string& model_name)
   
 bool WP_ObjectManager::removeStaticObject(const string& name)
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+
   list<WP_StaticObject*>::iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	
@@ -552,6 +592,7 @@ bool WP_ObjectManager::removeStaticObject(const string& name)
 	      delete (*i)->model;
 	    }
 	  
+	  ani->removeObject(*i);
 	  delete (*i);
 	  static_objects.erase(i);
 
@@ -564,6 +605,7 @@ bool WP_ObjectManager::removeStaticObject(const string& name)
 
 bool WP_ObjectManager::removeDynamicObject(const string& name)
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
   list<WP_DynamicObject*>::iterator i = dynamic_objects.begin();
   while (i != dynamic_objects.end())
     {	
@@ -575,6 +617,7 @@ bool WP_ObjectManager::removeDynamicObject(const string& name)
 	      delete (*i)->model;
 	    }
 	  
+	  ani->removeObject(*i);
 	  delete (*i);
 	  dynamic_objects.erase(i);
 
@@ -594,6 +637,7 @@ bool WP_ObjectManager::removeObject(const string& name)
 
 bool WP_ObjectManager::removeSameObjects(const string& name)
 {
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
   int static_counter = countStaticObjects(name);
   int j = 0;
   int static_removed = 0;
@@ -611,6 +655,7 @@ bool WP_ObjectManager::removeSameObjects(const string& name)
 		   delete (*i)->model;
 		 }
 
+	       ani->removeObject(*i);
 	       delete (*i);
 	       static_objects.erase(i);
 	       static_removed++;
@@ -637,6 +682,7 @@ bool WP_ObjectManager::removeSameObjects(const string& name)
 		   delete (*i)->model;
 		 }
 	       
+	       ani->removeObject(*i);
 	       delete (*i);
 	       dynamic_objects.erase(i);
 	       dynamic_removed++;
@@ -666,6 +712,7 @@ int WP_ObjectManager::countStaticObjects(const string& name) const
 int WP_ObjectManager::countDynamicObjects(const string& name) const
 {
   int counter = 0;
+
   list<WP_DynamicObject*>::const_iterator j = dynamic_objects.begin();
   while (j != dynamic_objects.end())
     {	
@@ -680,6 +727,8 @@ int WP_ObjectManager::countDynamicObjects(const string& name) const
 
 bool WP_ObjectManager::removeAll()
 {
+  WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+
   int count = static_objects.size() + dynamic_objects.size();
   int removed = 0;
 
@@ -691,7 +740,8 @@ bool WP_ObjectManager::removeAll()
 	{
 	  delete (*i)->model;
 	}
-      
+
+      ani->removeObject(*i);
       delete (*i);
       removed++;
       i++;
@@ -707,6 +757,7 @@ bool WP_ObjectManager::removeAll()
 	  delete (*j)->model;
 	}
       
+      ani->removeObject(*j);
       delete (*j);
       removed++;
       j++;
@@ -1142,12 +1193,13 @@ void WP_DynamicObject::print() const
 void 
 WP_ObjectManager::ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data)
 {
-  WP_Model* model = reinterpret_cast<WP_Model*>(user_data);
+  WP_Object* object = reinterpret_cast<WP_Object*>(user_data);
+  WP_Model *model = object->model;
   unsigned int* indices = model->triangles + triangleindex * 3;
 
-  triangle.Vertex[0] = reinterpret_cast<Point*>(&model->getVertex(indices[0])->point);
-  triangle.Vertex[1] = reinterpret_cast<Point*>(&model->getVertex(indices[1])->point);
-  triangle.Vertex[2] = reinterpret_cast<Point*>(&model->getVertex(indices[2])->point);
+  triangle.Vertex[0] = reinterpret_cast<Point*>(&model->getVertex(object, indices[0])->point);
+  triangle.Vertex[1] = reinterpret_cast<Point*>(&model->getVertex(object, indices[1])->point);
+  triangle.Vertex[2] = reinterpret_cast<Point*>(&model->getVertex(object, indices[2])->point);
 }
 
 void 
@@ -1231,8 +1283,8 @@ WP_ObjectManager::createCollisionPairs()
 WP_ObjectManager::WP_CollisionPair::WP_CollisionPair(WP_Object *obj1, WP_Object *obj2)
   :object1(obj1), object2(obj2)
 {
-  cache.Model0 = object1->model->getCollisionModel();
-  cache.Model1 = object2->model->getCollisionModel(); 
+  cache.Model0 = object1->model->getCollisionModel(object1);
+  cache.Model1 = object2->model->getCollisionModel(object2); 
 }
 }
 

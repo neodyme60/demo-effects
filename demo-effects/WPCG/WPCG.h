@@ -32,6 +32,7 @@ using namespace Opcode;
 #include "WP_Quad.h"
 #include "WP_Camera.h"
 #include "WP_ObjectManager.h"
+#include "WP_AnimationManager.h"
 #include "WP_Model.h"
 #include "WP_TextureManager.h"
 

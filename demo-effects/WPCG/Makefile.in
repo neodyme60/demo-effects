@@ -79,7 +79,7 @@ install_sh = @install_sh@
 noinst_LIBRARIES = libWPCG.a
 libWPCG_a_SOURCES = WP_2D.C WP_Camera.C WP_Endian.C WP_GLState.C WP_Image.C WP_Init.C WP_Line2D.C WP_Material.C WP_Math.C WP_Matrix2D.C \
 WP_Matrix3D.C WP_Model.C WP_ObjectManager.C WP_Point2D.C WP_Point3D.C WP_Ray2D.C WP_Ray3D.C WP_SkyBox.C WP_Terrain.C \
-WP_TextureManager.C WP_Triangle.C WP_Vector2D.C WP_Vector3D.C 
+WP_TextureManager.C WP_Triangle.C WP_Vector2D.C WP_Vector3D.C WP_AnimationManager.C
 
 EXTRA_DIST = *.h
 INCLUDES = -I../OPCODE-1.2
@@ -98,7 +98,8 @@ am_libWPCG_a_OBJECTS = WP_2D.$(OBJEXT) WP_Camera.$(OBJEXT) \
 	WP_Point2D.$(OBJEXT) WP_Point3D.$(OBJEXT) WP_Ray2D.$(OBJEXT) \
 	WP_Ray3D.$(OBJEXT) WP_SkyBox.$(OBJEXT) WP_Terrain.$(OBJEXT) \
 	WP_TextureManager.$(OBJEXT) WP_Triangle.$(OBJEXT) \
-	WP_Vector2D.$(OBJEXT) WP_Vector3D.$(OBJEXT)
+	WP_Vector2D.$(OBJEXT) WP_Vector3D.$(OBJEXT) \
+	WP_AnimationManager.$(OBJEXT)
 libWPCG_a_OBJECTS = $(am_libWPCG_a_OBJECTS)
 
 DEFS = @DEFS@
@@ -108,11 +109,13 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/WP_2D.Po ./$(DEPDIR)/WP_Camera.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/WP_Endian.Po ./$(DEPDIR)/WP_GLState.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/WP_Image.Po ./$(DEPDIR)/WP_Init.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/WP_Line2D.Po ./$(DEPDIR)/WP_Material.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/WP_Math.Po ./$(DEPDIR)/WP_Matrix2D.Po \
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/WP_2D.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_AnimationManager.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_Camera.Po ./$(DEPDIR)/WP_Endian.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_GLState.Po ./$(DEPDIR)/WP_Image.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_Init.Po ./$(DEPDIR)/WP_Line2D.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_Material.Po ./$(DEPDIR)/WP_Math.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/WP_Matrix2D.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/WP_Matrix3D.Po ./$(DEPDIR)/WP_Model.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/WP_ObjectManager.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/WP_Point2D.Po ./$(DEPDIR)/WP_Point3D.Po \
@@ -158,6 +161,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WP_2D.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WP_AnimationManager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WP_Camera.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WP_Endian.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WP_GLState.Po@am__quote@

@@ -97,6 +97,7 @@ public:
 	WP_TriangleGroup& operator=(const WP_TriangleGroup &group);
 
 	virtual void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const = 0; 
+	virtual void drawOpenGL(const WP_Vertex *verticesFrameA, scalar interpolation) const = 0; 
 
 	unsigned int *indices;
 	unsigned int numberIndices;
@@ -131,6 +132,7 @@ public:
 	WP_TriangleStrip& operator=(const WP_TriangleStrip &strip);
 
 	void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const; 
+	void drawOpenGL(const WP_Vertex *verticesFrameA, scalar interpolation) const; 
 };
 
 
@@ -162,6 +164,7 @@ public:
 	WP_TriangleFan& operator=(const WP_TriangleFan &fan);
 
 	void drawOpenGL(const WP_Vertex *verticesFrameA, const WP_Vertex *verticesFrameB, scalar interpolation) const; 
+	void drawOpenGL(const WP_Vertex *verticesFrameA, scalar interpolation) const; 
 };
 }
 #endif

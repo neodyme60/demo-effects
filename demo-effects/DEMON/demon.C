@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2002-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -24,9 +24,15 @@
 WP_Image *logo;
 WP_GLState *state;
 WP_Camera *cam;
+WP_Draw_2D draw;
 WP_ObjectManager *manager;
-WP_Model *model;
+WP_DynamicObject *demon;
+WP_DynamicObject *weapon;
 scalar heading = 0.0;
+string *demoncategories;
+unsigned short ncategories;
+short categoryindex = 0;
+string *weaponcategories;
 
 void quit( int code )
 {      
@@ -50,6 +56,19 @@ void handle_key_down( SDL_keysym* keysym )
       {
       case SDLK_ESCAPE:
 	quit(1);
+        break;
+      case SDLK_RIGHT:
+	categoryindex++;
+	categoryindex %= ncategories;
+	demon->setAnimationCategory(demoncategories[categoryindex]);
+	weapon->setAnimationCategory(weaponcategories[categoryindex]);
+        break;
+      case SDLK_LEFT:
+	categoryindex--;
+	if (categoryindex < 0)
+	  categoryindex = ncategories - 1;
+	demon->setAnimationCategory(demoncategories[categoryindex]);
+	weapon->setAnimationCategory(weaponcategories[categoryindex]);
         break;
       default:
         break;
@@ -81,8 +100,6 @@ void draw_screen( void )
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-  WP_DynamicObject *demon = manager->getDynamicObject();
-  WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
   demon->setNewHeading(heading);
   weapon->setNewHeading(heading);
   heading += 0.6;
@@ -90,11 +107,11 @@ void draw_screen( void )
   if (heading >= 360.0)
     heading -= 360.0;
 
-  //draw logo
+  //draw text
 
   state->disableDepthTest();
-  state->disableCulling();
   state->disableLighting();
+  state->disableCulling();
         
   state->projection();
   glPushMatrix();
@@ -104,7 +121,11 @@ void draw_screen( void )
   state->modelview();
   glPushMatrix();
   glLoadIdentity();
+  glColor3f(0.0f, 1.0f, 0.0f);
 
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, "Animation sequence: " + demoncategories[categoryindex], 10,  SCREEN_HEIGHT - 20);
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, "Use left or right arrow to change sequence", 10,  SCREEN_HEIGHT - 40);
+  
   logo->drawToFrameBuffer();
 
   glPopMatrix();
@@ -113,8 +134,8 @@ void draw_screen( void )
   state->modelview();
       
   state->enableDepthTest();
+  state->enableLighting();	
   state->enableCulling();
-  state->enableLighting();
 
   manager->updateAll();
 
@@ -200,16 +221,17 @@ int main( int argc, char* argv[] )
   
   init();
 
-  // add quake2 demon model  
-  manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2"); 
-  // add quake2 demon weapon model
-  manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2"); 
+  // add quake2 demon and weapon model  
+  demon = manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2"); 
+  weapon = manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2"); 
 
-  WP_DynamicObject *demon = manager->getDynamicObject();
-  demon->animate = true;
-  WP_DynamicObject *weapon = manager->getDynamicObject("Demon_Weapon");
-  weapon->animate = true;
+  //get animation categories for demon (and demon's weapon) model
 
+  ncategories = demon->getAnimationCategories(&demoncategories);
+  weapon->getAnimationCategories(&weaponcategories); 
+
+  //DUHH, the modeller of the demon model used different names for the frame categories of the weapon and the gun, now thats plain stupid, that's why I'm using two categories here. I bet ID's people didn't mess this up. 
+  
   /* time based demo loop */
   while( 1 ) 
     {

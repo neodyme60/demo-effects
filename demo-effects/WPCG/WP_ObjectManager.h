@@ -1,4 +1,4 @@
-/* Copyright (C) 2001 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2001-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -28,8 +28,8 @@ class WP_Model;
 class WP_Camera;
 
 /**
- * this abstract class represents an object in the 3D scene.Every object consists of the necessary matrices, a name and a pointer to a model, in this way it is possible to use the same models for different instances of the object\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
+ * this abstract class represents an object in the 3D scene.Every object consists of the necessary matrices, a name and a pointer to a model, in this way it is possible to use the same 3D models for different instances of the object\n
+ * @author Copyright (C) 2001-2003 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -56,7 +56,7 @@ class WP_Object
   void drawOpenGL(); 
 
   /**
-   * this WP_Matrix3D object holds the world matrix of the object. This matrix is used to render the object on the correct position in the correct orientation in the 3D scene
+   * this WP_Matrix3D object holds the world matrix of the object. This matrix is used to render the object with the correct position in the correct orientation in the 3D scene
    */
   WP_Matrix3D matrix;
 
@@ -89,13 +89,11 @@ class WP_Object
    * Pitch is an aviation term and the pitch of an airplane is the angle that its longitudinal axis (running from tail to nose makes with the horizontal plane
    */
   scalar pitch;
-  
+
   /**
    * Roll is an aviation term and an airplane rolls by rotating about its longitudinal axis (running from tail to nose). The roll is the amount of rotation relative to the horizontal plane.
    */
   scalar roll;
-
-  bool animate;
 
   PlanesCache planesCache;
   
@@ -160,6 +158,12 @@ class WP_Object
       matrix.data[14] = z;
     };
 
+  bool isAnimated() const;
+
+  unsigned short getAnimationCategories(string **strings) const;
+
+  bool setAnimationCategory(const string &category) const;
+
   /**
    * this boolean indicates if the object was in the camera's viewing volume (frustum) the last time the scene was rendered
    */
@@ -182,7 +186,7 @@ class WP_Object
 
 /**
  * this class represents a static object in the 3D scene. A static object doesn't change its position and rotation, for example a tree or a wall\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
+ * @author Copyright (C) 2001-2003 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -224,7 +228,7 @@ class WP_StaticObject: public WP_Object
 
 /**
  * this class represents a dynamic object in a 3D scene. A dynamic object is an object which is able to change its position and its orientation\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
+ * @author Copyright (C) 2001-2003 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -371,7 +375,7 @@ class WP_DynamicObject: public WP_Object
 
 /**
  * this singleton class creates and manages all created static and dynamic objects\n
- * @author Copyright (C) 2001 W.P. van Paassen   peter@paassen.tmfweb.nl
+ * @author Copyright (C) 2001-2003 W.P. van Paassen   peter@paassen.tmfweb.nl
  *
  *  This program is free software; you can redistribute it and/or modify it under
  *  the terms of the GNU General Public License as published by the Free
@@ -396,7 +400,14 @@ public:
    * this function is used to obtain a pointer to the only instance of this class (singleton)
    * @return a pointer to the only instance of this class
    */
-  static WP_ObjectManager* getInstance();
+  static WP_ObjectManager* getInstance()
+    {
+      if (!om_instance)
+	{
+	  om_instance = new WP_ObjectManager();
+	}
+      return om_instance;
+    }
 
   /**
    * this function is used for the creation of a static object
@@ -520,6 +531,8 @@ public:
 
   void updateAll();
 
+  
+
 private:
   WP_ObjectManager();
 
@@ -558,7 +571,12 @@ private:
    * @param extension the extension which is checked
    * @return a boolean indicating if the file has the extension
    */
-  bool hasValidExtension(const char* file, const char* extension);
+  //FIXME this function is also used in WP_Image.C, therefore better to create a WP_File class and park this function there
+  inline bool hasValidExtension(const string &file, const string &extension)
+    {
+      int pos = file.find('.' + extension);
+      return pos != string::npos;
+    }
 
   /**
    * this function searches all available static and dynamic objects and checks if their using the model with name <i>model_name</i>, if so this model can be reused by another object.
@@ -611,7 +629,6 @@ private:
       BVTCache cache;
     };
 
-
   /**
    * a list of pointers to WP_CollisionPair objects
    */
@@ -621,8 +638,7 @@ private:
   PlanesCollider PC;
   AABBTreeCollider TC;
 
-//OPCODE CALLBACK
-
+  //OPCODE CALLBACK
   static void ColCallback(udword triangleindex, VertexPointers &triangle, udword user_data);
 };
 }

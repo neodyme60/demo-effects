@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl
+/* Copyright (C) 2002-2003 W.P. van Paassen - peter@paassen.tmfweb.nl
 
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
@@ -287,10 +287,6 @@ int main( int argc, char* argv[] )
   manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon", "tris1.MD2"); 
   // add quake2 demon weapon model
   manager->createDynamicObject(WP_Matrix3D(TRANSLATION_MATRIX, 0.0, 5.4, 0.0), "Demon_Weapon", "weapon.MD2"); 
-  WP_DynamicObject *demon = manager->getDynamicObject();
-  WP_DynamicObject *weapon = manager->getNextDynamicObject(demon);
-  demon->animate = true;
-  weapon->animate = true;
 
   cam->follow_distance = 10.0;
   cam->follow_angleX = 10;
