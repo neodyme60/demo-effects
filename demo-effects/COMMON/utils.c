@@ -20,7 +20,7 @@ SDL_Surface* TDEC_copy_surface(SDL_Surface* surface)
 {
   SDL_Surface* res;
 
-  res = SDL_DisplayFormat(surface);
+  res = SDL_ConvertSurface(surface, surface->format, surface->flags);
 
   if (res->format->palette)
     SDL_SetPalette(res, SDL_LOGPAL | SDL_PHYSPAL, surface->format->palette->colors, 0, surface->format->palette->ncolors);
@@ -601,3 +601,101 @@ void TDEC_flipy_image(SDL_Surface* surface)
 
   SDL_FreeSurface(s);
 }
+
+SDL_Surface* TDEC_create_heightmap(SDL_Surface *source)
+{
+  SDL_Color colors[256];
+  Uint16 i, j; 
+  Uint8 index;
+  SDL_Palette *p = source->format->palette;
+  SDL_Surface *s;
+
+  if (!p) /* not an 8-bit source surface */
+    return (SDL_Surface*)0;
+
+  /* copy palette */
+
+  for (i = 0; i < 256; ++i)
+      colors[i] = *(p->colors + i);
+
+  /* sort palette from dark to light colors using selection sort */
+
+  for (i = 0; i < 256; ++i)
+    {
+      SDL_Color *c = colors + i;
+      SDL_Color temp;
+      index = i;
+
+      for (j = i + 1; j < 256; ++j)
+	{
+	  SDL_Color *d = colors + j;
+	  Uint8 biggest = 0;
+
+	  /* what is the biggest value? */
+	  if (c->r >= c->g && c->r >= c->b)
+	    {
+	      /* r is biggest */
+	      biggest = c->r;
+	    }
+	  else if (c->g >= c->r && c->g >= c->b)
+	    {
+	      /* g is biggest */
+	      biggest = c->g;
+	    }
+	  else if (c->b >= c->r && c->b >= c->g)
+	    {
+	      /* b is biggest */
+	      biggest = c->b;
+	    }
+
+	  if (d->r <= biggest && d->g <= biggest && d->b <= biggest)
+	    {
+	      if (d->r == biggest || d->g == biggest || d->b == biggest)
+		{
+		  if (d->r + d->g + d->b < c->r + c->g + c->b)
+		    {
+		      /* found darker color */
+		      index = j;
+		      c = d;
+		    }
+		}
+	      else
+		{
+		  /* found darker color */
+		  index = j;
+		  c = d;
+		}
+	    }
+	}
+      if (index > i)
+	{
+	  temp = colors[i];
+	  colors[i] = colors[index];
+	  colors[index] = temp;
+	}
+    }
+
+  /* copy image and set black to white palette */
+
+  s = TDEC_copy_surface(source);
+
+  p = s->format->palette;
+
+  for (i = 0; i < 256; ++i)
+    {
+      for (j = 0; j < 256; ++j)
+	{
+	  SDL_Color* c = (p->colors + j);
+	  if (colors[i].r == c->r && colors[i].g == c->g && colors[i].b == c->b)
+	    {
+	      c->r = i;
+	      c->g = i;
+	      c->b = i;
+	      break;
+	    }
+	}
+    }
+
+  return s;
+}
+
