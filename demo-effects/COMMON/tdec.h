@@ -18,6 +18,7 @@ extern "C" {
 #include "utils.h"
 #include "layers.h"
 #include "scroller.h"
+#include "list.h"
 
 #ifdef __cplusplus
 }

@@ -18,6 +18,7 @@
 #define LAYERS_H
 
 #include "SDL/SDL.h"
+#include "list.h"
 
 #define NLAYERS 25
 #define TDEC_BACKGROUND_LAYER 0
@@ -28,8 +29,10 @@
 extern int TDEC_init_layer_system();
 extern int TDEC_exit_layer_system();
 
-extern char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, 
+extern char TDEC_add_effect_valist(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, 
 				   const char *module, void (*restart_callback)(void),  ...);
+extern char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha, 
+				   const char *module, void (*restart_callback)(void), TDEC_NODE *argument_list);
 extern SDL_Surface* TDEC_get_backgroundlayer(void);
 extern void TDEC_draw_layers(void);
 extern void TDEC_free_layers(void);

@@ -24,7 +24,8 @@
 
 typedef struct
 {
-  void (*init)(SDL_Surface *s, void (*restart)(void), va_list parameters);
+  void (*init_valist)(SDL_Surface *s, void (*restart)(void), va_list parameters);
+  void (*init)(SDL_Surface *s, void (*restart)(void), TDEC_NODE *argument_list);
   void (*draw)(void);
   void (*free)(void);
   Uint8 (*is_filter)(void);
@@ -81,7 +82,7 @@ SDL_Surface* TDEC_get_background_layer(void)
   return layers[TDEC_BACKGROUND_LAYER]->surface;
 }
 
-char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
+char TDEC_add_effect_valist(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
 			    const char *module, void (*restart_callback)(void), ...)
 {
   char res = -1;
@@ -101,12 +102,14 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
       return -1;
     }
   
-  effect->init = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect");
-  if (!effect->init)  
+  effect->init_valist = (void(*)(SDL_Surface*, void(*)(void), va_list))lt_dlsym(effect->effect_module, "init_effect_valist");
+  if (!effect->init_valist)  
     {
       fprintf (stderr, "%s\n", lt_dlerror());
       return -1;
     }
+
+  effect->init = (void(*)(SDL_Surface*, void(*)(void), TDEC_NODE *argument_list))0;
 
   effect->draw = (void(*)(void))lt_dlsym(effect->effect_module, "draw_effect");
   if (!effect->draw)  
@@ -188,7 +191,7 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
       va_start(parameters, restart_callback);
 
       /*init effects plugin */
-      (*effect->init)(l->surface, restart_callback, parameters);
+      (*effect->init_valist)(l->surface, restart_callback, parameters);
 
       va_end(parameters);
     }
@@ -223,10 +226,155 @@ char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, 
       va_start(parameters, restart_callback);
 	  
       /*init effects plugin */
-      (*effect->init)(background->surface, restart_callback, parameters);
+      (*effect->init_valist)(background->surface, restart_callback, parameters);
 
       va_end(parameters);
       
+      nlayers = 1;
+    }
+
+  return res;
+}
+
+char TDEC_add_effect(Uint16 width, Uint16 height, Uint16 xstart, Uint16 ystart, Uint8 alpha,
+			    const char *module, void (*restart_callback)(void), TDEC_NODE *argument_list)
+{
+  char res = -1;
+  EFFECT *effect;
+  Uint8 is_filter;
+
+  /* dynamically load effects-plugin, attach it to a layer and init it */
+
+  effect = (EFFECT*)malloc(sizeof(EFFECT));
+
+  effect->effect_module = lt_dlopenext(module);
+  if (!effect->effect_module)
+    {
+      printf("error, unable to load effects plugin %s\n", module);
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+  
+  effect->init = (void(*)(SDL_Surface*, void(*)(void), TDEC_NODE *argument_list))lt_dlsym(effect->effect_module, "init_effect");
+  if (!effect->init)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->init_valist = (void(*)(SDL_Surface*, void(*)(void), va_list))0;
+
+  effect->draw = (void(*)(void))lt_dlsym(effect->effect_module, "draw_effect");
+  if (!effect->draw)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->free = (void(*)(void))lt_dlsym(effect->effect_module, "free_effect");
+  if (!effect->free)  
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  effect->is_filter = (Uint8(*)(void))lt_dlsym(effect->effect_module,"is_filter");
+  if (!effect->is_filter)
+    {
+      fprintf (stderr, "%s\n", lt_dlerror());
+      return -1;
+    }
+
+  /* check if effects module is a filter by invoking its is_filter function and checking the result */
+
+  is_filter = (*effect->is_filter)();
+  
+  if (nlayers + 1 <= NLAYERS && nlayers != 0)
+    {
+      LAYER *l = (LAYER*)malloc(sizeof(LAYER));
+
+      if (is_filter == TDEC_NO_FILTER)
+	{
+	  SDL_Surface *s = SDL_CreateRGBSurface(screen->flags, width, height, screen->format->BitsPerPixel, 
+					    screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, 
+					    screen->format->Amask);
+ 
+	  l->surface = SDL_ConvertSurface(s, screen->format, screen->flags);
+
+	  /* set palette if any */
+	  if (l->surface->format->palette)
+	    {
+	      SDL_SetPalette(l->surface, SDL_LOGPAL | SDL_PHYSPAL, l->surface->format->palette->colors, 0, 
+			     l->surface->format->palette->ncolors);
+	    }
+	  
+	  /* set transparant pixel which is black */
+	  SDL_SetColorKey(l->surface, SDL_SRCCOLORKEY/* | SDL_RLEACCEL*/, SDL_MapRGBA(l->surface->format, 0, 0, 0, 0xFF)); 
+
+	  /* set surface alpha value if appropriate*/
+	  l->alpha = alpha;
+	  if (alpha != 0xFF)
+	    {
+	      SDL_SetAlpha(l->surface, SDL_SRCALPHA/* | SDL_RLEACCEL*/, alpha);
+	    }
+
+#ifdef DEBUG
+	  printf("Added layer %i\n", nlayers);
+#endif
+	  SDL_FreeSurface(s);
+	}
+      else
+	{
+	  /* effect is a filter, for instance a blur or a lens or a transition effect, so use background as surface */
+	  l->surface = TDEC_get_background_layer();
+	}
+      
+      /* set surface dimensions and position */
+      l->r.x = xstart;
+      l->r.y = ystart;
+      l->r.w = width;
+      l->r.h = height;
+      l->visible = 1;
+      layers[nlayers] = l;
+
+      res = nlayers;
+
+      layers[nlayers++]->effect = effect;
+
+      /*init effects plugin */
+      (*effect->init)(l->surface, restart_callback, argument_list);
+    }
+  else if (nlayers == 0)
+    {
+      LAYER *background;
+
+      /* first layer so init layering system, the first effect can also be a filter but we've got to create a background surface anyway */
+
+      /* check if video was set */
+      if (!screen)
+	{
+	  printf("error, video not set, call TDEC_set_video first please\n");
+	  return -1;
+	}
+
+      /* screen is the display buffer and therefore the background */
+  
+      background = (LAYER*)malloc(sizeof(LAYER));
+      background->surface = screen;
+      background->r.x = xstart;
+      background->r.y = ystart;
+      background->r.w = width;
+      background->r.h = height;
+      background->alpha = 0xFF;
+      background->visible = 1;
+      res = TDEC_BACKGROUND_LAYER;
+
+      background->effect = effect;
+      layers[TDEC_BACKGROUND_LAYER] = background;
+
+      /*init effects plugin */
+      (*effect->init)(background->surface, restart_callback, argument_list);
+
       nlayers = 1;
     }
 
