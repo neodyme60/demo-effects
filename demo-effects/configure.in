@@ -1,12 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(COPPERBARS/copper.c)
 
-AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.0.7)
+AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.0.8)
 
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
+AC_PROG_MAKE_SET
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread, pthread_exit, , [AC_MSG_ERROR([libpthread not found])],)
@@ -41,6 +42,21 @@ echo "The Equalizer effect will not be build "
 echo "run configure --enable-mikmod=yes to include mod support "
 fi
 
+AC_ARG_ENABLE(opengl,
+     [  --enable-opengl    Turn on 3D effects using opengl [default=yes]],
+     [case "${enableval}" in
+       yes) opengl=true ;;
+       no)  opengl=false ;;
+       *) AC_MSG_ERROR(bad value ${enableval} for --enable-opengl) ;;
+     esac],[opengl=true])
+AM_CONDITIONAL(OPENGL, test x$opengl = xtrue)
+
+if test x$opengl = xtrue; then
+AC_CHECK_LIB(GL, glPushMatrix, ,[AC_MSG_ERROR([libGL not found])],)
+AC_CHECK_LIB(GLU, gluLookAt, ,[AC_MSG_ERROR([libGLU not found])],)
+AC_CHECK_HEADERS(GL/gl.h GL/glu.h)
+fi
+
 AC_CHECK_LIB(m, abs, , [AC_MSG_ERROR([libm not found])],)
 
 dnl Checks for header files.
@@ -57,5 +73,6 @@ CFLAGS="$CFLAGS `sdl-config --cflags`"
 LIBS="$LIBS `sdl-config --libs`"
 
 AC_OUTPUT(Makefile STARFIELD/Makefile PLASMA/Makefile COPPERBARS/Makefile EXPLOSION/Makefile FIRE/Makefile CANDYBAR/Makefile 
-SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile ROTOZOOM/Makefile 
-EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile SPIRALTWIST/Makefile)
+SINUSSCROLLER/Makefile LENS/Makefile JUMPINGSCROLL/Makefile SHADEBOB/Makefile COMMON/Makefile BOBS/Makefile UNLIMITEDBOBS/Makefile 
+ROTOZOOM/Makefile EQUALIZER/Makefile CIRCLESCROLLER/Makefile SINEWAVE/Makefile FLIPIMAGE/Makefile WATER/Makefile DOOMMELT/Makefile 
+SPIRALTWIST/Makefile WPCG/Makefile)

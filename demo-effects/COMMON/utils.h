@@ -17,7 +17,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 /* copying */
 SDL_Surface* TDEC_copy_surface(SDL_Surface* surface);

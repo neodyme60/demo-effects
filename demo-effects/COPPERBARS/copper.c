@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include "tdec.h"
 
 static SDL_Color copper[46];

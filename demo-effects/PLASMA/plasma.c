@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include "tdec.h"
 
 static Uint16 pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, tpos1, tpos2, tpos3, tpos4;

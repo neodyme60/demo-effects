@@ -17,7 +17,7 @@
 #ifndef FPS_H
 #define FPS_H
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 static Uint32 Ticks = 0, Drawn_Frames = 0, next, now;
 static unsigned char fps = 40;

@@ -23,8 +23,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include "tdec.h"
 
 #define CHARACTER_WIDTH 16

@@ -21,7 +21,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include "tdec.h"
 
 static Uint8 shades[SCREEN_WIDTH * SCREEN_HEIGHT];

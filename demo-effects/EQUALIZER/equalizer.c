@@ -23,8 +23,6 @@
 #include <math.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include "mikmod.h"
 #include "tdec.h"
 

@@ -17,7 +17,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 360
