@@ -79,7 +79,14 @@ bool
 WP_Object::setAnimationCategory(const string &category) const
 {
   static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
-  ani->setCategory(this, category);
+  return ani->setCategory(this, category);
+}
+
+string
+WP_Object::getAnimationCategory() const
+{
+  static WP_AnimationManager *ani = WP_AnimationManager::getInstance();
+  return ani->getCategory(this);
 }
 
 //********************************************* WP_ObjectManager *******************************************************
@@ -521,36 +528,25 @@ void WP_ObjectManager::drawObjects()
 
 void WP_ObjectManager::drawObjectsSelection() 
 {
-  //FIXME adjust to new frustum culling by OPCODE
-
-  /*  glInitNames(); //init the name stack
+  glInitNames(); //init the name stack
 
   list<WP_StaticObject*>::const_iterator i = static_objects.begin();
   while (i != static_objects.end())
     {	
-      if (cam->inFrustum((*i)->matrix.data[12], (*i)->matrix.data[13],
-			 (*i)->matrix.data[14], (*i)->model->radius))
-	{
-	  glPushName((*i)->name_id);
-	  (*i)->drawOpenGL();
-	  glPopName();
-	}
+      glPushName((*i)->name_id);
+      (*i)->drawOpenGL();
+      glPopName();
       i++;
     }
 
   list<WP_DynamicObject*>::const_iterator j = dynamic_objects.begin();
   while (j != dynamic_objects.end())
     {	
-      if (cam->inFrustum((*j)->matrix.data[12], (*j)->matrix.data[13],
-			 (*j)->matrix.data[14], (*j)->model->radius))
-	{
-	  glPushName((*j)->name_id);
-	  (*j)->drawOpenGL();
-	  glPopName();
-	}
+      glPushName((*j)->name_id);
+      (*j)->drawOpenGL();
+      glPopName();
       j++;
     }
-  */
 }
 
 WP_Model* WP_ObjectManager::findInstance(const string& model_name) 
@@ -785,12 +781,6 @@ bool WP_ObjectManager::removeAll()
 
 WP_Object* WP_ObjectManager::pickObject(int x, int y)
 {
-  //FIXME there are some possibilities for performance improvement here
-  //first render only the objects which are in the new selection buffer viewing volume, so again frustum 
-  //culling
-  //Secondly, use object addresses for names, in this case it is not necessary to walk through the object
-  //lists to match the objects' name_id and the found name in the selection buffer
-
   GLuint selectBuf[512];
   WP_GLState* state = WP_GLState::getInstance();
   GLuint hits = 0;

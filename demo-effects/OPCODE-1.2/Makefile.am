@@ -1,3 +1,9 @@
+OPC_TreeCollider.o:
+	source='OPC_TreeCollider.cpp' object='OPC_TreeCollider.o' libtool=no \
+	depfile='$(DEPDIR)/OPC_TreeCollider.Po' tmpdepfile='$(DEPDIR)/OPC_TreeCollider.TPo' \
+	$(CXXDEPMODE) $(depcomp) \
+	$(CXXCOMPILE) -O1 -c -o OPC_TreeCollider.o `test -f 'OPC_TreeCollider.cpp' || echo '$(srcdir)/'`OPC_TreeCollider.cpp
+	
 noinst_LIBRARIES = libOPCODE.a
 libOPCODE_a_SOURCES = Opcode.cpp OPC_BVTCache.h     OPC_MemoryMacros.h     OPC_OptimizedTree.h      OPC_Ray.cpp  OPC_Triangle.h \
 	OPC_Collider.cpp   OPC_Model.cpp          OPC_Plane.cpp            OPC_Ray.h                OPC_TriBoxOverlap.h \

@@ -1,13 +1,18 @@
 AC_INIT(Opcode.h)
 
-AM_INIT_AUTOMAKE(OPCODE, 1.2)
+AM_INIT_AUTOMAKE(OPCODE, 1.2.1)
 
 dnl Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_RANLIB
 
-dnl Checks for libraries.
+AC_EGREP(version 3,
+      [
+	`gcc -v`
+      ],[sane_cv_use_libjpeg="yes";
+      AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+    ],)
 
 dnl Checks for header files.
 AC_HEADER_STDC

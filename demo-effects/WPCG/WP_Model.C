@@ -192,7 +192,6 @@ WP_AnimatedModel::finalizeAll()
 
   for (k = 0; k < numberFrames; ++k)
     {
-
       int i = 0;
       for (; i < numberVertices; ++i)
 	points[i].Set(frames[k].vertices[i].point.data);
@@ -603,7 +602,7 @@ bool WP_Model_MD2::initModel()
 
 	  WP_FrameCategory *frame_cat;
 
-	  //check if animation cateory already exist, if yes get it, if no create it	
+	  //check if animation category already exist, if yes get it, if no create it	
 	  if (categories.count(category))
 	    {
 	      // exists, so get it and increase total frames

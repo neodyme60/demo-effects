@@ -77,12 +77,14 @@ WP_AnimationManager::addObject(const WP_Object *object)
   
   //set model's first category as a default
   WP_AnimatedModel *model = dynamic_cast<WP_AnimatedModel*>(object->model);
-  
-  //create and add ObjectAnimationInfo
-  WP_ObjectAnimationInfo *info = new WP_ObjectAnimationInfo(model->getCategoryName(0));
-  object_info.insert(map<const WP_Object*, WP_ObjectAnimationInfo*>::value_type(object, info));
-  
-  return true;
+  if (model)
+    {
+      //create and add ObjectAnimationInfo
+      WP_ObjectAnimationInfo *info = new WP_ObjectAnimationInfo(model->getCategoryName(0));
+      object_info.insert(map<const WP_Object*, WP_ObjectAnimationInfo*>::value_type(object, info));
+      return true;
+    }
+  return false;
 }
 
 }

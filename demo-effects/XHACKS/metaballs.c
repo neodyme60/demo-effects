@@ -1,4 +1,4 @@
-/* The Blob, Copyright (c) 2002 W.P. van Paassen <peter@paassen.tmfweb.nl>
+/* MetaBalls, Copyright (c) 2002-2003 W.P. van Paassen <peter@paassen.tmfweb.nl>
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
@@ -8,10 +8,11 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *
- * Module - "blob.c"
+ * Module - "metaballs.c"
  *
- * [12/26/02] - W.P. van Paassen: Creation for the Demo Effects Collection (http://demo-effects.sourceforge.net)
+ * [01/24/03] - W.P. van Paassen: Additional features
  * [12/29/02] - W.P. van Paassen: Port to X for use with XScreenSaver, the shadebob hack by Shane Smit was used as a template
+ * [12/26/02] - W.P. van Paassen: Creation for the Demo Effects Collection (http://demo-effects.sourceforge.net)
  */
 
 #include <math.h>
@@ -20,17 +21,18 @@
 
 /*#define VERBOSE*/ 
 
-char *progclass = "The Blob";
+char *progclass = "Metaballs";
 
 char *defaults [] = {
   ".background: black",
   ".foreground: white",
   "*color:    random",
-  "*count:    20",
+  "*count:    10",
   "*cycles:   1000",
   "*ncolors:  256",
   "*delay:    5000",
-  "*radius:   40",
+  "*radius:   100",
+  "*delta:   3",
   0
 };
 
@@ -41,6 +43,7 @@ XrmOptionDescRec options [] = {
   { "-delay",   ".delay",   XrmoptionSepArg, 0 },
   { "-cycles",  ".cycles",  XrmoptionSepArg, 0 },
   { "-radius",  ".radius",  XrmoptionSepArg, 0 },
+  { "-delta",  ".delta",  XrmoptionSepArg, 0 },
   { 0, 0, 0, 0 }
 };
 
@@ -57,6 +60,7 @@ typedef struct
 
 static unsigned char nBlobCount;
 static unsigned char radius;
+static unsigned char delta;
 static unsigned char dradius;
 static unsigned short sradius;
 static unsigned char **blob;
@@ -83,41 +87,53 @@ static void Execute( Display *pDisplay,
 	/* move blobs */
 	for (i = 0; i < nBlobCount; i++)
 	{
-	  blobs[i].xpos += -2 + (int)(2.5 * (random()/(RAND_MAX+1.0)));
-	  blobs[i].ypos += -2 + (int)(2.5 * (random()/(RAND_MAX+1.0)));
+	  blobs[i].xpos += -delta + (int)((delta + .5f) * (random()/(RAND_MAX+1.0)));
+	  blobs[i].ypos += -delta + (int)((delta + .5f) * (random()/(RAND_MAX+1.0)));
 	}
 
 	/* draw blobs to blub array */
 	for (k = 0; k < nBlobCount; ++k)
 	  { 
-	    if (blobs[k].xpos > dradius && blobs[k].xpos < iWinWidth - dradius  * 2 &&
-		blobs[k].ypos > dradius && blobs[k].ypos < iWinHeight - dradius * 2)
+	    if (blobs[k].ypos > -dradius && blobs[k].xpos > -dradius && blobs[k].ypos < iWinHeight && blobs[k].xpos < iWinWidth)
 	      {
 		for (i = 0; i < dradius; ++i)
-		{
-		  for (j = 0; j < dradius; ++j)
 		  {
-		    if (blub[blobs[k].ypos + i][blobs[k].xpos + j] + blob[i][j] > iColorCount)
-		       blub[blobs[k].ypos + i][blobs[k].xpos + j] = iColorCount;
-		    else 
-		      blub[blobs[k].ypos + i][blobs[k].xpos + j] += blob[i][j];     
+		    if (blobs[k].ypos + i >= 0 && blobs[k].ypos + i < iWinHeight)
+		      {
+			for (j = 0; j < dradius; ++j)
+			  {
+			    if (blobs[k].xpos + j >= 0 && blobs[k].xpos + j < iWinWidth)
+			      {
+				if (blub[blobs[k].ypos + i][blobs[k].xpos + j] < iColorCount)
+				  {
+				    if (blub[blobs[k].ypos + i][blobs[k].xpos + j] + blob[i][j] > iColorCount)
+				      blub[blobs[k].ypos + i][blobs[k].xpos + j] = iColorCount;
+				    else 
+				      blub[blobs[k].ypos + i][blobs[k].xpos + j] += blob[i][j];     
+				  }
+			      }
+			  }
+		      }
 		  }
-		}
 	      }
 	    else
 	      init_blob(blobs + k);
 	  }
 
+	memset( pImage->data, 0, pImage->bytes_per_line * pImage->height);
+
 	/* draw blub array to screen */
-	for (i = dradius; i < iWinHeight - dradius; ++i)
+	for (i = 0; i < iWinHeight; ++i)
 	  {
-	    for (j = dradius; j < iWinWidth - dradius; ++j)
+	    for (j = 0; j < iWinWidth; ++j)
 	      {
-		XPutPixel( pImage, j, i, aiColorVals[blub[i][j]] );
+		if (aiColorVals[blub[i][j]] > 0)
+		  XPutPixel( pImage, j, i, aiColorVals[blub[i][j]] );
 	      }
 	  }
+
 	XPutImage( pDisplay, MainWindow, *pGC, pImage,
-		   dradius, dradius, dradius, dradius, iWinWidth - dradius * 2, iWinHeight - dradius * 2 );
+		   0, 0, 0, 0, iWinWidth, iWinHeight );
 	XSync( pDisplay, False );
 }
 
@@ -228,13 +244,22 @@ static void Initialize( Display *pDisplay, Window Win, GC *pGC, XImage **ppImage
 	/*  Get the base color. */
 	sColor = get_string_resource( "color", "Color" );
 
+	/*  Get the delta. */
+	delta = get_integer_resource( "delta", "Integer" );
+	if (delta < 1)
+	  delta = 1;
+	else if (delta > 20)
+	  delta = 20;
+	
 	/*  Get the radius. */
 	radius = get_integer_resource( "radius", "Integer" );
 	if (radius < 2)
 	  radius = 2;
-	if (radius > 60)
-	  radius = 60;
+	if (radius > 100)
+	  radius = 100;
 	
+	radius = (radius / 100.0) * (iWinHeight >> 3);
+
 	dradius = radius * 2;
 	sradius = radius * radius;
 
@@ -286,7 +311,7 @@ void screenhack(Display *pDisplay, Window Win )
 	int delay, cycles, i;
 
 	nBlobCount = get_integer_resource( "count", "Integer" );
-	if( nBlobCount > 120 ) nBlobCount = 120;
+	if( nBlobCount > 255 ) nBlobCount = 255;
 	if( nBlobCount <  2 ) nBlobCount = 2;
 
 	if( ( blobs = calloc( nBlobCount, sizeof(BLOB) ) ) == NULL )
@@ -354,7 +379,5 @@ void screenhack(Display *pDisplay, Window Win )
 }
 
 
-/* End of Module - "blob.c" */
+/* End of Module - "metaballs.c" */
 
-/* vim: ts=4
- */

@@ -164,6 +164,8 @@ class WP_Object
 
   bool setAnimationCategory(const string &category) const;
 
+  string getAnimationCategory() const;
+
   /**
    * this boolean indicates if the object was in the camera's viewing volume (frustum) the last time the scene was rendered
    */
@@ -530,8 +532,6 @@ public:
   void createCollisionPairs();
 
   void updateAll();
-
-  
 
 private:
   WP_ObjectManager();

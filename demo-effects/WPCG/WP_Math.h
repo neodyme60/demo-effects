@@ -59,35 +59,67 @@ public:
 	 * @param angle the angle in degrees
 	 * @return the angle in radians
 	 */
-	scalar degreeToRad(int angle) const;
+	scalar degreeToRad(int angle) const
+	  {
+	    return ((scalar)angle) * DEGRAD;
+	  }
 
 	/**
 	 * this function converts an angle in degrees to an angle in radians
 	 * @param angle the angle in degrees
 	 * @return the angle in radians
 	 */
-	scalar fDegreeToRad(scalar angle) const;
+	scalar fDegreeToRad(scalar angle) const
+	{
+	  return angle * DEGRAD;
+	}
 
 	/**
 	 * this functions converts an angle in radians to an angle in degrees
 	 * @param rad the angle in radians
 	 * @return the angle in degrees 
 	 */
-	int radToDegree(scalar rad) const;
+	int radToDegree(scalar rad) const
+	{
+	  int result = (int)(round(rad * RADDEG));
+  
+	  if (result < 0)
+	    {
+	      result %= 360;
+	      return result + 360;
+	    }
+  
+	  if (result >= 360)
+	    {
+	      result %= 360;
+	      return result - 360;
+	    }
+
+	  return result % 360;
+	}
 
 	/**
 	 * this functions converts an angle in radians to an angle in degrees
 	 * @param rad the angle in radians
 	 * @return the angle in degrees 
 	 */
-	scalar fRadToDegree(scalar rad) const;
+	scalar fRadToDegree(scalar rad) const
+	{
+	  return rad * RADDEG;
+	}
 
 	/**
 	 * this function rounds of scalars to whole numbers. for example 1.49 is rounded to 1.0 and 1.50 is rounded to 2.0
 	 * @param s the to be rounded scalar
 	 * @return the rounded scalar
 	 */
-	scalar round(scalar s) const;
+	scalar round(scalar s) const
+	{
+	  scalar f = (scalar)floor(s);
+	  if ((s - 0.5) < f)
+	    return f;
+	  return (scalar)ceil(s);
+	}
 
 	/**
 	 * this function returns the sin value of an angle in degrees

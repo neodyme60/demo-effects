@@ -29,10 +29,9 @@ WP_ObjectManager *manager;
 WP_DynamicObject *demon;
 WP_DynamicObject *weapon;
 scalar heading = 0.0;
-string *demoncategories;
+string *categories;
 unsigned short ncategories;
 short categoryindex = 0;
-string *weaponcategories;
 
 void quit( int code )
 {      
@@ -60,15 +59,15 @@ void handle_key_down( SDL_keysym* keysym )
       case SDLK_RIGHT:
 	categoryindex++;
 	categoryindex %= ncategories;
-	demon->setAnimationCategory(demoncategories[categoryindex]);
-	weapon->setAnimationCategory(weaponcategories[categoryindex]);
+	demon->setAnimationCategory(categories[categoryindex]);
+	weapon->setAnimationCategory(categories[categoryindex]);
         break;
       case SDLK_LEFT:
 	categoryindex--;
 	if (categoryindex < 0)
 	  categoryindex = ncategories - 1;
-	demon->setAnimationCategory(demoncategories[categoryindex]);
-	weapon->setAnimationCategory(weaponcategories[categoryindex]);
+	demon->setAnimationCategory(categories[categoryindex]);
+	weapon->setAnimationCategory(categories[categoryindex]);
         break;
       default:
         break;
@@ -123,7 +122,7 @@ void draw_screen( void )
   glLoadIdentity();
   glColor3f(0.0f, 1.0f, 0.0f);
 
-  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, "Animation sequence: " + demoncategories[categoryindex], 10,  SCREEN_HEIGHT - 20);
+  draw.vDrawString(GLUT_BITMAP_HELVETICA_18, "Animation sequence: " + categories[categoryindex], 10,  SCREEN_HEIGHT - 20);
   draw.vDrawString(GLUT_BITMAP_HELVETICA_18, "Use left or right arrow to change sequence", 10,  SCREEN_HEIGHT - 40);
   
   logo->drawToFrameBuffer();
@@ -225,13 +224,10 @@ int main( int argc, char* argv[] )
   demon = manager->createDynamicObject(WP_Matrix3D(), "Demon", "tris1.MD2"); 
   weapon = manager->createDynamicObject(WP_Matrix3D(), "Demon_Weapon", "weapon.MD2"); 
 
-  //get animation categories for demon (and demon's weapon) model
+  //get animation category for demon and weapon model (these have the same categories, not in the original demon and weapon models however, I changed this according to ID's standard)
 
-  ncategories = demon->getAnimationCategories(&demoncategories);
-  weapon->getAnimationCategories(&weaponcategories); 
+  ncategories = demon->getAnimationCategories(&categories);
 
-  //DUHH, the modeller of the demon model used different names for the frame categories of the weapon and the gun, now thats plain stupid, that's why I'm using two categories here. I bet ID's people didn't mess this up. 
-  
   /* time based demo loop */
   while( 1 ) 
     {

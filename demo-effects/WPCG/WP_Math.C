@@ -33,45 +33,4 @@ WP_Math::WP_Math()
     }
 }
 
-scalar WP_Math::round(scalar s) const
-{
-  scalar f = (scalar)floor(s);
-  if ((s - 0.5) < f)
-    return f;
-  return (scalar)ceil(s);
-}
-
-scalar WP_Math::degreeToRad(int angle) const
-{
-  return ((scalar)angle) * DEGRAD;
-}
-
-scalar WP_Math::fDegreeToRad(scalar angle) const
-{
-  return angle * DEGRAD;
-}
-	
-int WP_Math::radToDegree(scalar rad) const
-{
-  int result = (int)(round(rad * RADDEG));
-  
-  if (result < 0)
-    {
-      result %= 360;
-      return result + 360;
-    }
-  
-  if (result >= 360)
-    {
-      result %= 360;
-      return result - 360;
-    }
-
-  return result % 360;
-}
-
-scalar WP_Math::fRadToDegree(scalar rad) const
-{
-  return rad * RADDEG;
-}		
 }

@@ -70,33 +70,33 @@ public:
 	 * @param angleV the angle in degrees of rotation around <b>v</b>
 	 * @param angleN the angle in degrees of rotation around <b>n</b>
 	 */
-	void rotate(int angleU, int angleV, int angleN);
+	void rotate(scalar angleU, scalar angleV, scalar angleN);
 
 	/**
-	 * this function <i>pitches</i> the object. Pitch is an aviation term and the pitch of an airplane is the angle that its longitudinal axis (running from tail to nose and having direction <b>-n</b> makes with the horizontal plane
+	 * this function <i>pitches</i> the camera. Pitch is an aviation term and the pitch of an airplane is the angle that its longitudinal axis (running from tail to nose and having direction <b>-n</b> makes with the horizontal plane
 	 * @param the angle in degrees
 	 */
-	inline void pitch(int angle)
+	inline void pitch(scalar angle)
 	  {
-	    rotate(angle, 0, 0);
+	    rotate(angle, 0.0f, 0.0f);
 	  }
 
 	/**
-	 * this function <i>rolls</i> the object. Roll is an aviation term and an airplane rolls by rotating about its longitudinal axis (<b>n</b>. The roll is the amount of rotation relative to the horizontal plane.
+	 * this function <i>rolls</i> the camera. Roll is an aviation term and an airplane rolls by rotating about its longitudinal axis (<b>n</b>. The roll is the amount of rotation relative to the horizontal plane.
 	 * @param the angle in degrees
 	 */
-	inline void roll(int angle)
+	inline void roll(scalar angle)
 	  {
-	    rotate(0, 0, angle);
+	    rotate(0.0f, 0.0f, angle);
 	  }
 
 	/**
-	 * this function <i>yaws</i> the object. Yaw is an aviation term and it means changing the heading of the plane by rotating about <b>v</b>
+	 * this function <i>yaws</i> the camera. Yaw is an aviation term and it means changing the heading of the plane by rotating about <b>v</b>
 	 * @param the angle in degrees
 	 */
-	inline void yaw(int angle)
+	inline void yaw(scalar angle)
 	  {
-	    rotate(0, angle, 0);
+	    rotate(0.0f, angle, 0.0f);
 	  }
 
 	/**

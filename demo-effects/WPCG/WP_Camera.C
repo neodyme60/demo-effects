@@ -213,34 +213,34 @@ void WP_Camera::computeFrustum()
 }
 
 //first rotated around X(U), then Y(V) and finally Z(N)
-void WP_Camera::rotate(int angleU, int angleV, int angleN)
+void WP_Camera::rotate(scalar angleU, scalar angleV, scalar angleN)
 {
   WP_Vector3D temp;
   scalar cos;
   scalar sin;
   
-  if (angleU != 0)
+  if (angleU != 0.0f)
     {
-      cos = math->getCos(angleU);
-      sin = math->getSin(angleU);
+      cos = cosf(math->fDegreeToRad(angleU));
+      sin = sinf(math->fDegreeToRad(angleU));
       
       temp = v;
       v = (temp * cos) + (n * sin);
       n = (temp * -sin) + (n * cos);
     }
-  if (angleV != 0)
+  if (angleV != 0.0f)
     {
-      cos = math->getCos(angleV);
-      sin = math->getSin(angleV);
+      cos = cosf(math->fDegreeToRad(angleV));
+      sin = sinf(math->fDegreeToRad(angleV));
       
       temp = n;
       n = (temp * cos) + (u * sin);
       u = (temp * -sin) + (u * cos);
     }
-  if (angleN != 0)
+  if (angleN != 0.0f)
     {
-      cos = math->getCos(angleN);
-      sin = math->getSin(angleN);
+      cos = cosf(math->fDegreeToRad(angleN));
+      sin = sinf(math->fDegreeToRad(angleN));
       
       temp = u;
       u = (temp * cos) + (v * sin);
