@@ -1,0 +1,30 @@
+#ifndef WPCG_H
+#define WPCG_H
+
+#include "WP_Def.h"
+#include "WP_Color.h"
+#include "WP_GLState.h"
+#include "WP_Image.h"
+#include "WP_Init.h"
+#include "WP_Material.h"
+#include "WP_Math.h"
+#include "WP_Vector2D.h"
+#include "WP_Vector3D.h"
+#include "WP_Matrix2D.h"
+#include "WP_Matrix3D.h"
+#include "WP_Point2D.h"
+#include "WP_Point3D.h"
+#include "WP_Light.h"
+#include "WP_Line2D.h"
+#include "WP_Ray2D.h"
+#include "WP_Ray3D.h"
+#include "WP_Vertex.h"
+#include "WP_Triangle.h"
+#include "WP_2D.h"
+#include "WP_RGBA.h"
+#include "WP_Endian.h"
+#include "WP_SkyDome.h"
+#include "WP_Terrain.h"
+#include "WP_Quad.h"
+
+#endif
