@@ -6,4 +6,4 @@ endif
 
 tunnel_SOURCES = tunnel.C 
 tunnel_LDADD = ../COMMON/libTDEC.la ../WPCG/libWPCG.a ../OPCODE-1.2/libOPCODE.a
-INCLUDES= -I../COMMON/ -I../WPCG
+AM_CPPFLAGS= -I../COMMON/ -I../WPCG

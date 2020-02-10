@@ -6,4 +6,4 @@ endif
 
 equalizer_SOURCES = equalizer.c 
 equalizer_LDADD = ../COMMON/libTDEC.la
-INCLUDES= -I../COMMON
+AM_CPPFLAGS= -I../COMMON
