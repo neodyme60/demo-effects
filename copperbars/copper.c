@@ -35,11 +35,11 @@ void quit( int code )
    * mode and restore the previous video settings,
    * etc.
    */
-  
+
   SDL_Quit( );
 
   TDEC_print_fps();
-  
+
   /* Exit program. */
   exit( code );
 }
@@ -81,11 +81,11 @@ void init()
 {
   int i, centery = SCREEN_HEIGHT >> 1;
   float rad;
-  
+
   /*create sin lookup table */
   for (i = 0; i < 360; i++)
     {
-      rad =  (float)i * 0.0174532; 
+      rad =  (float)i * 0.0174532;
       aSin[i] = centery + (sin(rad) * 100.0);
     }
 
@@ -114,7 +114,7 @@ void init()
   copper[16].b = copper[16].g;
   copper[17].r = 0x44;
   copper[17].g = copper[17].r;
-  copper[17].b = copper[17].g;  
+  copper[17].b = copper[17].g;
   copper[18].r = 0x66;
   copper[18].g = copper[18].r;
   copper[18].b = copper[18].g;
@@ -172,11 +172,11 @@ void init()
   copper[43].b = 0x66;
   copper[44].b = 0x44;
   copper[45].b = 0x22;
-  
-  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, copper, 0, 46); 
+
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, copper, 0, 46);
 
  /*disable events */
-  
+
   for (i = 0; i < SDL_NUMEVENTS; ++i)
     {
       if (i != SDL_KEYDOWN && i != SDL_QUIT)
@@ -184,14 +184,14 @@ void init()
 	  SDL_EventState(i, SDL_IGNORE);
 	}
     }
-  
+
   SDL_ShowCursor(SDL_DISABLE);
 }
 
 void draw_copper(SDL_Rect* r, int add)
 {
   int i;
-  
+
   for (i = 0; i < 15; i++)
     {
       SDL_FillRect(screen, r, i + add);
@@ -201,8 +201,8 @@ void draw_copper(SDL_Rect* r, int add)
 
 int main( int argc, char* argv[] )
 {
-  Uint16 red = 96, red2 = 0, red3 = 88, red4 = 0, red5 = 80, red6 = 0, red7 = 72, red8 = 0, 
-    white = 64, white2 = 0, white3 = 56, white4 = 0, white5 = 48, white6 = 0, white7 = 40, white8 = 0, 
+  Uint16 red = 96, red2 = 0, red3 = 88, red4 = 0, red5 = 80, red6 = 0, red7 = 72, red8 = 0,
+    white = 64, white2 = 0, white3 = 56, white4 = 0, white5 = 48, white6 = 0, white7 = 40, white8 = 0,
     blue = 32, blue2 = 0, blue3 = 24, blue4 = 0, blue5 = 16, blue6 = 0, blue7 = 8, blue8 = 0;
 
   SDL_Rect drect, crect;
@@ -219,7 +219,7 @@ int main( int argc, char* argv[] )
  TDEC_init_timer();
 
  SDL_WM_SetCaption("Retro - Copperbars - ", "");
-  
+
  init();
 
   /* Lock the screen for direct access to the pixels */
@@ -228,13 +228,13 @@ int main( int argc, char* argv[] )
   drect.x = 0;
   drect.w = SCREEN_WIDTH;
   drect.h = 1;
-  
+
   crect.x = 0;
   crect.w = SCREEN_WIDTH;
   crect.h = 15;
 
   /* time based demo loop */
-  while( 1 ) 
+  while( 1 )
     {
       TDEC_new_time();
 
@@ -253,69 +253,69 @@ int main( int argc, char* argv[] )
       crect.y = white4;
       SDL_FillRect(screen, &crect, 0);
       crect.y = blue4;
-      SDL_FillRect(screen, &crect, 0);     
+      SDL_FillRect(screen, &crect, 0);
       crect.y = red6;
       SDL_FillRect(screen, &crect, 0);
       crect.y = white6;
       SDL_FillRect(screen, &crect, 0);
       crect.y = blue6;
-      SDL_FillRect(screen, &crect, 0);     
+      SDL_FillRect(screen, &crect, 0);
       crect.y = red8;
       SDL_FillRect(screen, &crect, 0);
       crect.y = white8;
       SDL_FillRect(screen, &crect, 0);
       crect.y = blue8;
-      SDL_FillRect(screen, &crect, 0);    
+      SDL_FillRect(screen, &crect, 0);
 
       /*draw copperbars back to front*/
-      
+
       drect.y = aSin[blue7];
       blue8 = drect.y;
       blue7 += 2;
       blue7 %= 360;
-	
+
       draw_copper(&drect, 31);
 
       drect.y = aSin[blue5];
       blue6 = drect.y;
       blue5 += 2;
       blue5 %= 360;
-	
+
       draw_copper(&drect, 31);
 
       drect.y = aSin[blue3];
       blue4 = drect.y;
       blue3 += 2;
       blue3 %= 360;
-	
+
       draw_copper(&drect, 31);
 
       drect.y = aSin[blue];
       blue2 = drect.y;
       blue += 2;
       blue %= 360;
-	
+
       draw_copper(&drect, 31);
 
       drect.y = aSin[white7];
       white8 = drect.y;
       white7 += 2;
       white7 %= 360;
-	
+
       draw_copper(&drect, 16);
 
       drect.y = aSin[white5];
       white6 = drect.y;
       white5 += 2;
       white5 %= 360;
-	
+
       draw_copper(&drect, 16);
 
       drect.y = aSin[white3];
       white4 = drect.y;
       white3 += 2;
       white3 %= 360;
-	
+
       draw_copper(&drect, 16);
 
       drect.y = aSin[white];
@@ -329,34 +329,34 @@ int main( int argc, char* argv[] )
       red8 = drect.y;
       red7 += 2;
       red7 %= 360;
-	
+
       draw_copper(&drect, 1);
 
       drect.y = aSin[red5];
       red6 = drect.y;
       red5 += 2;
       red5 %= 360;
-	
+
       draw_copper(&drect, 1);
 
       drect.y = aSin[red3];
       red4 = drect.y;
       red3 += 2;
       red3 %= 360;
-	
+
       draw_copper(&drect, 1);
-	
+
       drect.y = aSin[red];
       red2 = drect.y;
       red += 2;
       red %= 360;
-	
+
       draw_copper(&drect, 1);
-      
+
       if (TDEC_fps_ok())
 	SDL_UpdateRect(screen, 0, (SCREEN_HEIGHT >> 1) - 100, SCREEN_WIDTH, 220);
     }
-  
+
   return 0; /* never reached */
 }
 
