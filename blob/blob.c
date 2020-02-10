@@ -35,7 +35,7 @@ static SDL_Color colors[256];
 Uint8 blob[BLOB_DRADIUS][BLOB_DRADIUS];
 
 /*blob structure*/
-typedef struct 
+typedef struct
 {
   short xpos,ypos;
 } BLOB;
@@ -49,11 +49,11 @@ void quit( int code )
    * mode and restore the previous video settings,
    * etc.
    */
-  
+
   SDL_Quit( );
 
   TDEC_print_fps();
-  
+
   /* Exit program. */
   exit( code );
 }
@@ -74,7 +74,7 @@ void handle_key_down( SDL_keysym* keysym )
         quit( 0 );
         break;
       case SDLK_SPACE:
-	
+
 	/* reinit blobs,  generate them in the center of the screen */
 
 	for (i = 0; i < NUMBER_OF_BLOBS; i++)
@@ -115,15 +115,15 @@ void init()
   float fraction;
 
   /* create a suitable palette, this is crucial for a good effect */
-  
+
   for (i = 0; i < 256; ++i)
     {
       colors[i].r = i;
       colors[i].g = i;
       colors[i].b = i;
-    } 
- 
-  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256); 
+    }
+
+  SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 
 
   /* create blob */
@@ -134,13 +134,13 @@ void init()
 	  distance_squared = i * i + j * j;
 	  if (distance_squared <= BLOB_SRADIUS)
 	    {
-	      /* compute density */     
+	      /* compute density */
 	      fraction = (float)distance_squared / (float)BLOB_SRADIUS;
 	      blob[i + BLOB_RADIUS][j + BLOB_RADIUS] = pow((1.0 - (fraction * fraction)),4.0) * 255.0;
 	    }
 	  else
 	    blob[i + BLOB_RADIUS][j + BLOB_RADIUS] = 0;
-	}    
+	}
     }
 
   for (i = 0; i < NUMBER_OF_BLOBS; i++)
@@ -157,7 +157,7 @@ void init()
 	  SDL_EventState(i, SDL_IGNORE);
 	}
     }
-  
+
   SDL_ShowCursor(SDL_DISABLE);
 }
 
@@ -165,24 +165,24 @@ int main( int argc, char* argv[] )
 {
   Uint8* image;
   Uint32 start;
-  int i, j; 
+  int i, j;
   Uint8 k;
 
   printf("\nPress Space to reinit the blobs!!\n");
-  
+
   if (argc > 1)
     {
       printf("Retro Blob - W.P. van Paassen - 2002\n");
       return -1;
     }
-  
+
   if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF /*| SDL_FULLSCREEN*/))
     quit(1);
 
   TDEC_init_timer();
-  
+
   SDL_WM_SetCaption("Retro Blob ", "");
-  
+
   init();
 
   /* Lock the screen for direct access to the pixels */
@@ -193,12 +193,12 @@ int main( int argc, char* argv[] )
   image = (Uint8*)screen->pixels;
 
   /* time based demo loop */
-  while( 1 ) 
+  while( 1 )
     {
       TDEC_new_time();
 
       process_events();
-      
+
       memset(image, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint8));
 
       /* move and draw blobs to screen */
@@ -210,30 +210,30 @@ int main( int argc, char* argv[] )
 	}
 
       for (k = 0; k < NUMBER_OF_BLOBS; ++k)
-	{ 
+	{
 	  if (blobs[k].xpos > 0 && blobs[k].xpos < SCREEN_WIDTH - BLOB_DRADIUS &&
 	      blobs[k].ypos > 0 && blobs[k].ypos < SCREEN_HEIGHT - BLOB_DRADIUS)
 	      {
-		start = blobs[k].xpos + blobs[k].ypos * SCREEN_WIDTH; 
+		start = blobs[k].xpos + blobs[k].ypos * SCREEN_WIDTH;
 		for (i = 0; i < BLOB_DRADIUS; ++i)
 		{
 		  for (j = 0; j < BLOB_DRADIUS; ++j)
 		  {
 		    if (image[start + j] + blob[i][j] > 255)
 		    image[start + j] = 255;
-		    else 
-		    image[start + j] += blob[i][j];     
+		    else
+		    image[start + j] += blob[i][j];
 		  }
 		  start += SCREEN_WIDTH;
 		}
 	      }
 	  else
 	    init_blob(blobs + k);
-	}   
-      
+	}
+
       if (TDEC_fps_ok())
 	SDL_Flip(screen);
     }
-  
+
   return 0; /* never reached */
 }
