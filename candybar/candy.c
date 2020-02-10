@@ -34,13 +34,13 @@ void quit( int code )
    * mode and restore the previous video settings,
    * etc.
    */
-  
+
   SDL_FreeSurface(copper_surface);
 
   SDL_Quit( );
 
   TDEC_print_fps();
-  
+
   /* Exit program. */
   exit( code );
 }
@@ -86,7 +86,7 @@ void init()
   SDL_Rect r = {0, 0, SCREEN_WIDTH, 16};
 
   /*disable events */
-  
+
   for (i = 0; i < SDL_NUMEVENTS; ++i)
     {
       if (i != SDL_KEYDOWN && i != SDL_QUIT)
@@ -94,15 +94,15 @@ void init()
 	  SDL_EventState(i, SDL_IGNORE);
 	}
     }
-  
+
   SDL_ShowCursor(SDL_DISABLE);
 
   /* create palette */
-  
+
   for (i = 0; i < 128; ++i)
     {
       colors[i].r = i << 1;
-      colors[i].g = 0; 
+      colors[i].g = 0;
       colors[i].b = 0;
       colors[i + 128].r = 0xFF - (i << 1);
       colors[i + 128].g = 0xFF - (i << 1);
@@ -111,14 +111,14 @@ void init()
 
   SDL_SetPalette(screen, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
 
-  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8, r_mask, g_mask, b_mask, a_mask); 
-  
+  s = SDL_CreateRGBSurface(SDL_HWSURFACE, SCREEN_WIDTH, 128, 8, r_mask, g_mask, b_mask, a_mask);
+
   copper_surface = SDL_DisplayFormat(s);
-  
+
   SDL_FreeSurface(s);
 
   /* create candybar */
-  
+
   SDL_FillRect(copper_surface, &r, SDL_MapRGB(copper_surface->format, 0xFF, 0, 0));
   r.y += 16;
   SDL_FillRect(copper_surface, &r, SDL_MapRGB(copper_surface->format, 0xFF, 0xFF, 0xFF));
@@ -145,7 +145,7 @@ int main( int argc, char* argv[] )
   SDL_Rect crect3 = {0, 127, SCREEN_WIDTH, 1};
   SDL_Rect crect4 = {0, (SCREEN_HEIGHT >> 1) - 64, SCREEN_WIDTH, 1};
   SDL_Color col;
- 
+
   if (argc > 1)
     {
       printf("Retro Amiga Candybar - W.P. van Paassen - 2002\n");
@@ -154,18 +154,18 @@ int main( int argc, char* argv[] )
 
   if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_HWSURFACE | SDL_HWPALETTE /*| SDL_FULLSCREEN*/))
    quit(1);
-  
+
   TDEC_init_timer();
-  
+
   SDL_WM_SetCaption("Retro - Amiga Candybar - ", "");
-  
+
   init();
 
   /* Lock the screen for direct access to the pixels */
   SDL_LockSurface(screen);
 
   /* time based demo loop */
-  while( 1 ) 
+  while( 1 )
     {
       TDEC_new_time();
 
@@ -180,12 +180,12 @@ int main( int argc, char* argv[] )
       /*shade candy*/
 
       pitch = 0;
- 
+
       for (i = 0; i < 128; ++i)
 	{
 	  temp = *((Uint8*)copper_surface->pixels + pitch);
 	  SDL_GetRGB(temp, screen->format, &col.r, &col.g, &col.b);
-	  
+
 	  if (i < 64)
 	    {
 	      col.r &= i << 2;
@@ -196,7 +196,7 @@ int main( int argc, char* argv[] )
 	    {
 	      col.r &= 0xFF - (i << 2);
 	      col.b &= 0xFF - (i << 2);
-	      col.g &= 0xFF - (i << 2);	    
+	      col.g &= 0xFF - (i << 2);
 	    }
 	  temp = SDL_MapRGB(screen->format, col.r, col.g, col.b);
 	  SDL_FillRect(screen, &crect4, temp);
@@ -209,7 +209,7 @@ int main( int argc, char* argv[] )
       if (TDEC_fps_ok())
 	SDL_UpdateRect(screen, 0, crect4.y, SCREEN_WIDTH, 128);
     }
-  
+
   return 0; /* never reached */
 }
 
