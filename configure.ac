@@ -1,5 +1,4 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(Makefile.am)
 #
 AC_CANONICAL_SYSTEM
 AC_ARG_PROGRAM
@@ -8,7 +7,9 @@ THE_DEMO_EFFECTS_COLLECTION_VERSION=0.7
 
 AC_PREFIX_DEFAULT("/usr/local/tdec")
 
-AM_INIT_AUTOMAKE(The_Demo_Effects_Collection, 0.7)
+AC_INIT(The_Demo_Effects_Collection, 0.7)
+AC_CONFIG_SRCDIR(Makefile.am)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 AC_CONFIG_SUBDIRS(libltdl)
