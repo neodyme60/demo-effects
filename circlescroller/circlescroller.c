@@ -43,11 +43,11 @@ static char characters[] = " !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRST
 static char* text_pointer = text;
 static Uint16 x_move = 0, y_move = 0;
 
-typedef struct 
+typedef struct
 {
   Uint16 sin_index;
   Uint16 font_pos;
-} LETTER; 
+} LETTER;
 
 LETTER letters[NLETTERS];
 
@@ -58,13 +58,13 @@ void quit( int code )
    * mode and restore the previous video settings,
    * etc.
    */
-  
+
   SDL_FreeSurface(font_surface);
 
   SDL_Quit( );
 
   TDEC_print_fps();
-  
+
   /* Exit program. */
   exit( code );
 }
@@ -125,10 +125,10 @@ Uint16 compute_font_pos(char scroll_char)
   return 0;
 }
 
-Uint16 init_character(void) 
+Uint16 init_character(void)
 {
   /* determine font character according to position in scroll text */
-  
+
   return compute_font_pos(*text_pointer++);
 }
 
@@ -155,8 +155,8 @@ void init()
     }
 
   /* load font */
-  
-  font_surface = IMG_Load("../GFX/font.pcx");
+
+  font_surface = IMG_Load("../gfx/font.pcx");
 
   SDL_SetColorKey(font_surface, SDL_SRCCOLORKEY, SDL_MapRGB(screen->format, 0x00, 0x00, 0x00));
 
@@ -165,7 +165,7 @@ void init()
     {
       letters[i].sin_index = 0;
     }
-  
+
   /*disable events */
 
   for (i = 0; i < SDL_NUMEVENTS; ++i)
@@ -184,25 +184,25 @@ int main( int argc, char* argv[] )
   int i, displacement = 0;
   SDL_Rect frect = {0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT};
   SDL_Rect srect = {0, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT};
-  
+
   if (argc > 1)
     {
       printf("Retro Circle Scroller - W.P. van Paassen - 2002\n");
       return -1;
     }
 
-  if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /*| 
+  if (!TDEC_set_video(SCREEN_WIDTH, SCREEN_HEIGHT, 8, SDL_DOUBLEBUF | SDL_HWACCEL | SDL_HWSURFACE | SDL_HWPALETTE /*|
 SDL_FULLSCREEN*/))
    quit(1);
-  
+
   TDEC_init_timer();
 
   SDL_WM_SetCaption("Retro - Circle Scroller - ", "");
-  
+
   init();
 
   /* time based demo loop */
-  while( 1 ) 
+  while( 1 )
     {
       TDEC_new_time();
 
@@ -233,7 +233,7 @@ SDL_FULLSCREEN*/))
       /* clear screen */
 
       SDL_FillRect(screen, 0, 0);
-  
+
       /* update letter positions */
 
       for (i = NLETTERS - 1; i >= 0; --i)
@@ -241,7 +241,7 @@ SDL_FULLSCREEN*/))
 	  if (letters[i].sin_index > 0)
 	      {
 		/* blit letter to screen */
-		
+
 		frect.x = letters[i].font_pos - 1;
 		srect.x = aCos[letters[i].sin_index] + Movement[x_move];
 		srect.y = aSin[letters[i].sin_index] + Movement[y_move];
@@ -251,7 +251,7 @@ SDL_FULLSCREEN*/))
 		  srect.x = RIGHTBORDER;
 		else if (srect.x < 0)
 		  srect.x = 0;
-		
+
 		if (srect.y > BOTTOMBORDER)
 		  srect.y = BOTTOMBORDER;
 		else if (srect.y < 0)
@@ -279,6 +279,6 @@ SDL_FULLSCREEN*/))
 	SDL_Flip(screen);
 	}
     }
-  
+
   return 0; /* never reached */
 }
